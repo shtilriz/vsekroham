@@ -1,0 +1,1 @@
+<strong>Свяжитесь с нами:</strong><span class="phone">+7 (499) 372-04-83</span><span class="phone">8 (800) 775-35-48</span>

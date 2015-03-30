@@ -1,0 +1,1 @@
+<img src="/bitrix/templates/main/images/logo.png" alt="Все для крохи"/><span>Все для крохи</span>

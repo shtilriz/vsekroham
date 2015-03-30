@@ -1,0 +1,6 @@
+<?
+$sSectionName = "Логи";
+$arDirProperties = Array(
+
+);
+?>

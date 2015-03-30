@@ -1,0 +1,10 @@
+<?
+$PERM["bitrix"]["7"]="R";
+$PERM["bitrix"]["5"]="R";
+$PERM["dev"]["2"]="D";
+$PERM["dev"]["3"]="D";
+$PERM["dev"]["4"]="D";
+$PERM["/"]["5"]="W";
+$PERM["/"]["*"]="R";
+$PERM["desktop_app"]["*"]="R";
+?>
