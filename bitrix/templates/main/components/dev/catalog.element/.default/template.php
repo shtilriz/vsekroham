@@ -83,8 +83,8 @@ $this->setFrameMode(true);?>
 				<?endif;?>
 
 				<?if ($arResult["PROPERTIES"]["AVAILABLE"]["VALUE"] == "Y"):?>
-					<div class="form-field">
 					<?if (!empty($arResult["THIS_SKU_PROPS"]["COLOR"]["VALUES"])):?>
+					<div class="form-field">
 						<div class="form-field__select">
 							<select class="form-select select_type_color" data-placeholder="Выберите цвет" name="COLOR">
 								<?/*<option value=""></option>*/?>
@@ -102,6 +102,7 @@ $this->setFrameMode(true);?>
 								}?>
 							</select>
 						</div>
+					</div>
 					<?endif;?>
 
 					<?if (!empty($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"])):?>
@@ -129,7 +130,14 @@ $this->setFrameMode(true);?>
 							</select>
 						</div>*/?>
 					<?endif;?>
-					</div>
+
+					<?if (empty($arResult["OFFERS"]) && $arResult["PROPERTIES"]["SIZE"]["VALUE"]):?>
+						<div class="form-field">
+							<div class="product-size-ch">
+								<input type='radio' id='size-ch' name='SIZE' value='' class='radiobox-styled1' checked/><label for='size-ch'><?=$arResult["PROPERTIES"]["SIZE"]["VALUE"]?></label>
+							</div>
+						</div>
+					<?endif;?>
 				<?endif;?>
 			</div>
 			<div class="item__info-btm item-box" itemprop="offers" itemscope itemtype="http://schema.org/Offer">

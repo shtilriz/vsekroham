@@ -230,6 +230,15 @@ if (isset($_REQUEST[$arParams["ACTION_VARIABLE"]]) && isset($_REQUEST[$arParams[
 								$successfulAdd  = false;
 							}
 						}
+						$db_props = CIBlockElement::GetProperty($intProductIBlockID, $productID, array(), array("CODE"=>"SIZE"));
+						if ($ar_props = $db_props->Fetch()) {
+							$product_properties[] = array(
+								"NAME" => $ar_props["NAME"],
+								"CODE" => $ar_props["CODE"],
+								"VALUE" => $ar_props["VALUE"],
+								"SORT" => 100
+							);
+						}
 					}
 					else
 					{
