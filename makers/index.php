@@ -96,6 +96,51 @@ $APPLICATION->SetTitle("Каталог по производителям");
 					"MAKER" => $arRes["PROPERTY_MAKER_VALUE"],
 					"IPROPERTY_VALUES" => $arPropValues
 				);
+				//В случае, если у производителя только d одном подразделе есть товары, добавлять каноническую ссылку на вышележащий раздел
+				$arReturn["CANONICAL"] = false;
+				if ($arReturn["SECTION_ID"] && $arReturn["MAKER"]) {
+					$rsChain = CIblockSection::GetNavChain(false, $arReturn["SECTION_ID"], array("ID"));
+					$arSectIDs = array();
+					while ($arSectPath = $rsChain->GetNext()) {
+						if ($arSectPath["ID"] == $arReturn["SECTION_ID"])
+							continue;
+						$rsTemp = CIBlockElement::GetList(
+							array(),
+							array(
+								"IBLOCK_ID" => IBLOCK_PRODUCT_ID,
+								"ACTIVE" => "Y",
+								"SECTION_ID" => $arSectPath["ID"],
+								"INCLUDE_SUBSECTIONS" => "Y",
+								"PROPERTY_MAKER" => $arReturn["MAKER"]
+							),
+							false,
+							false,
+							array("IBLOCK_SECTION_ID")
+						);
+						while ($arTemp = $rsTemp->GetNext()) {
+							if (!in_array($arTemp["IBLOCK_SECTION_ID"], $arSectIDs))
+								$arSectIDs[] = $arTemp["IBLOCK_SECTION_ID"];
+						}
+						$arReturn["CANONICAL"] = (count($arSectIDs)==1);
+						//если нужно выводить каноническу ссылку, то получаем её
+						if ($arReturn["CANONICAL"]) {
+							$rsParent = CIBlockElement::GetList(
+								array(),
+								array(
+									"IBLOCK_ID" => $arRes["IBLOCK_ID"],
+									"ACTIVE" => "Y",
+									"PROPERTY_SECTION_ID" => $arSectPath["ID"],
+									"PROPERTY_MAKER" => $arReturn["MAKER"]
+								),
+								false,
+								false,
+								array("IBLOCK_ID", "DETAIL_PAGE_URL")
+							);
+							if ($arParent = $rsParent->GetNext())
+								$arReturn["CANONICAL_LINK"] = $arParent["DETAIL_PAGE_URL"];
+						}
+					}
+				}
 			}
 		}
 		$obCache->EndDataCache(array("arReturn" => $arReturn));
@@ -163,6 +208,9 @@ $APPLICATION->SetTitle("Каталог по производителям");
 		}
 		else {
 			$APPLICATION->SetPageProperty("textdescription", "&nbsp;");
+		}
+		if ($arReturn["CANONICAL"] && strlen($arReturn["CANONICAL_LINK"]) > 0) {
+			$APPLICATION->AddViewContent("Canonical", '<link rel="canonical" href="http://'.$_SERVER["SERVER_NAME"].$arReturn["CANONICAL_LINK"].'"/>');
 		}
 		?>
 		<script type="text/javascript">

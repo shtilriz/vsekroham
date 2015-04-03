@@ -19,8 +19,8 @@
 	<?endif?>
 
 	<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/libs/jquery.min.js"></script>
-	<!-- <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/libs/modernizr.min.js"></script> -->
-	<!-- <script type="text/javascript" src="//code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script> -->
+	<?/*<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/libs/modernizr.min.js"></script>
+	<script type="text/javascript" src="//code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>*/?>
 	<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery-ui.min.js"></script>
 	<!--[if lt IE 9]>
 		<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/libs/html5shiv.js"></script>
@@ -59,6 +59,7 @@
 	<?if ($_SERVER["HTTPS"]=="on"):?>
 		<link rel="canonical" href="http://<?=$_SERVER["SERVER_NAME"].GetPagePath(false, false);?>"/>
 	<?endif;?>
+	<?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowViewContent("Canonical"));?>
 </head>
 <body>
 <?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowPanel());?>
