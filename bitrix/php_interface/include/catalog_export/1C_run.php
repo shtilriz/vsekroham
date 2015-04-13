@@ -25,7 +25,7 @@ if ($USER->IsAuthorized())
 	CCatalogDiscountCoupon::ClearCouponsByManage($USER->GetID());
 }
 
-$arYandexFields = array('vendor', 'vendorCode', 'model', 'author', 'name', 'publisher', 'series', 'year', 'ISBN', 'volume', 'part', 'language', 'binding', 'page_extent', 'table_of_contents', 'performed_by', 'performance_type', 'storage', 'format', 'recording_length', 'artist', 'title', 'year', 'media', 'starring', 'director', 'originalName', 'country', 'aliases', 'description', 'sales_notes', 'promo', 'provider', 'tarifplan', 'xCategory', 'additional', 'worldRegion', 'region', 'days', 'dataTour', 'hotel_stars', 'room', 'meal', 'included', 'transport', 'price_min', 'price_max', 'options', 'manufacturer_warranty', 'country_of_origin', 'downloadable', 'param', 'place', 'hall', 'hall_part', 'is_premiere', 'is_kids', 'date',);
+$arYandexFields = array('vendor', 'vendorCode', 'model', 'author', 'name', 'publisher', 'series', 'year', 'ISBN', 'volume', 'part', 'language', 'binding', 'page_extent', 'table_of_contents', 'performed_by', 'performance_type', 'storage', 'format', 'recording_length', 'artist', 'title', 'year', 'media', 'starring', 'director', 'originalName', 'country', 'aliases', 'sales_notes', 'promo', 'provider', 'tarifplan', 'xCategory', 'additional', 'worldRegion', 'region', 'days', 'dataTour', 'hotel_stars', 'room', 'meal', 'included', 'transport', 'price_min', 'price_max', 'options', 'manufacturer_warranty', 'country_of_origin', 'downloadable', 'param', 'place', 'hall', 'hall_part', 'is_premiere', 'is_kids', 'date',);
 
 if (!function_exists("yandex_replace_special"))
 {
@@ -538,7 +538,7 @@ if (empty($arRunErrors))
 	} */
 }
 
-if (empty($arRunErrors))
+/*if (empty($arRunErrors))
 {
 	CheckDirPath($_SERVER["DOCUMENT_ROOT"].$SETUP_FILE_NAME);
 
@@ -561,12 +561,12 @@ if (empty($arRunErrors))
 			fwrite($fp, '<? $strReferer2 = htmlspecialchars($_GET["referer2"]); ?>');
 		}
 	}
-}
+}*/
 
 if (empty($arRunErrors))
 {
-	@fwrite($fp, '<? header("Content-Type: text/xml; charset=windows-1251");?>');
-	@fwrite($fp, '<? echo "<"."?xml version=\"1.0\" encoding=\"windows-1251\"?".">"?>');
+	$fp = @fopen($_SERVER["DOCUMENT_ROOT"].$SETUP_FILE_NAME, "wb");
+	@fwrite($fp, "<?xml version=\"1.0\" encoding=\"windows-1251\"?>");
 	@fwrite($fp, "\n<!DOCTYPE yml_catalog SYSTEM \"shops.dtd\">\n");
 	@fwrite($fp, "<yml_catalog date=\"".Date("Y-m-d H:i")."\">\n");
 	@fwrite($fp, "<shop>\n");
@@ -865,7 +865,7 @@ if (empty($arRunErrors))
 				$str_TYPE = '';
 
 			$strTmpOff.= "<offer id=\"".$arAcc["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
-			$strTmpOff.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arAcc["~DETAIL_PAGE_URL"]).(strstr($arAcc['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
+			$strTmpOff.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arAcc["~DETAIL_PAGE_URL"])."</url>\n";
 
 			$strTmpOff.= "<price>".$minPrice."</price>\n";
 			$strTmpOff.= "<currencyId>".$minPriceCurrency."</currencyId>\n";
@@ -984,7 +984,12 @@ if (empty($arRunErrors))
 	elseif ('P' == $arCatalog['CATALOG_TYPE'] || 'X' == $arCatalog['CATALOG_TYPE'])
 	{
 		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
-		$arOfferFilter = array('IBLOCK_ID' => $intOfferIBlockID, 'PROPERTY_'.$arOffers['SKU_PROPERTY_ID'] => 0, "ACTIVE" => "Y", "ACTIVE_DATE" => "Y");
+		$arOfferFilter = array(
+			'IBLOCK_ID' => $intOfferIBlockID,
+			'PROPERTY_'.$arOffers['SKU_PROPERTY_ID'] => 0,
+			//"ACTIVE" => "Y",
+			//"ACTIVE_DATE" => "Y"
+		);
 		if (YANDEX_SKU_EXPORT_PROP == $arSKUExport['SKU_EXPORT_COND'])
 		{
 			$strExportKey = '';
@@ -1282,8 +1287,8 @@ if (empty($arRunErrors))
 					$arOfferItem['YANDEX_TYPE'] = $str_TYPE;
 
 					$strOfferYandex = '';
-					$strOfferYandex .= "<offer id=\"".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
-					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
+					$strOfferYandex .= "<offer id=\"".$arItem["ID"]."-".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
+					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"])."</url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
 					$strOfferYandex .= "<currencyId>".$minPriceCurrency."</currencyId>\n";
@@ -1529,7 +1534,7 @@ if (empty($arRunErrors))
 
 					$strOfferYandex = '';
 					$strOfferYandex .= "<offer id=\"".$arItem["ID"]."-".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
-					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
+					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"])."</url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
 					$strOfferYandex .= "<currencyId>".$minPriceCurrency."</currencyId>\n";
@@ -1776,7 +1781,7 @@ if (empty($arRunErrors))
 
 				$strOfferYandex = '';
 				$strOfferYandex.= "<offer id=\"".$arItem["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
-				$strOfferYandex.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arItem["~DETAIL_PAGE_URL"]).(strstr($arItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
+				$strOfferYandex.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arItem["~DETAIL_PAGE_URL"])."</url>\n";
 
 				$strOfferYandex.= "<price>".$minPrice."</price>\n";
 				$strOfferYandex.= "<currencyId>".$minPriceCurrency."</currencyId>\n";
