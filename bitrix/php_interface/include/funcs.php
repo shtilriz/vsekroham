@@ -110,7 +110,8 @@ function getSummBasket () {
 			array(
 				"FUSER_ID" => CSaleBasket::GetBasketUserID(),
 				"LID" => SITE_ID,
-				"ORDER_ID" => "NULL"
+				"ORDER_ID" => "NULL",
+				"CAN_BUY" => "Y"
 			),
 			false,
 			false,
@@ -272,5 +273,43 @@ function user_browser() {
 function _substr($text, $length) {
 	$length = strripos(substr($text, 0, $length), '.');
 	return substr($text, 0, $length);
+}
+
+function payKeeperGetInvoice ($arOrder) {
+	if ($ch_token = curl_init("http://vsekroham.server.paykeeper.ru/info/settings/token/")) {
+		curl_setopt($ch_token, CURLOPT_HEADER, false);
+		curl_setopt($ch_token, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch_token, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		curl_setopt($ch_token, CURLOPT_USERPWD, "user_api:vli8IH3L8I");
+		$return = curl_exec($ch_token);
+		curl_close($ch_token);
+		$arReturn = json_decode($return, true);
+
+		if (strlen($arReturn["token"])) {
+			$ch = curl_init("http://vsekroham.server.paykeeper.ru/change/invoice/preview/");
+			curl_setopt($ch, CURLOPT_HEADER, false);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt ($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+			curl_setopt($ch, CURLOPT_USERPWD, "user_api:vli8IH3L8I");
+			curl_setopt($ch, CURLOPT_POSTFIELDS, array(
+				"pay_amount" => $arOrder["PRICE"],
+				"clientid" => $arOrder["USER_ID"],
+				"orderid" => $arOrder["ID"],
+				"service_name" => "Оплата заказа",
+				"client_phone" => $arOrder["PROPS"]["PHONE"]["VALUE"],
+				"client_email" => $arOrder["PROPS"]["EMAIL"]["VALUE"],
+				"expiry" => date("Y-m-d", time()+3600*24*3),
+				"token" => $arReturn["token"]
+			));
+			$invoice = curl_exec($ch);
+			curl_close($ch);
+			$arInvoice = json_decode($invoice, true);
+		}
+	}
+	if (isset($arInvoice["invoice_id"]))
+		return $arInvoice["invoice_id"];
+	else
+		return false;
 }
 ?>
