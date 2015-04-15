@@ -1252,7 +1252,7 @@ $(function() {
 		}
 	});
 
-	function getCookie(name) {
+	/*function getCookie(name) {
 		var matches = document.cookie.match(new RegExp(
 			"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
 		));
@@ -1262,5 +1262,18 @@ $(function() {
 		e.preventDefault();
 		var el = $(this);
 		window.open('https://oauth.vk.com/authorize?client_id=4433979&scope=photos,emailS&redirect_uri='+el.data('redirect')+'&API_VERSION=5.28&SESSION_STATE='+getCookie('PHPSESSID'),'vk',"width=420,height=230,resizable=yes,scrollbars=yes,status=yes");
-	});
+	});*/
+
+	if ($('#payment-block input[name=payment]').length) {
+		function setPayHref() {
+			var activePayHref = $('#payment-block input[name=payment]:radio:checked').val();
+			$('#payment-block .payment-method__footer a.btn').attr('href', activePayHref);
+		}
+		setPayHref();
+
+		$('#payment-block .payment-method__item').on('click', function(e) {
+			$(this).find('.payment-method__checkbox').prop("checked", true);
+			setPayHref();
+		});
+	}
 });

@@ -77,7 +77,12 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 
 	$rsBaskets = CSaleBasket::GetList(
 		array("ID" => "ASC"),
-		array("FUSER_ID" => CSaleBasket::GetBasketUserID(), "LID" => SITE_ID, "ORDER_ID" => "NULL"),
+		array(
+			"FUSER_ID" => CSaleBasket::GetBasketUserID(),
+			"LID" => SITE_ID,
+			"ORDER_ID" => "NULL",
+			"CAN_BUY" => "Y"
+		),
 		false,
 		false,
 		array(
@@ -114,7 +119,7 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 		if ($arItem["PRODUCT_ID"]) {
 			$rsProduct = CIBlockElement::GetList(
 				array("SORT" => "ASC"),
-				array("ID" => $arItem["PRODUCT_ID"], "ACTIVE" => "Y"),
+				array("ID" => $arItem["PRODUCT_ID"]),
 				false,
 				false,
 				array("IBLOCK_ID", "ID", "NAME", "PREVIEW_PICTURE", "DETAIL_PAGE_URL", "PROPERTY_COLOR", "PROPERTY_SIZE")

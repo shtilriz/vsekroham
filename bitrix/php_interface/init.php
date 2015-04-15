@@ -275,6 +275,16 @@ class MyEvents {
 					$arOrder = CSaleOrder::GetByID($arFields["ORDER_ID"]);
 					$arFields["TRACKING_NUMBER"] = $arOrder["TRACKING_NUMBER"]?$arOrder["TRACKING_NUMBER"]:'';
 					break;
+				case "SALE_STATUS_CHANGED_M":
+					$arOrder = CSaleOrder::GetList(array(), array("ID" => $arFields["ORDER_ID"]))->Fetch();
+					$rsOrderProps = CSaleOrderPropsValue::GetOrderProps($arOrder["ID"]);
+					while ($arProp = $rsOrderProps->Fetch()) {
+						$arOrder["PROPS"][$arProp["CODE"]] = $arProp;
+					}
+					$arFields["USER_NAME"] = $arOrder["PROPS"]["FIO"]["VALUE"];
+					$arFields["INVOICE"] = payKeeperGetInvoice($arOrder);
+					$arFields["PRICE"] = SaleFormatCurrency($arOrder["PRICE"], "RUB");
+					break;
 			}
 
 		}

@@ -73,6 +73,7 @@ if ($normalCount > 0):?>
 						<span class="item-price item-price_type_old"><?=number_format($arItem["PRICE_MARGIN"]["PRICE"], 0, '', ' ')?> р.</span>
 					<?endif;?>
 					<span class="item-price"><?=number_format($arItem["PRICE"]*$arItem["QUANTITY"], 0, '', ' ')?> р.</span>
+					</div>
 				</td>
 				<?/*<td><a class="item-hold" href="#">Отложить</a></td>*/?>
 				<td><a class="item-remove" href="#">Удалить</a><input type="checkbox" name="DELETE_<?=$arItem["ID"]?>" value="Y" style="display: none" class="productDel"></td>

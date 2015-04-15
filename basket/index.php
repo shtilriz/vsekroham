@@ -4,8 +4,8 @@ $APPLICATION->SetTitle("Корзина");
 ?>
 
 <?$APPLICATION->IncludeComponent(
-	"bitrix:sale.basket.basket", 
-	".default", 
+	"bitrix:sale.basket.basket",
+	".default",
 	array(
 		"COLUMNS_LIST" => array(
 			0 => "NAME",
