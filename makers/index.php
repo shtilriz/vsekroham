@@ -177,7 +177,9 @@ $APPLICATION->SetTitle("Каталог по производителям");
 
 		<?include($_SERVER["DOCUMENT_ROOT"].'/include/catalog-sort.php');?>
 
-		<?$GLOBALS["arrFilter"]["PROPERTY_MAKER"] = $MAKER;?>
+		<?$GLOBALS["arrFilter"]["PROPERTY_MAKER"] = $MAKER;
+		$GLOBALS["arrFilter"]["!PROPERTY_AVAILABLE"] = false;
+		$GLOBALS["arrFilter"]["!CATALOG_PRICE_1"] = false;?>
 		<form name="makersForm">
 			<input type="hidden" name="SECTION_ID" value="<?=$SECTION_ID?>">
 			<input type="hidden" name="MAKER" value="<?=$MAKER?>">
