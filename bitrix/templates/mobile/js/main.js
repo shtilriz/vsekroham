@@ -930,4 +930,11 @@ $(function () {
 			$('html, body').stop().animate({scrollTop: $('#resultList').offset().top}, 800);
 		});
 	});
+
+	//при клике на банер проставлять куку
+	$('body').delegate('.js-b-b-m', 'click', function(){
+		$.cookie('counter_baner', '4', {
+			path: '/'
+		});
+	});
 });

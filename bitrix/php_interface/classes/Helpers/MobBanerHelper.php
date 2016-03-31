@@ -22,7 +22,7 @@ class MobBanerHelper
 	/**
 	 * массив поле инфоблока, которые содержат информацию по банеру
 	 */
-	protected $arSelect = array('NAME', 'PREVIEW_PICTURE', 'PROPERTY_LINK');
+	protected $arSelect = ['NAME', 'PREVIEW_PICTURE', 'PROPERTY_LINK'];
 
 	private static $instance;
 	private function __construct()
@@ -48,14 +48,14 @@ class MobBanerHelper
 	 */
 	public function getList()
 	{
-		$arBaners = array();
+		$arBaners = [];
 
 		$rsList = CIBlockElement::GetList(
-			array('SORT' => 'ASC'),
-			array(
+			['SORT' => 'ASC'],
+			[
 				'IBLOCK_ID' => self::IBLOCK_ID,
 				'ACTIVE'    => 'Y'
-			),
+			],
 			false,
 			false,
 			$this->arSelect
@@ -81,25 +81,25 @@ class MobBanerHelper
 		$sectionId = CIBlockFindTools::GetSectionID(
 			$sectionId,
 			$sectionCode,
-			array(
+			[
 				'IBLOCK_ID' => self::IBLOCK_PRODUCT_ID,
 				'ACTIVE'    => 'Y'
-			)
+			]
 		);
 
-		$arBaner = array();
-		$arFilter = array(
+		$arBaner = [];
+		$arFilter = [
 			'IBLOCK_ID' => self::IBLOCK_ID,
 			'ACTIVE'    => 'Y'
-		);
+		];
 		if ($sectionId) {
 			$arFilter['PROPERTY_SECTIONS' ] = $sectionId;
 		}
 		$rsList = CIBlockElement::GetList(
-			array('RAND' => 'ASC'),
+			['RAND' => 'ASC'],
 			$arFilter,
 			false,
-			array('nTopCount' => 1),
+			['nTopCount' => 1],
 			$this->arSelect
 		);
 		if ($arItem = $rsList->Fetch()) {
