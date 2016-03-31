@@ -12,6 +12,8 @@
 /** @var CBitrixComponent $component */
 $this->setFrameMode(true);?>
 
+<?$bShowRecommend = false; //флаг показаны или нет рекомендации?>
+
 <h1 class="item-title__"><?=$arResult["NAME"]?></h1>
 
 <div class="item" itemscope itemtype="http://schema.org/Product">
@@ -79,12 +81,12 @@ $this->setFrameMode(true);?>
 				<?endif;?>
 
 				<?if ($arResult["PROPERTIES"]["AVAILABLE"]["VALUE"] == "Y" && $arResult["CATALOG_WEIGHT"] && $arResult["CATALOG_WIDTH"] && $arResult["CATALOG_LENGTH"] && $arResult["CATALOG_HEIGHT"]):?>
-					<div id="deliveryCalc2Product" data-weight="<?=$arResult["CATALOG_WEIGHT"]?>" data-width="<?=$arResult["CATALOG_WIDTH"]?>" data-length="<?=$arResult["CATALOG_LENGTH"]?>" data-height="<?=$arResult["CATALOG_HEIGHT"]?>" data-price="<?=$arResult["PRICES"]["BASE"]["DISCOUNT_VALUE"]?>"></div>
+					<div id="deliveryCalc2Product" data-weight="<?=$arResult["CATALOG_WEIGHT"]?>" data-width="<?=$arResult["CATALOG_WIDTH"]?>" data-length="<?=$arResult["CATALOG_LENGTH"]?>" data-height="<?=$arResult["CATALOG_HEIGHT"]?>" data-price="<?=$arResult["PRICES"]["BASE"]["DISCOUNT_VALUE"]?>" data-page="product"></div>
 				<?endif;?>
 
 				<?if ($arResult["PROPERTIES"]["AVAILABLE"]["VALUE"] == "Y"):?>
+				<div class="form-field">
 					<?if (!empty($arResult["THIS_SKU_PROPS"]["COLOR"]["VALUES"])):?>
-					<div class="form-field">
 						<div class="form-field__select">
 							<select class="form-select select_type_color" data-placeholder="Выберите цвет" name="COLOR">
 								<?/*<option value=""></option>*/?>
@@ -102,11 +104,22 @@ $this->setFrameMode(true);?>
 								}?>
 							</select>
 						</div>
-					</div>
 					<?endif;?>
 
 					<?if (!empty($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"])):?>
-						<div class="form-field">
+						<div class="form-field__select">
+							<select class="form-select select_type_size" data-placeholder="Выберите размер" name="SIZE">
+								<?/*<option value=""></option>*/?>
+								<?
+								$bFirst = true;
+								foreach ($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"] as $keyColor => $arSize) {
+									echo '<option value="'.$arSize["VALUE"].'"'.($bFirst?' selected':'').'>'.$arSize["VALUE"].'</option>';
+									$bFirst = false;
+								}?>
+							</select>
+						</div>
+
+						<?/*<div class="form-field">
 							<div class="product-size-ch">
 								<?$arColorOne = reset($arResult["THIS_SKU_PROPS"]["COLOR"]["VALUES"]);
 								$bFirst = true;
@@ -121,7 +134,7 @@ $this->setFrameMode(true);?>
 								}?>
 							</div>
 						</div>
-						<?/*<div class="form-field__select">
+						<div class="form-field__select">
 							<select class="form-select select_type_size" data-placeholder="Выберите размер" name="SIZE">
 								<option value=""></option>
 								<?foreach ($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"] as $keySize => $arSize) {
@@ -130,24 +143,24 @@ $this->setFrameMode(true);?>
 							</select>
 						</div>*/?>
 					<?endif;?>
-
-					<?if (empty($arResult["OFFERS"]) && $arResult["PROPERTIES"]["SIZE"]["VALUE"]):?>
-						<div class="form-field">
-							<div class="product-size-ch">
-								<input type='radio' id='size-ch' name='SIZE' value='' class='radiobox-styled1' checked/><label for='size-ch'><?=$arResult["PROPERTIES"]["SIZE"]["VALUE"]?></label>
-							</div>
-						</div>
-					<?endif;?>
+				</div>
+				<?endif;?>
+				<?if ($arResult["SECTION"]["PATH"][0]["ID"] == 241):?>
+				<a class="size-table-link" data-target="size-table" href="#">Таблица размеров</a>
 				<?endif;?>
 			</div>
-			<div class="item__info-btm item-box" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+			<div class="item__info-btm item-box" itemprop="offers" itemscope itemtype="http://schema.org/Offer" id="product_price">
 				<meta itemprop="priceCurrency" content="<?=$arResult["PRICES"]["BASE"]["CURRENCY"]?>">
+				<?$frame = $this->createFrame("product_price", false)->begin('');
+				$frame->setBrowserStorage(true);
+				//$frame->setAnimation(true);
+				?>
 				<?if ($arResult["PROPERTIES"]["AVAILABLE"]["VALUE"] == "Y"):?>
 					<?if (!empty($arResult["OFFERS"])):?>
 						<?$arFirstOffer = reset($arResult["OFFERS"]);?>
-						<a class="add-to-basket form-button" href="#" data-id="<?=$arFirstOffer["ID"];?>" onmousedown="try {rrApi.addToBasket(<?=$arResult["ID"];?>)} catch(e) {}">В корзину</a>
+						<a class="add-to-basket item__submit" href="#" data-id="<?=$arFirstOffer["ID"];?>" onmousedown="try {rrApi.addToBasket(<?=$arResult["ID"];?>)} catch(e) {}" data-gift="<?=$arResult["PROPERTIES"]["GIFT"]["VALUE"]?>">В корзину</a>
 					<?else:?>
-						<a class="add-to-basket form-button" href="#" data-id="<?=$arResult["ID"];?>" onmousedown="try {rrApi.addToBasket(<?=$arResult["ID"];?>)} catch(e) {}">В корзину</a>
+						<a class="add-to-basket item__submit" href="#" data-id="<?=$arResult["ID"];?>" onmousedown="try {rrApi.addToBasket(<?=$arResult["ID"];?>)} catch(e) {}" data-gift="<?=$arResult["PROPERTIES"]["GIFT"]["VALUE"]?>">В корзину</a>
 					<?endif;?>
 					<link itemprop="availability" href="http://schema.org/InStock">
 				<?else:?>
@@ -186,6 +199,7 @@ $this->setFrameMode(true);?>
 					</div>";
 				}
 				?>
+				<?$frame->end();?>
 			</div>
 		</form>
 	</div>
@@ -201,8 +215,7 @@ foreach ($arResult["OFFERS"] as $key => $arOffer){
 	}
 }
 if (
-	is_array($arResult["OFFERS"]) && !empty($arResult["OFFERS"]) && $bShowOffers ||
-	is_array($arResult["PROPERTIES"]["IMAGES"]["VALUE"]) &&	!empty($arResult["PROPERTIES"]["IMAGES"]["VALUE"])
+	is_array($arResult["OFFERS"]) && !empty($arResult["OFFERS"]) && $bShowOffers || is_array($arResult["PROPERTIES"]["IMAGES"]["VALUE"]) && !empty($arResult["PROPERTIES"]["IMAGES"]["VALUE"])
 ):?>
 <div class="item-colors" id="product-colors">
 	<h3>Выберите расцветку</h3>
@@ -217,7 +230,7 @@ if (
 			foreach ($arResult["OFFERS"] as $key => $arOffer):
 				/*if ($arOffer["CATALOG_QUANTITY"] <= 0 || empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]))
 					continue;*/
-				if (empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]))
+				if (empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]) || !$arOffer["PREVIEW_PICTURE"])
 					continue;?>
 				<?if (!in_array($arOffer["PROPERTIES"]["COLOR"]["VALUE"], $arTemp)):
 					$arTemp[] = $arOffer["PROPERTIES"]["COLOR"]["VALUE"];
@@ -285,7 +298,7 @@ if (
 				$activeOfferCount = 0;
 			$arTemp = array();
 			foreach ($arResult["OFFERS"] as $key => $arOffer):
-				if (empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]))
+				if (empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]) || !$arOffer["PREVIEW_PICTURE"])
 					continue;
 				/*if ($arOffer["CATALOG_QUANTITY"] <= 0 || empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]))
 					continue;*/?>
@@ -345,6 +358,9 @@ if (
 	<a class="get-more" href="#" data-showtext="Показать все расцветки" data-hidetext="Свернуть">Показать все расцветки</a>
 	<?endif;?>
 </div>
+<?elseif (!empty($arResult["RECOMMEND"]["ITEMS"]) && !$bShowRecommend):?>
+	<?$bShowRecommend = true;?>
+	<?include('recommend.php');?>
 <?endif;?>
 
 <div class="item-tabs">
@@ -388,12 +404,18 @@ if (
 						</tr>
 					<?endforeach;?>
 				<?endif;?>
-				<?if ($arResult["DETAIL_TEXT"]):?>
+				<?if ($arResult["DETAIL_TEXT"] || $arResult["PROPERTIES"]["VIDEO"]["VALUE"]):?>
 					<tr>
 						<th colspan="2">Описание</th>
 					</tr>
 					<tr>
-						<td colspan="2"><?=$arResult["DETAIL_TEXT"]?></td>
+						<td colspan="2">
+							<?if ($arResult["PROPERTIES"]["VIDEO"]["VALUE"])
+							{
+								echo '<div class="product-video"><iframe width="686" height="386" src="http://www.youtube.com/embed/'.$arResult["PROPERTIES"]["VIDEO"]["VALUE"].'" frameborder="0" allowfullscreen></iframe></div>';
+							}?>
+							<?=$arResult["DETAIL_TEXT"]?>
+						</td>
 					</tr>
 				<?endif;?>
 			</table>
@@ -410,7 +432,29 @@ if (
 	</div>
 </div>
 
-<?include('recommend.php');?>
+<?if ($arResult["SECTION"]["PATH"][0]["ID"] == 241):?>
+<div class="size-table popup" id="size-table">
+	<div class="popup__top">
+		<a href="#" class="popup__close">X</a>
+		<strong class="popup__title">Таблица размеров детской одежды.</strong>
+	</div>
+	<div class="popup__content">
+		<?$APPLICATION->IncludeComponent("bitrix:main.include","",
+			array(
+				"AREA_FILE_SHOW" => "file",
+				"PATH" => "/bitrix/templates/main/page_templates/table-sizes.php",
+				"EDIT_TEMPLATE" => ""
+			),
+			false
+		);?>
+	</div>
+	<div class="popup__footer"></div>
+</div>
+<?endif;?>
+
+<?if (!$bShowRecommend):?>
+	<?include('recommend.php');?>
+<?endif;?>
 
 <?include('carousel-modal.php');?>
 
@@ -475,7 +519,73 @@ foreach ($arResult["OFFERS"] as $keyOffer => $arOffer) {
 		?>
 		<meta property="og:description" content="<?=trim(strip_tags($TEXT))?>" />
 	<?endif?>
-	<meta property="og:image" content="https://<?=$_SERVER["SERVER_NAME"].$arResult["PREVIEW_PICTURE"]["SRC"]?>" />
-	<meta property="og:url" content="https://<?=$_SERVER["SERVER_NAME"].$arResult["DETAIL_PAGE_URL"]?>" />
+	<meta property="og:image" content="http://<?=$_SERVER["SERVER_NAME"].$arResult["PREVIEW_PICTURE"]["SRC"]?>" />
+	<meta property="og:type" content="website"/>
+	<meta property="og:url" content="http://<?=$_SERVER["SERVER_NAME"].$arResult["DETAIL_PAGE_URL"]?>" />
 	<?$this->EndViewTarget();?>
 <?endif;?>
+
+<?$this->SetViewTarget("baner-anex");?>
+	<?if (in_array($arResult["IBLOCK_SECTION_ID"], array(141, 157, 165, 170, 174, 180, 184, 190))):?>
+	<div class="banner">
+		<a href="/brands/anex/"><img src="<?=SITE_TEMPLATE_PATH?>/images/Anex_Banner_Classic.png"></a>
+	</div>
+	<?endif;?>
+<?$this->EndViewTarget();?>
+
+<script type="text/javascript">
+(function(d,w){
+var n=d.getElementsByTagName("script")[0],
+s=d.createElement("script"),
+f=function(){n.parentNode.insertBefore(s,n);};
+s.type="text/javascript";
+s.async=true;
+s.src="http://track.recreativ.ru/trck.php?shop=1584&ttl=30&offer=<?=$arResult['ID']?>&rnd="+Math.floor(Math.random()*999);
+if(window.opera=="[object Opera]"){d.addEventListener("DOMContentLoaded", f, false);}
+else{f();}
+})(document,window);
+</script>
+
+<?
+$GLOBALS["GOOGLE_TAG_PARAMS"] = array(
+	"ECOMM_PRODID" => (!empty($arResult["OFFERS_IDS"]) ? "[".implode(", ", $arResult["OFFERS_IDS"])."]" : $arResult["ID"]),
+	"ECOMM_TOTALVALUE" => $arPrices["BASE"]["VALUE"]
+);
+?>
+
+<?$offersExist = CCatalogSKU::getExistOffers(array($arResult["ID"]));
+$arSections = array();
+foreach ($arResult["SECTION"]["PATH"] as $key => $arSection) {
+	$arSections[] = $arSection["NAME"];
+}?>
+<script type="text/javascript">
+dataLayer.push({
+	"ecommerce": {
+		"detail": {
+			"products": [
+				<?if ($offersExist[$arResult["ID"]]):?>
+					<?foreach ($arResult["OFFERS"] as $key => $arOffer):?>
+					{
+						"id": "<?=$arOffer["ID"]?>",
+						"name" : "<?=$arOffer["NAME"]?>",
+						"price": <?=$arOffer["PRICES"]["BASE"]["DISCOUNT_VALUE"]?>,
+						<?if ($arResult["DISPLAY_PROPERTIES"]["MAKER"]["VALUE"]):?>"brand": "<?=$arResult["DISPLAY_PROPERTIES"]["MAKER"]["LINK_ELEMENT_VALUE"][$arResult["DISPLAY_PROPERTIES"]["MAKER"]["VALUE"]]["NAME"]?>",<?endif;?>
+						<?if (!empty($arSections)):?>"category": "<?=implode("/",$arSections);?>",<?endif;?>
+						<?if ($arOffer["PROPERTIES"]["COLOR"]["VALUE"]):?>"variant" : "<?=$arOffer["PROPERTIES"]["COLOR"]["VALUE"]?>"<?endif;?>
+					},
+					<?endforeach;?>
+				<?else:?>
+				{
+					"id": "<?=$arResult["ID"]?>",
+					"name" : "<?=$arResult["NAME"]?>",
+					"price": <?=$arResult["PRICES"]["BASE"]["DISCOUNT_VALUE"]?>,
+					<?if ($arResult["PROPERTIES"]["MAKER"]["VALUE"]):?>"brand": "<?=$arResult["DISPLAY_PROPERTIES"]["MAKER"]["LINK_ELEMENT_VALUE"][$arResult["DISPLAY_PROPERTIES"]["MAKER"]["VALUE"]]["NAME"]?>",<?endif;?>
+					<?if (!empty($arSections)):?>"category": "<?=implode("/",$arSections);?>",<?endif;?>
+					<?if ($arResult["PROPERTIES"]["COLOR"]["VALUE"]):?>"variant" : "<?=$arResult["PROPERTIES"]["COLOR"]["VALUE"]?>"<?endif;?>
+				}
+				<?endif;?>
+			]
+		}
+	}
+});
+</script>

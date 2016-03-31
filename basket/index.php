@@ -1,11 +1,12 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
+$APPLICATION->SetPageProperty("ecomm_pagetype", "cart");
 $APPLICATION->SetTitle("Корзина");
 ?>
 
 <?$APPLICATION->IncludeComponent(
 	"bitrix:sale.basket.basket",
-	".default",
+	"new",
 	array(
 		"COLUMNS_LIST" => array(
 			0 => "NAME",
@@ -26,7 +27,8 @@ $APPLICATION->SetTitle("Корзина");
 		"OFFERS_PROPS" => array(
 			0 => "SIZE",
 			1 => "COLOR",
-		)
+		),
+		"COMPONENT_TEMPLATE" => "new"
 	),
 	false
 );?>

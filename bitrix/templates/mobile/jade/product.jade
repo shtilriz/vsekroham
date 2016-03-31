@@ -1,0 +1,199 @@
+extends ./layouts/default
+
+block content
+
+    .page-content
+        a.logo(href="#")
+
+        .b-content
+
+            - b_header.title = 'Автокресло Welldon Royal Baby 2 SideArmor & CuddleMe Breeze';
+            - b_header.class = 'b-content__header';
+            include includes/partials/b-header/3_1
+
+            .slider-big
+                div
+                    img(src="images/temp/45.jpg", alt="Скидка при покупке детской кроватки, матраса и постельного белья")
+                div
+                    img(src="images/temp/45.jpg", alt="")
+                div
+                    img(src="images/temp/45.jpg", alt="")
+
+            .product__stars.b-stars-big.b-stars-big-3
+            a(href="#").product__comments 20 отзывов
+
+            .b-box.b-box_colors
+                .b-box__content
+                    select.selectpicker(name="")
+                        each val in ["Цвет", 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                            option(value=val) #{val}
+                    .b-colors
+                        .js-dropdown
+                            .b-colors__content
+                                .b-color
+                                    .b-color__img
+                                        img(src="images/temp/53_.jpg", alt="")
+                                    .b-color__title Красный
+                                .b-color
+                                    .b-color__img
+                                        img(src="images/temp/53_.jpg", alt="")
+                                    .b-color__title Зеленый
+                                .b-color
+                                    .b-color__img
+                                        img(src="images/temp/53_.jpg", alt="")
+                                    .b-color__title Голубой
+                        a(href="javascript:void(0)" class='b-colors__header js-toogle')
+                            span(class="b-colors__icon")
+                            .b-colors__title Показать все расцветки
+            .product__size.b-size
+                .b-size__item
+                    input#size-ch1.radiobox-styled1(type='radio', checked='checked', name='size-ch')
+                    label(for='size-ch1') 140 х 110
+                .b-size__item
+                    input#size-ch2.radiobox-styled1(type='radio', name='size-ch')
+                    label(for='size-ch2') 140 х 110
+                .b-size__item
+                    input#size-ch3.radiobox-styled1(type='radio', disabled='disabled', name='size-ch')
+                    label(for='size-ch3') 140 х 110
+                .b-size__item
+                    input#size-ch4.radiobox-styled1(type='radio', name='size-ch')
+                    label(for='size-ch4') 140 х 110
+            .product__order
+                .product__price-wrapper
+                    .product__price-old 14 000 р.
+                    .product__price 13 500 р.
+                button(type="submit").product__button В корзину
+            .product__delivery.b-delivery
+                .b-delivery__label Доставка до города:
+                .b-delivery__input
+                    input(type="text" value="Ростов-На-Дону")
+                br
+                .b-delivery__img
+                    img(src="images/temp/48_.png", alt="")
+                .b-delivery__info
+                    span.b-delivery__info-title Энергия - 
+                    span.b-delivery__price 292 р. 
+                    span.b-delivery__days (2-3 дня)
+                a(href="#").b-delivery__more Показать все варианты
+            a(href="#").btn-big.btn-primary 
+                span.icon.sprite-phone
+                | Позвонить
+
+            .b-tabs.product__b-tabs
+                // Nav tabs
+                ul.nav.nav-tabs(role='tablist')
+                    li.active(role='presentation')
+                        a(href='#home', aria-controls='home', role='tab', data-toggle='tab') Описание
+                    li(role='presentation')
+                        a(href='#profile', aria-controls='profile', role='tab', data-toggle='tab') Отзывы
+                // Tab panes
+                .b-tabs__tab-content.tab-content
+                    #home.b-tabs__tab-pane.tab-pane.active(role='tabpanel')
+                        table.tab-pane__table
+                          tr
+                              td Материал изготовления
+                              td Детские ходунки Barty J2009p6 – это оптимальное решение для тех, кто ценит качество и функциональность, при этом не хочет тратить неоправданно много средств. Это оптимальное решение для тех, кто ценит качество и
+                          tr
+                              td Материал изготовления
+                              td Детские ходунки Barty J2009p6 – это оптимальное решение для тех, кто ценит качество и функциональность, при этом не хочет тратить неоправданно много средств. Это оптимальное решение для тех, кто ценит качество и
+                        .tab-pane__title Описание
+                        .tab-pane__content
+                          .product-description
+                              .product-description__title Детские автокресла 15-36 кг можно купить недорого в интернет-магазине «Все для Крохи»
+                              p Автокресло должно быть качественным, комфортным и функциональным! Именно такие системы можно купить в интернет-магазине «Все для Крохи» от лучших мировых производителей по доступным ценам. Компромиссов в вопросе безопасности ребенка быть не может!
+
+                              ul.styled
+                                  li Детские автокресла 15-36 кг имеют регулируемые спинку и подголовник, когда ребенок подрастет спинка может быть демонтиров тогда автокресло превращается в бустер.
+                                  li Регулируемые ремни безопасности с мягкими накладками нао фиксируют непоседу.
+                                  li Большинство конструкций снабжаются съемными чехлами, которые можно стирать  даже в домашних условиях.
+                                  li Автокресла, представленные в каталоге нашего магазина, одо нормами и стандартами ЕСЕ.
+
+                    #profile.b-tabs__tab-pane.tab-pane(role='tabpanel')
+                        .reviews(data-id='932')
+                            .review__item(data-review_id='907')
+                                .review__top
+                                    .review__top-date 24 Марта
+                                    .review__avatar
+                                        img(alt='', src='images/temp/user.png')
+                                    .review__name Алексей Иванов
+                                .review__content
+
+                                    .review__stars.b-stars.b-stars-3
+
+                                    .review-text-block
+                                        .review-text-block__title Достоинства:
+                                        p.review-text-block__content Внешний вид,огромные колёса,регулируется подголовник,вместительный багажник.В комплекте сумка,клеенка,москитная сетка, два дождевика.
+                                        
+                                        .review-text-block__title Недостатки:
+                                        p.review-text-block__content я покупала коляску для своей крошки,долго выбирая, при выборе этой коляски не нашла ни одного недостатка!!!
+                                        
+                                        .review-text-block__title.review-text-block__title_mod_1 Комментарий:
+                                        p.review-text-block__content Я купила коляску  Adamex за безупречный внешний вид!!!Классная просторная люлька,большие колеса,красивая блестящая рама!!!Ммм!!!Я влюбилась в нее,как только увидела!!Хоть и цена для нас была немаленькая,я загорелась желанием купить ее,а отговорить меня и купить коляску подешевле мой муж,так и не сумел.А потом продавец начал рассказывать о достоинствах,и в глазах моих по-моему вспыхнуло пламя,хотя до этого горел огонек!!!
+                                    .review__utility.review-utility
+                                        | Отзыв полезен? 
+                                        a.review-utility__plus(href='#') Да
+                                        span.review-utility__count 6
+                                        |  / 
+                                        a.review-utility__minus(href='#') Нет
+                                        span.review-utility__count 2
+                            .review__item(data-review_id='907')
+                                .review__top
+                                    .review__top-date 24 Марта
+                                    .review__avatar
+                                        img(alt='', src='images/temp/user.png')
+                                    .review__name Дмитрий Колосовский
+                                .review__content
+
+                                    .review__stars.b-stars.b-stars-3
+
+                                    .review-text-block
+                                        .review-text-block__title Достоинства:
+                                        p.review-text-block__content Внешний вид,огромные колёса,регулируется подголовник,вместительный багажник.В комплекте сумка,клеенка,москитная сетка, два дождевика.
+                                        
+                                        .review-text-block__title Недостатки:
+                                        p.review-text-block__content я покупала коляску для своей крошки,долго выбирая, при выборе этой коляски не нашла ни одного недостатка!!!
+                                        
+                                        .review-text-block__title.review-text-block__title_mod_1 Комментарий:
+                                        p.review-text-block__content Я купила коляску  Adamex за безупречный внешний вид!!!Классная просторная люлька,большие колеса,красивая блестящая рама!!!Ммм!!!Я влюбилась в нее,как только увидела!!Хоть и цена для нас была немаленькая,я загорелась желанием купить ее,а отговорить меня и купить коляску подешевле мой муж,так и не сумел.А потом продавец начал рассказывать о достоинствах,и в глазах моих по-моему вспыхнуло пламя,хотя до этого горел огонек!!!
+                                    .review__utility.review-utility
+                                        | Отзыв полезен? 
+                                        a.review-utility__plus(href='#') Да
+                                        span.review-utility__count 6
+                                        |  / 
+                                        a.review-utility__minus(href='#') Нет
+                                        span.review-utility__count 2
+
+                            .paginator.paginator_type_light
+                                ul.paginator__list
+                                    li.paginator__item
+                                        a.paginator__page.paginator__page_type_prev
+                                    li.paginator__item
+                                        span.paginator__page.active_page 1
+                                    each val in [2, 3, 4, 5]
+                                        li.paginator__item
+                                            a(href="#").paginator__page=val
+                                    li.paginator__item
+                                        a.paginator__page.paginator__page_type_next(href="#")
+
+                        p.product__comments-take.comments-take
+                            | Отзывы взяты из Яндекс Маркет и mail.ru 
+                            img.comments-take__img(src="images/temp/layer-210.png", alt="")
+                            img.comments-take__img(src="images/temp/layer-211.png", alt="")
+
+                        //- a(href="#").btn-big Отправить отзыв
+                        button.btn-big.btn-primary Отправить отзыв
+
+            - b_header.title = 'Автокресло Welldon Royal Baby 2 SideArmor & CuddleMe Breeze';
+            - b_header.class = 'b-content__header';
+            include includes/partials/b-header/1
+
+            - b_goods.class = 'product__goods';
+            - b_g.title = 'Детские ходунки Dion Kids FL-616 очень длинное название товара';
+            - b_g.counter = 3
+            include includes/partials/b-goods/2
+            
+
+
+
+
+

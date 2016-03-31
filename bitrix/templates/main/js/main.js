@@ -9,7 +9,7 @@ function numeric_format(val, thSep, dcSep) {
 	// Проверка указания разделителя разрядов
 	if (!thSep) thSep = ' ';
 	// Проверка указания десятичного разделителя
-	if (!dcSep) dcSep = ',';
+	if (!dcSep) dcSep = '.';
 	var res = val.toString();
 	var lZero = (val < 0); // Признак отрицательного числа
 	// Определение длины форматируемой части
@@ -53,66 +53,13 @@ function info_alert(title, msg) {
 	});
 }
 
-/*
-делает запрос городов при вводе подстроки
-q - поисковый запрос
-insertBlock - id блока, в который подставлять результат
-*/
-function getCity (q, insertBlock) {
-	var bStatus = false;
-	if (q.length > 1) {
-		$.ajax({
-			type: 'GET',
-			url: '/include/getCity.php',
-			data: {q: q},
-			dataType: 'json',
-			//async: false,
-			success: function (data){
-				if (data.length > 0) {
-					var html = '';
-					for (var i = 0; i < data.length; i++) {
-						data[i]
-						html += '<li><a href="">'+data[i]+'</a></li>';
-					};
-					html = '<ul class="address-dropdown__list">'+html+'</ul>';
-					$('#'+insertBlock).html(html);
-					if (insertBlock == 'cityBlock2Product' || insertBlock == 'cityBlock2ProductModal') {
-						var addressBlock = $('#'+insertBlock).parent('.address-dropdown');
-						if (addressBlock.is(':hidden')) {
-							addressBlock.show();
-						}
-					}
-				}
-				else {
-					$('#'+insertBlock).empty();
-					if (insertBlock == 'cityBlock2Product' || insertBlock == 'cityBlock2ProductModal') {
-						var addressBlock = $('#'+insertBlock).parent('.address-dropdown');
-						if (addressBlock.is(':visible')) {
-							addressBlock.hide();
-						}
-					}
-				}
-			}
-		});
-	}
-	else {
-		$('#'+insertBlock).empty();
-	}
-	return bStatus;
-}
-//подставляет выбранный город в строку поиска
-function setCity (city) {
-	$('.address-search__title').html(city+' <span class="address-search__spinner"></span>');
-	$('.address-search__dropdown').hide();
-	setSessionCity(city);
-}
-function setSessionCity (city) {
-	if (city.length > 0) {
-		$.get('/include/setSessionCity.php', {city: city});
-		return true;
-	}
-	else
-		return false;
+//перегружает малую корзину
+function bskSmallRefresh() {
+	$.post('/include/basket_small.php',
+		function(data) {
+			$('#basket_small').html(data);
+		}
+	);
 }
 
 $(function() {
@@ -140,7 +87,7 @@ $(function() {
 		if (nextPageNum <= NavPageCount) {
 			$('#preloader').show();
 			var getData = '';
-			if ($('form[name=catalog-filter] input#send-filter').val()=="Y")
+			if ($('form[name=catalog-filter] input[name=send-filter]').val()=="Y")
 				getData = $('form[name=catalog-filter],form[name=makersForm]').serialize();
 			else
 				getData = $('form[name=makersForm]').serialize();
@@ -150,6 +97,19 @@ $(function() {
 			$.getJSON('', getData, function(data) {
 				$('#preloader').hide();
 				ProductList.append(data.PRODUCTS);
+				(function() {
+				    $('.stuff-list__link-title').each(function() {
+				        var el = $(this);
+				        var s = el.text();
+				        var arr = ['2 в 1', '3 в 1'];
+				        for (var i = arr.length - 1; i >= 0; i--) {
+				            if(s.indexOf(arr[i]) >= 0) {
+				              s = s.replace(arr[i], '<span>'+ arr[i] +'</span>');
+				              el.html(s);
+				            }
+				        };
+				    })
+				}());
 				if (data.NAV) {
 					NavBlock.html(data.NAV);
 					NavBlock.find('.paginator-fixed').show();
@@ -174,16 +134,54 @@ $(function() {
 		}
 	});
 
-	$('form[name=catalog-filter] select#catalog-filter').on('change', function() {
+	$('form[name=catalog-filter] select[name=category]').on('change', function() {
 		if ($('#searchPage').length <= 0) {
 			var select = $(this),
-				cat_url = select.find('option:selected').val();
+				cat_url = select.find('option:selected').val(),
+				id = select.find('option:selected').data('id');
 			select.closest('form').attr('action', cat_url);
+			var getData = {id: id};
+			$.getJSON('/include/filter/getMakersFromSect.php', getData, function(response) {
+				if (response.SUCCESS == 'Y' && response.BRANDS) {
+					var selectMaker = [];
+					$('form[name=catalog-filter] select[name="brand[]"] option:selected').each(function() {
+						var select = $(this);
+						if (select.is(':selected')) {
+							selectMaker.push(select.val());
+						}
+					});
+					var insertMakers = '';
+					for (var k in response.BRANDS) {
+						insertMakers += '<option value="'+k+'"'+(in_array(k,selectMaker) ? ' selected' : '')+'>'+response.BRANDS[k]+'</option>';
+					}
+					$('form[name=catalog-filter] select[name="brand[]"]').html(insertMakers);
+					$('form[name=catalog-filter] select[name="brand[]"]').multiselect("refresh");
+				}
+			});
 		}
 	});
 
+	function getCntProductsFiltered()
+	{
+		var getData = $('form[name=catalog-filter]').serialize();
+		getData += '&SECTION_CODE='+$('form[name=catalog-filter]').data('section_code');
+		getData += '&SECTION_ID='+$('form[name=catalog-filter]').data('section_id');
+		$.getJSON('/include/filter/getCntProductsFiltered.php', getData, function(response) {
+			$('#findProducts').html('<span class="find-result">Нашлось <span>'+response.CNT+'</span> '+response.TXT+'</span>');
+		});
+	}
+	$('form[name=catalog-filter] :input').on('change', function () {
+		getCntProductsFiltered();
+	});
+	$('form[name=catalog-filter] .range-slider').on('change', function(){
+		getCntProductsFiltered();
+	});
+	if ($('#findProducts').length) {
+		getCntProductsFiltered();
+	}
+
 	//сортировка в каталоге товаров
-	$('body').delegate('#catalog-sort a', 'click', function(e) {
+	$('body').delegate('#catalog-sort a.sortby__btn', 'click', function(e) {
 		e.preventDefault();
 		var el = $(this),
 			sort = el.data('sort'),
@@ -224,6 +222,8 @@ $(function() {
 			$('html, body').stop().animate({scrollTop: $('#catalog-sort').offset().top}, 800);
 		});
 	});
+
+	//фильтр
 
 	//картинки товаров в лайтбоксе
 	$('body').delegate('a[data-target="cart-img-popup"]', 'click', function() {
@@ -280,7 +280,6 @@ $(function() {
 		};
 	});
 	function setPropModalSKU(offer) {
-		console.log(offer);
 		$('#cart-img-popup .cart-img-popup__title').text(offer.title);
 		$('#cart-img-popup .popup__right .price').text(offer.price);
 		//вывести выбор размеров, если для данного цвета их больше одного
@@ -333,7 +332,6 @@ $(function() {
 	});
 
 	//кладем товар в корзину
-	//console.log(SKU);
 	function add2basket(id) {
 		if (parseInt(id,10) > 0) {
 			var getData = {
@@ -347,6 +345,7 @@ $(function() {
 					$.get('/include/modal/add2basketModal.php', {id:id}, function(data) {
 						$('body').append(data);
 						showPopup('add2basketModal');
+						ecommerce (id, 'add');
 					});
 				}
 				else {
@@ -358,18 +357,73 @@ $(function() {
 			info_alert('Ошибка', 'Возникла ошибка при добавлении товара в корзину. Повторите попытку позже.');
 		}
 	}
-
-	function bskSmallRefresh() {
-		$.post('/include/basket_small.php',
-			function(data) {
-				$('#basket_small').html(data);
+	//кладем товар в корзину без вызова всплывающих окон
+	function add2basketSimple(id) {
+		if (parseInt(id,10) > 0) {
+			var getData = {
+				action: 'ADD2BASKET',
+				ajax_basket: 'Y',
+				id: id
 			}
-		);
+			$.getJSON('', getData, function (response) {
+				if (response.STATUS == "OK") {
+					bskSmallRefresh();
+					ecommerce (id, 'add');
+				}
+			});
+		}
 	}
+	//отслеживаем добавление/удаление товара в корзине электронной коммерцией яндекса
+	function ecommerce (id, actionType) {
+		if (!id || !actionType)
+			return false;
+		$.getJSON('/include/ecommerce.php', {id: id}, function (response) {
+			if (response.ID) {
+				if (actionType == 'add') {
+					dataLayer.push({
+						"ecommerce": {
+							"add": {
+								"products": [
+									{
+										"id": response.ID,
+										"name": response.NAME,
+										"price": response.PRICE,
+										"brand": response.MAKER,
+										"category": response.SECTIONS,
+										"quantity": response.QUANTITY
+									}
+								]
+							}
+						}
+					});
+				}
+				else if (actionType == 'remove') {
+					dataLayer.push({
+						"ecommerce": {
+							"remove": {
+								"products": [
+									{
+										"id": response.ID,
+										"name": response.NAME,
+										"price": response.PRICE,
+										"brand": response.MAKER,
+										"category": response.SECTIONS,
+										"quantity": response.QUANTITY
+									}
+								]
+							}
+						}
+					});
+				}
+			}
+		});
+	}
+
 	$('body').delegate('#item__info .add-to-basket, #popupSelectOffers .add-to-basket', 'click',function(e) {
 		e.preventDefault();
 		var el = $(this),
-			form = el.closest('form');
+			form = el.closest('form'),
+			gift = parseInt(el.data('gift'), 10);
 		//form.find('#addBskErr').slideUp();
 		//если товар с торговыми предложениями
 		if (window.SKU.B_OFFERS) {
@@ -430,6 +484,10 @@ $(function() {
 			var product_id = window.SKU.PRODUCT_ID;
 			add2basket(product_id);
 		}
+
+		//если имеется подарок
+		if (gift)
+			add2basketSimple(gift);
 	});
 	//кладем в корзину во всплывающем окне
 	$('body').delegate('#add2bsk_popup', 'click', function(e) {
@@ -464,6 +522,7 @@ $(function() {
 			form.find('input[name=SIZE]:radio').each(function() {
 				$(this).prop('checked',false).removeAttr('checked');
 			});
+			form.find('select[name=SIZE] option').prop('selected',false).removeAttr('selected')
 		}
 		if (skuCount > 1) {
 			var setVal = {};
@@ -591,18 +650,22 @@ $(function() {
 		var form = $('#basket-list form[name=basket_form]'),
 			getData = form.serialize();
 		$('#basket-list').append('<div class="loader"></div>');
-		$.post('/basket/',getData,function(data) {
+		$.post('',getData,function(data) {
 			//$('#basket-list').remove('.loader');
 			$('#basket-list').html(data);
 			bskSmallRefresh();
+			getDCV2P('','');
 		});
 	}
 	//удаление товара из корзины
 	$('body').delegate('form[name=basket_form] .item-remove', 'click', function(e) {
 		e.preventDefault();
-		var el = $(this);
+		var el = $(this),
+			product_id = el.data('product-id');
 		el.next('input').attr({checked:'checked'});
 		basketRefresh();
+		if (product_id)
+			ecommerce (product_id, 'remove');
 	});
 	//плюс-минус
 	$('body').delegate('.plus-minus a', 'click', function(e) {
@@ -625,9 +688,15 @@ $(function() {
 		}
 	});
 	//очищаем корзину
-	$('body').delegate('form[name=basket_form] a.clear-cart', 'click',function(e) {
+	$('body').delegate('form[name=basket_form] a.js-clear-cart', 'click',function(e) {
 		e.preventDefault();
 		$('form[name=basket_form] .productDel').attr({checked:'checked'});
+		$('form[name=basket_form] .item-remove').each(function () {
+			var el = $(this),
+				product_id = el.data('product-id');
+			if (product_id)
+				ecommerce (product_id, 'remove');
+		});
 		setTimeout(function() {
 			basketRefresh();
 		},1);
@@ -652,6 +721,7 @@ $(function() {
 			}
 		});
 		if (form.valid()) {
+			yaCounter15270730.reachGoal('zvonok-product');
 			var getData = form.serialize();
 			$.getJSON('/include/callbackSend.php', getData, function(data) {
 				info_alert(data.TITLE, data.MESSAGE);
@@ -682,6 +752,7 @@ $(function() {
 			errorElement: 'div'
 		});
 		if (form.valid()) {
+			yaCounter15270730.reachGoal('sborka-mebel');
 			var getData = form.serialize(),
 				url = form.attr('action');
 			$.getJSON(url, getData, function(data) {
@@ -692,54 +763,62 @@ $(function() {
 	});
 
 	//возврат товара
-	$('form[name=returnPolicy]').validate({
-		rules: {
-			FIO: 'required',
-			'prop[CITY]': 'required',
-			'prop[PHONE]': {
-				required: true,
-				phoneRU: true
+	$('form[name=returnPolicy] input[type=submit]').on('click', function (e) {
+		e.preventDefault();
+		var form = $(this).closest('form');
+		form.validate({
+			rules: {
+				FIO: 'required',
+				'prop[CITY]': 'required',
+				'prop[PHONE]': {
+					required: true,
+					phoneRU: true
+				},
+				'prop[EMAIL]': {
+					required: true,
+					email: true
+				},
+				'prop[PRODUCT]': 'required',
+				'prop[ORDER_ID]': 'required'
 			},
-			'prop[EMAIL]': {
-				required: true,
-				email: true
+			/*messages: {
+				FIO: 'Введите ваше имя',
+				'prop[CITY]': 'Введите ваш город',
+				'prop[PHONE]': {
+					required: 'Введите ваш номер телефона',
+					phoneRU: 'Номер телефона введен некорректно'
+				},
+				'prop[EMAIL]': {
+					required: 'Введите ваш E-mail',
+					email: 'E-mail введен некорректно'
+				},
+				'prop[PRODUCT]': 'Введите название товара',
+				'prop[ORDER_ID]': 'Введите номер вашего заказа',
+			},*/
+			messages: {
+				FIO: '<span class="validation-message validation-error"></span>',
+				'prop[CITY]': '<span class="validation-message validation-error"></span>',
+				'prop[PHONE]': {
+					required: '<span class="validation-message validation-error"></span>',
+					phoneRU: '<span class="validation-message validation-error"></span>'
+				},
+				'prop[EMAIL]': {
+					required: '<span class="validation-message validation-error"></span>',
+					email: '<span class="validation-message validation-error"></span>'
+				},
+				'prop[PRODUCT]': '<span class="validation-message validation-error"></span>',
+				'prop[ORDER_ID]': '<span class="validation-message validation-error"></span>',
 			},
-			'prop[PRODUCT]': 'required',
-			'prop[ORDER_ID]': 'required'
-		},
-		/*messages: {
-			FIO: 'Введите ваше имя',
-			'prop[CITY]': 'Введите ваш город',
-			'prop[PHONE]': {
-				required: 'Введите ваш номер телефона',
-				phoneRU: 'Номер телефона введен некорректно'
-			},
-			'prop[EMAIL]': {
-				required: 'Введите ваш E-mail',
-				email: 'E-mail введен некорректно'
-			},
-			'prop[PRODUCT]': 'Введите название товара',
-			'prop[ORDER_ID]': 'Введите номер вашего заказа',
-		},*/
-		messages: {
-			FIO: '<span class="validation-message validation-error"></span>',
-			'prop[CITY]': '<span class="validation-message validation-error"></span>',
-			'prop[PHONE]': {
-				required: '<span class="validation-message validation-error"></span>',
-				phoneRU: '<span class="validation-message validation-error"></span>'
-			},
-			'prop[EMAIL]': {
-				required: '<span class="validation-message validation-error"></span>',
-				email: '<span class="validation-message validation-error"></span>'
-			},
-			'prop[PRODUCT]': '<span class="validation-message validation-error"></span>',
-			'prop[ORDER_ID]': '<span class="validation-message validation-error"></span>',
-		},
-		//errorLabelContainer: '#messageBox',
-		//errorElement: 'div'
-		errorClass: 'has-error',
-		errorPlacement: function(error, element) {
-			error.appendTo(element.closest('tr').find('td:last'));
+			//errorLabelContainer: '#messageBox',
+			//errorElement: 'div'
+			errorClass: 'has-error',
+			errorPlacement: function(error, element) {
+				error.appendTo(element.closest('tr').find('td:last'));
+			}
+		});
+		if (form.valid()) {
+			yaCounter15270730.reachGoal('brak-warranty');
+			form.submit();
 		}
 	});
 
@@ -764,6 +843,7 @@ $(function() {
 			errorElement: 'div'
 		});
 		if (form.valid()) {
+			yaCounter15270730.reachGoal('opt-subscribe');
 			var getData = form.serialize(),
 				url = form.attr('action');
 			$.getJSON(url, getData, function(data) {
@@ -960,6 +1040,9 @@ $(function() {
 					el.closest('tr').show();
 				}
 			});
+			if ($('#payments-block table tr:visible').length == 1) {
+				$('#payments-block table tr:visible input:radio').prop('checked', true);
+			}
 		}
 	}
 	if ($('#payments-block').length) {
@@ -1042,69 +1125,6 @@ $(function() {
 		}
 	});
 
-	$('body').delegate('.address-search__title', 'click', function() {
-		$('.address-search__dropdown').slideToggle();
-		$('.address-dropdown__input').val('').focus();
-	});
-	$('body').delegate('input[name=YOUR_CITY]', 'keypress', function (e) {
-		var el = $(this);
-		var $listItem = el.parents('.address-dropdown').find('#cityBlock li');
-			console.log(e);
-		if (e.keyCode == 13) {
-			var city = el.val();
-			//$('input[name=YOUR_CITY]').val(el.text());
-			setCity(city);
-			getDCV2P('',city);
-		}
-		else if (e.keyCode == 40) {
-			if (!$listItem.hasClass('active')) {
-				$listItem.first().addClass('active');
-				el.val($listItem.first().children('a').text());
-			} else {
-				var $listItemActive = $listItem.filter('.active');
-				el.val($listItemActive.next().children('a').text());
-				$listItemActive
-				.removeClass('active')
-				.next()
-				.addClass('active');
-			};
-		}
-		else if (e.keyCode == 38) {
-			if (!$listItem.hasClass('active')) {
-				$listItem.first().addClass('active');
-				el.val($listItem.first().children('a').text());
-			} else {
-				var $listItemActive = $listItem.filter('.active');
-				el.val($listItemActive.prev().children('a').text());
-				$listItemActive
-				.removeClass('active')
-				.prev()
-				.addClass('active');
-			};
-		}
-		else {
-			getCity(el.val(), 'cityBlock');
-		}
-	});
-	$('body').delegate('#cityBlock a', 'click', function (e) {
-		e.preventDefault()
-		var el = $(this);
-		$('input[name=YOUR_CITY]').val(el.text());
-		setCity(el.text());
-		getDCV2P('','');
-	});
-	$('form[name=selectCity]').on('submit', function (e) {
-		e.preventDefault();
-		var city = $(this).find('input[name=YOUR_CITY]').val();
-		setCity(city);
-	});
-	$(document).on('click', function (e) {
-		e.stopPropagation();
-		if ($(e.target).closest('.address-search').length)
-			return;
-		$('.address-search .address-dropdown').slideUp();
-	});
-
 	//окно выбора расцветок в списке товаров
 	$('body').delegate('.showSelectOffers', 'click', function (e) {
 		e.preventDefault();
@@ -1122,134 +1142,6 @@ $(function() {
 		e.preventDefault();
 		var el = $(this);
 		add2basket(el.data('id'));
-	});
-
-	//выбор города в карточке товара
-	function getDCV2P (mode, city) {
-		if ($('#deliveryCalc2Product').length) {
-			var dcv2p = $('#deliveryCalc2Product');
-			var getData = {
-				weight: dcv2p.data('weight'),
-				length: dcv2p.data('length'),
-				width: dcv2p.data('width'),
-				height: dcv2p.data('height'),
-				price:  dcv2p.data('price')
-			};
-			if (city === undefined) {
-				city = '';
-			}
-			if (city.length > 0) {
-				getData.city = city;
-			}
-			if (mode.length) {
-				getData.mode = mode;
-			}
-			if (parseInt(getData.weight, 10) > 0) {
-				$.ajax({
-					type: 'GET',
-					url: '/include/deliveryCalc2Product.php',
-					data: getData,
-					success: function (data) {
-						if (mode == 'modal') {
-							$('#cityModalList').html(data);
-							var pane = $('#cityModalList .js-scroll-pane').jScrollPane({
-								mouseWheelSpeed: 200
-							});
-
-						}
-						else {
-							dcv2p.html(data);
-						}
-					}
-				});
-			}
-		}
-	}
-	getDCV2P('','');
-
-	$('body').delegate('.js-sity-change', 'click', function (e) {
-		e.preventDefault();
-		var el = $(this),
-			input = el.parent().parent().find('.sity-change-input');
-		input.prop('disabled', false).focus().val('').addClass('active');
-		el.hide();
-		//input.parent().find('.address-dropdown').slideDown();
-	});
-	$('body').delegate('input.sity-change-input', 'keyup', function (e) {
-		var el = $(this),
-			blockName = '',
-			$listItem = el.parent().find('.address-dropdown li');
-		if (el.closest('#popup-calc').length)
-			blockName = 'cityBlock2ProductModal';
-		else
-			blockName = 'cityBlock2Product';
-		if (e.which == 13) {
-			var city = el.val();
-			el.removeClass('active').data('city', city);
-			setCity(city);
-			getDCV2P((blockName=='cityBlock2ProductModal'?'modal':''),city);
-			el.parent().find('.address-dropdown').hide();
-		}
-		else if (e.which == 27) {
-			el.removeClass('active').val(el.data('city'));
-			el.parent().find('.address-dropdown').hide();
-		}
-		else if (e.which == 40) {
-			if (!$listItem.hasClass('active')) {
-			  $listItem.first().addClass('active');
-			  el.val($listItem.first().children('a').text());
-			} else {
-			  var $listItemActive = $listItem.filter('.active');
-			  el.val($listItemActive.next().children('a').text());
-			  $listItemActive
-			    .removeClass('active')
-			    .next()
-			    .addClass('active');
-			};
-		}
-		else if (e.which == 38) {
-			if (!$listItem.hasClass('active')) {
-			  $listItem.first().addClass('active');
-			  el.val($listItem.first().children('a').text());
-			} else {
-			  var $listItemActive = $listItem.filter('.active');
-			  el.val($listItemActive.prev().children('a').text());
-			  $listItemActive
-			    .removeClass('active')
-			    .prev()
-			    .addClass('active');
-			};
-		}
-		else {
-			var addressBlock = el.parent().find('.address-dropdown');
-			getCity(el.val(), blockName);
-		}
-	});
-	$('body').delegate('#cityBlock2Product a', 'click', function (e) {
-		e.preventDefault()
-		var el = $(this);
-		el.parent().parent().find('input.sity-change-input').val(el.text()).removeClass('active');
-		//setCity(el.text());
-		setSessionCity(el.text());
-		getDCV2P(el.text());
-		el.parent('.address-dropdown').hide();
-	});
-	$('body').delegate('#cityBlock2ProductModal a', 'click', function (e) {
-		e.preventDefault()
-		var el = $(this);
-		el.closest('.b-calc').find('input.sity-change-input').val(el.text()).removeClass('active');
-		//setCity(el.text());
-		setSessionCity(el.text());
-		getDCV2P('modal',el.text());
-		el.closest('.address-dropdown').hide();
-		el.parents('.b-calc').find('.js-sity-change').show();
-	});
-	$('body').delegate('#popup-calc', 'hidden.modal', function () {
-		var cityModal = $('#popup-calc input.sity-change-input').val(),
-			cityProduct = $('#deliveryCalc2Product .bl-calc input[name=YOUR_CITY_PRODUCT]').val();
-		if (cityModal != cityProduct) {
-			getDCV2P(cityModal);
-		}
 	});
 
 	/*function getCookie(name) {
@@ -1276,4 +1168,39 @@ $(function() {
 			setPayHref();
 		});
 	}
+
+	//форма оплаты заказа
+	$('form[name=payModal]').on('submit', function(e) {
+		e.preventDefault();
+		var form = $(this);
+		form.find('#messageBox').empty();
+		form.validate({
+			rules: {
+				order: {
+					required: true,
+					number: true
+				}
+			},
+			messages: {
+				order: {
+					required: 'Введите ваш номер заказа',
+					number: 'Номер заказа должен состоять из цифр'
+				}
+			},
+			errorLabelContainer: '#messageBoxPay',
+			errorElement: 'div',
+			errorClass: 'text-danger'
+		});
+		if (form.valid()) {
+			var getData = {order: form.find('input[name=order]').val()};
+			$.getJSON('/include/orderPay.php', getData, function(response) {
+				if (response.STATUS == "OK") {
+					window.location.href = "/basket/payment.php?order="+getData.order;
+				}
+				else if (response.STATUS == "ERROR") {
+					form.find('#messageBoxPay').show().html('<div class="text-danger">'+response.MESSAGE+'</div>');
+				}
+			});
+		};
+	});
 });

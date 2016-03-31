@@ -25,7 +25,7 @@ if ($USER->IsAuthorized())
 	CCatalogDiscountCoupon::ClearCouponsByManage($USER->GetID());
 }
 
-$arYandexFields = array('vendor', 'vendorCode', 'model', 'author', 'name', 'publisher', 'series', 'year', 'ISBN', 'volume', 'part', 'language', 'binding', 'page_extent', 'table_of_contents', 'performed_by', 'performance_type', 'storage', 'format', 'recording_length', 'artist', 'title', 'year', 'media', 'starring', 'director', 'originalName', 'country', 'aliases', 'description', 'sales_notes', 'promo', 'provider', 'tarifplan', 'xCategory', 'additional', 'worldRegion', 'region', 'days', 'dataTour', 'hotel_stars', 'room', 'meal', 'included', 'transport', 'price_min', 'price_max', 'options', 'manufacturer_warranty', 'country_of_origin', 'downloadable', 'param', 'place', 'hall', 'hall_part', 'is_premiere', 'is_kids', 'date',);
+$arYandexFields = array('typePrefix', 'vendor', 'vendorCode', 'model', 'author', 'name', 'publisher', 'series', 'year', 'ISBN', 'volume', 'part', 'language', 'binding', 'page_extent', 'table_of_contents', 'performed_by', 'performance_type', 'storage', 'format', 'recording_length', 'artist', 'title', 'year', 'media', 'starring', 'director', 'originalName', 'country', 'aliases', 'description', 'sales_notes', 'promo', 'provider', 'tarifplan', 'xCategory', 'additional', 'worldRegion', 'region', 'days', 'dataTour', 'hotel_stars', 'room', 'meal', 'included', 'transport', 'price_min', 'price_max', 'options', 'manufacturer_warranty', 'country_of_origin', 'downloadable', 'param', 'place', 'hall', 'hall_part', 'is_premiere', 'is_kids', 'date',);
 
 if (!function_exists("yandex_replace_special"))
 {
@@ -538,6 +538,78 @@ if (empty($arRunErrors))
 	} */
 }
 
+/* Производители */
+use Bitrix\Highloadblock as HL;
+use Bitrix\Main\Entity;
+use Bitrix\Main\Type as FieldType;
+CModule::IncludeModule("highloadblock");
+$arMakers = array();
+$arMakersCountry = array();
+$rsMaker = CIBlockElement::GetList(
+	array(),
+	array(
+		"IBLOCK_ID" => 3,
+		//"ACTIVE" => "Y"
+	),
+	false,
+	false,
+	array("ID", "NAME", "PROPERTY_COUNTRY", "PROPERTY_DAYS")
+);
+while ($arMaker = $rsMaker->GetNext()) {
+
+	$arMakers[$arMaker["ID"]] = $arMaker["NAME"];
+
+	$countryID = $arMaker["PROPERTY_COUNTRY_VALUE"];
+
+	if (intval($countryID) > 0) {
+		$hlblock = HL\HighloadBlockTable::getById(1)->fetch();
+		$entity = HL\HighloadBlockTable::compileEntity($hlblock);
+		$entity_data_class = $entity->getDataClass();
+		$rsData = $entity_data_class::getList(array(
+			"select" => array("UF_NAME"),
+			"order" => array(),
+			"filter" => array("UF_XML_ID" => intval($countryID))
+		));
+		if ($arCountry = $rsData->Fetch()) {
+			$arMakersCountry[$arMaker["ID"]] = $arCountry["UF_NAME"];
+			//$arResult["COUNTRY"] = $arCountry;
+		}
+	}
+}
+
+$delivOptBetter2000 = "<delivery-options><option cost=\"0\" days=\"0\" order-before=\"13\"/><option cost=\"0\" days=\"1\" order-before=\"19\"/></delivery-options>\n";
+$delivOptLess2000 = "<delivery-options><option cost=\"350\" days=\"1-2\" order-before=\"19\"/></delivery-options>\n";
+$strDelivery = "<delivery>true</delivery>";
+
+/**
+ * Функция вернет строку с тегом delivery-options в зависимости от стоимости товара и проивзодителя
+ * @param float $price
+ * @param int $makerId
+ *
+ * @return string
+ */
+function getDelivOpt ($price, $makerId) {
+	$str = '';
+
+	$makerDay = '0';
+	if ($makerId) {
+		$rsProps = CIBlockElement::GetProperty(3, $makerId, array('SORT' => 'ASC'), array('CODE' => 'DAYS'));
+		if ($arProp = $rsProps->GetNext()) {
+			if ($arProp['VALUE'])
+				$makerDay = $arProp['VALUE'];
+		}
+	}
+	if ($price > 2000) {
+		$str = '<delivery-options><option cost="0" days="'.$makerDay.'" order-before="13"/><option cost="0" days="'.($makerDay+1).'" order-before="19"/></delivery-options>'.PHP_EOL;
+	} else {
+		$str .= '<delivery-options><option cost="350" days="'.($makerDay+1).'-'.($makerDay+2).'" order-before="19"/></delivery-options>'.PHP_EOL;
+	}
+	return $str;
+}
+
+
+$strPickup = ($SHOW_PICKUP=="Y"?"<pickup>true</pickup>":"");
+
 if (empty($arRunErrors))
 {
 	CheckDirPath($_SERVER["DOCUMENT_ROOT"].$SETUP_FILE_NAME);
@@ -697,13 +769,21 @@ if (empty($arRunErrors))
 	$intMaxSectionID += 100000000;
 
 	//*****************************************//
+	$strTmpDelivery = '<delivery-options><option cost="0" days="1" order-before="19"/></delivery-options>';
+
+	//*****************************************//
 	$boolNeedRootSection = false;
 
 	if ('D' == $arCatalog['CATALOG_TYPE'] || 'O' == $arCatalog['CATALOG_TYPE'])
 	{
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL");
+		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL", "CATALOG_GROUP_1", "CATALOG_GROUP_2");
 
-		$filter = array("IBLOCK_ID" => $IBLOCK_ID, "PROPERTY_MARKET_VALUE"=>"Y", "!PROPERTY_AVAILABLE"=>false);
+		$filter = array(
+			"IBLOCK_ID" => $IBLOCK_ID,
+			"PROPERTY_MARKET_VALUE"=>"Y",
+			"!PROPERTY_AVAILABLE"=>false,
+			"!PROPERTY_MAKER"=>false
+		);
 		if (!$bAllSections && !empty($arSectionIDs))
 		{
 			$filter["INCLUDE_SUBSECTIONS"] = "Y";
@@ -758,37 +838,6 @@ if (empty($arRunErrors))
 				);
 				if ($arPrice = $rsPrices->Fetch())
 				{
-					/*$dbVAT = CCatalogProduct::GetVATInfo($arAcc['ID']);
-					if ($arVat = $dbVAT->Fetch())
-					{
-						$arVat['RATE'] = floatval($arVat['RATE'] * 0.01);
-					}
-					else
-					{
-						$arVat = array('RATE' => 0, 'VAT_INCLUDED' => 'N');
-					}
-					$arPrice['VAT_RATE'] = $arVat['RATE'];
-					$arPrice['VAT_INCLUDED'] = $arVat['VAT_INCLUDED'];
-					if ($arPrice['VAT_INCLUDED'] == 'N')
-					{
-						$arPrice['PRICE'] *= (1 + $arPrice['VAT_RATE']);
-						$arPrice['VAT_INCLUDED'] = 'Y';
-					}
-					$arPrice['PRICE'] = roundEx($arPrice['PRICE'], CATALOG_VALUE_PRECISION);
-					$arDiscounts = CCatalogDiscount::GetDiscount(
-						$arAcc['ID'],
-						$IBLOCK_ID,
-						array($XML_DATA['PRICE']),
-						array(2),
-						'N',
-						$ar_iblock['LID'],
-						false
-					);
-					$minPrice = CCatalogProduct::CountPriceWithDiscount($arPrice['PRICE'], $arPrice["CURRENCY"], $arDiscounts);
-					$minPriceGroup = $arPrice['CATALOG_GROUP_ID'];
-					$minPriceCurrency = $arPrice["CURRENCY"];
-					$minPriceRUR = CCurrencyRates::ConvertCurrency($arPrice['PRICE'], $arPrice["CURRENCY"], $RUR);
-					*/
 					if ($arOptimalPrice = CCatalogProduct::GetOptimalPrice(
 						$arAcc['ID'],
 						1,
@@ -827,6 +876,12 @@ if (empty($arRunErrors))
 
 			if ($minPrice <= 0) continue;
 
+			$oldPrice = 0;
+			$arCatalogPrices = CIBlockPriceTools::GetCatalogPrices(false, array('MARGIN'));
+			$arMarginPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arAcc, false, array());
+			if ($arMarginPrices["MARGIN"]["DISCOUNT_VALUE"])
+				$oldPrice = $arMarginPrices["MARGIN"]["DISCOUNT_VALUE"];
+
 			$boolCurrentSections = false;
 			$bNoActiveGroup = true;
 			$strTmpOff_tmp = "";
@@ -854,6 +909,18 @@ if (empty($arRunErrors))
 					continue;
 			}
 
+			$strTmpOff_tmp .= $strPickup;
+			$strTmpOff_tmp .= $strDelivery;
+
+			$strTmpOff_tmp .= getDelivOpt($minPrice, $arAcc['PROPERTIES'][6]['VALUE']);
+
+			/*if ($minPrice > 2000) {
+				$strTmpOff_tmp .= $delivOptBetter2000;
+			}
+			else {
+				$strTmpOff_tmp .= $delivOptLess2000;
+			}*/
+
 			if (strlen($arAcc['DETAIL_PAGE_URL']) <= 0)
 				$arAcc['DETAIL_PAGE_URL'] = '/';
 			else
@@ -864,10 +931,17 @@ if (empty($arRunErrors))
 			else
 				$str_TYPE = '';
 
+			if ($arAcc["PROPERTIES"][253]["VALUE"] && $arAcc["PROPERTIES"][252]["VALUE"])
+				$str_TYPE = ' type="vendor.model"';
+			else
+				$str_TYPE = '';
+
 			$strTmpOff.= "<offer id=\"".$arAcc["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
 			$strTmpOff.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arAcc["~DETAIL_PAGE_URL"]).(strstr($arAcc['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 			$strTmpOff.= "<price>".$minPrice."</price>\n";
+			if ($oldPrice > 0)
+				$strTmpOff .= "<oldprice>$oldPrice</oldprice>";
 			$strTmpOff.= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 			$strTmpOff.= $strTmpOff_tmp;
@@ -895,79 +969,111 @@ if (empty($arRunErrors))
 			{
 				switch ($key)
 				{
-				case 'name':
-					if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
-						continue;
-
-					$strTmpOff .= "<name>".yandex_text2xml($arAcc["~NAME"], true)."</name>\n";
-					break;
-				case 'description':
-					$strTmpOff .=
-						"<description>".
-						yandex_text2xml(TruncateText(
-							($arAcc["PREVIEW_TEXT_TYPE"]=="html"?
-							strip_tags(preg_replace_callback("'&[^;]*;'", "yandex_replace_special", $arAcc["~PREVIEW_TEXT"])) : preg_replace_callback("'&[^;]*;'", "yandex_replace_special", $arAcc["~PREVIEW_TEXT"])),
-							255), true).
-						"</description>\n";
-					break;
-				case 'param':
-					if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && is_array($XML_DATA['XML_DATA']['PARAMS']))
-					{
-						foreach ($XML_DATA['XML_DATA']['PARAMS'] as $key => $prop_id)
-						{
-							$strParamValue = '';
-							if ($prop_id)
-							{
-								$strParamValue = yandex_get_value($arAcc, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
+					case 'typePrefix':
+						if ($arAcc["PROPERTIES"][253]["VALUE"] && $arAcc["PROPERTIES"][252]["VALUE"])
+							$strTmpOff .= "<typePrefix>".yandex_text2xml($arAcc["PROPERTIES"][253]["VALUE"], true)."</typePrefix>\n";
+						break;
+					case 'vendor':
+						if ($arAcc["PROPERTIES"][6]["VALUE"]) {
+							if (array_key_exists($arAcc["PROPERTIES"][6]["VALUE"], $arMakers)) {
+								$strTmpOff .= "<vendor>".yandex_text2xml($arMakers[$arAcc["PROPERTIES"][6]["VALUE"]], true)."</vendor>\n";
 							}
-							if ('' != $strParamValue)
-								$strTmpOff .= $strParamValue."\n";
 						}
-					}
-					break;
-				case 'model':
-				case 'title':
-					if (!is_array($XML_DATA) || !is_array($XML_DATA['XML_DATA']) || !$XML_DATA['XML_DATA'][$key])
-					{
-						if (
-							$key == 'model' && $XML_DATA['TYPE'] == 'vendor.model'
-							||
-							$key == 'title' && $XML_DATA['TYPE'] == 'artist.title'
-						)
+						break;
+					case 'model':
+						if ($arAcc["PROPERTIES"][253]["VALUE"] && $arAcc["PROPERTIES"][252]["VALUE"])
+							$strTmpOff .= "<model>".yandex_text2xml($arAcc["PROPERTIES"][252]["VALUE"], true)."</model>\n";
+						break;
+					case 'name':
+						/*if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
+							continue;*/
+						if ($arAcc["PROPERTIES"][253]["VALUE"] && $arAcc["PROPERTIES"][252]["VALUE"])
+							continue;
 
-						$strTmpOff.= "<".$key.">".yandex_text2xml($arAcc["~NAME"], true)."</".$key.">\n";
-					}
-					else
-					{
-						$strValue = '';
-						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
-						if ('' != $strValue)
-							$strTmpOff .= $strValue."\n";
-					}
-					break;
-				case 'year':
-					$y++;
-					if ($XML_DATA['TYPE'] == 'artist.title')
-					{
-						if ($y == 1) continue;
-					}
-					else
-					{
-						if ($y > 1) continue;
-					}
+						$strTmpOff .= "<name>".yandex_text2xml($arAcc["~NAME"], true)."</name>\n";
+						break;
+					case 'description':
+						$strTmpOff .=
+							"<description>".
+							yandex_text2xml(TruncateText(
+								($arAcc["PREVIEW_TEXT_TYPE"]=="html"?
+								strip_tags(preg_replace_callback("'&[^;]*;'", "yandex_replace_special", $arAcc["~PREVIEW_TEXT"])) : preg_replace_callback("'&[^;]*;'", "yandex_replace_special", $arAcc["~PREVIEW_TEXT"])),
+								255), true).
+							"</description>\n";
+						break;
+					case 'sales_notes':
+						if ($arAcc["PROPERTIES"][255]["VALUE"])
+							$strTmpOff .= "<sales_notes>".yandex_text2xml($arAcc["PROPERTIES"][255]["VALUE"], true)."</sales_notes>\n";
+						break;
+					case 'country_of_origin':
+						if ($arAcc["PROPERTIES"][6]["VALUE"]) {
+							if (array_key_exists($arAcc["PROPERTIES"][6]["VALUE"], $arMakersCountry)) {
+								$strTmpOff .= "<country_of_origin>".yandex_text2xml($arMakersCountry[$arAcc["PROPERTIES"][6]["VALUE"]], true)."</country_of_origin>\n";
+							}
+						}
+						break;
+					case 'manufacturer_warranty':
+						$strTmpOff .= "<manufacturer_warranty>true</manufacturer_warranty>";
+						break;
+					case 'param':
+						if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && is_array($XML_DATA['XML_DATA']['PARAMS']))
+						{
+							foreach ($XML_DATA['XML_DATA']['PARAMS'] as $key => $prop_id)
+							{
+								$strParamValue = '';
+								if ($prop_id)
+								{
+									$strParamValue = yandex_get_value($arAcc, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
+								}
+								if ('' != $strParamValue)
+									$strTmpOff .= $strParamValue."\n";
+							}
+						}
+						break;
+					case 'title':
+						if (!is_array($XML_DATA) || !is_array($XML_DATA['XML_DATA']) || !$XML_DATA['XML_DATA'][$key])
+						{
+							if (
+								$key == 'model' && $XML_DATA['TYPE'] == 'vendor.model'
+								||
+								$key == 'title' && $XML_DATA['TYPE'] == 'artist.title'
+							)
+
+							$strTmpOff.= "<".$key.">".yandex_text2xml($arAcc["~NAME"], true)."</".$key.">\n";
+						}
+						else
+						{
+							$strValue = '';
+							$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+							if ('' != $strValue)
+								$strTmpOff .= $strValue."\n";
+						}
+						break;
+					case 'year':
+						$y++;
+						if ($XML_DATA['TYPE'] == 'artist.title')
+						{
+							if ($y == 1) continue;
+						}
+						else
+						{
+							if ($y > 1) continue;
+						}
 
 					// no break here
 
-				default:
-					if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
-					{
-						$strValue = '';
-						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
-						if ('' != $strValue)
-							$strTmpOff .= $strValue."\n";
-					}
+					default:
+						if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
+						{
+							$strValue = '';
+							$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+							if ('' != $strValue)
+								$strTmpOff .= $strValue."\n";
+						}
 				}
 			}
+
+			$strTmpOff .= "<cpa>".($arAcc["PROPERTIES"]["CPA"]["VALUE"]?1:0)."</cpa>";
 
 			$strTmpOff.= "</offer>\n";
 			if (100 <= $cnt)
@@ -983,7 +1089,7 @@ if (empty($arRunErrors))
 	}
 	elseif ('P' == $arCatalog['CATALOG_TYPE'] || 'X' == $arCatalog['CATALOG_TYPE'])
 	{
-		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL", "CATALOG_GROUP_1", "CATALOG_GROUP_2");
 		$arOfferFilter = array('IBLOCK_ID' => $intOfferIBlockID, 'PROPERTY_'.$arOffers['SKU_PROPERTY_ID'] => 0, "ACTIVE" => "Y", "ACTIVE_DATE" => "Y");
 		if (YANDEX_SKU_EXPORT_PROP == $arSKUExport['SKU_EXPORT_COND'])
 		{
@@ -997,7 +1103,7 @@ if (empty($arRunErrors))
 			$arOfferFilter[$strExportKey] = $mxValues;
 		}
 
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL", "CATALOG_GROUP_1", "CATALOG_GROUP_2");
 		$arFilter = array("IBLOCK_ID" => $IBLOCK_ID);
 		if (!$bAllSections && !empty($arSectionIDs))
 		{
@@ -1008,6 +1114,7 @@ if (empty($arRunErrors))
 		$arFilter["ACTIVE_DATE"] = "Y";
 		$arFilter["PROPERTY_MARKET_VALUE"] = "Y";
 		$arFilter["!PROPERTY_AVAILABLE"] = false;
+		$arFilter["!PROPERTY_MAKER"] = false;
 
 		$strOfferTemplateURL = '';
 		if (!empty($arSKUExport['SKU_URL_TEMPLATE_TYPE']))
@@ -1036,6 +1143,7 @@ if (empty($arRunErrors))
 			$arCross = array();
 			$arItem = $obItem->GetFields();
 			$arItem['PROPERTIES'] = $obItem->GetProperties();
+			$vendorID = (int)$arItem["PROPERTIES"]["MAKER"]["VALUE"];
 			if (!empty($arItem['PROPERTIES']))
 			{
 				foreach ($arItem['PROPERTIES'] as &$arProp)
@@ -1104,11 +1212,16 @@ if (empty($arRunErrors))
 							255), true);
 
 			$arOfferFilter['PROPERTY_'.$arOffers['SKU_PROPERTY_ID']] = $arItem['ID'];
+			$arOfferFilter["!PROPERTY_COLOR"] = false;
+			$arOfferNavParams = array("nTopCount"=>1);
+			if ($arItem["PROPERTIES"][248]["VALUE"])
+				$arOfferNavParams = false;
 
-			$rsOfferItems = CIBlockElement::GetList(array("SORT"=>"ASC", "ID" => "ASC"),$arOfferFilter,false,array("nTopCount"=>1),$arOfferSelect);
+			$rsOfferItems = CIBlockElement::GetList(array("SORT"=>"ASC", "ID" => "ASC"),$arOfferFilter,false,$arOfferNavParams,$arOfferSelect);
 
 			if (!empty($strOfferTemplateURL))
 				$rsOfferItems->SetUrlTemplates($strOfferTemplateURL);
+
 			if (YANDEX_SKU_EXPORT_MIN_PRICE == $arSKUExport['SKU_EXPORT_COND'])
 			{
 				$arCurrentOffer = false;
@@ -1133,36 +1246,6 @@ if (empty($arRunErrors))
 						);
 						if ($arPrice = $rsPrices->Fetch())
 						{
-							/*$dbVAT = CCatalogProduct::GetVATInfo($arOfferItem['ID']);
-							if ($arVat = $dbVAT->Fetch())
-							{
-								$arVat['RATE'] = floatval($arVat['RATE'] * 0.01);
-							}
-							else
-							{
-								$arVat = array('RATE' => 0, 'VAT_INCLUDED' => 'N');
-							}
-							$arPrice['VAT_RATE'] = $arVat['RATE'];
-							$arPrice['VAT_INCLUDED'] = $arVat['VAT_INCLUDED'];
-							if ($arPrice['VAT_INCLUDED'] == 'N')
-							{
-								$arPrice['PRICE'] *= (1 + $arPrice['VAT_RATE']);
-								$arPrice['VAT_INCLUDED'] = 'Y';
-							}
-							$arPrice['PRICE'] = roundEx($arPrice['PRICE'], CATALOG_VALUE_PRECISION);
-							$arDiscounts = CCatalogDiscount::GetDiscount(
-								$arOfferItem['ID'],
-								$intOfferIBlockID,
-								array($XML_DATA['PRICE']),
-								array(2),
-								'N',
-								$arOfferIBlock['LID'],
-								false
-							);
-							$minPrice = CCatalogProduct::CountPriceWithDiscount($arPrice['PRICE'], $arPrice["CURRENCY"], $arDiscounts);
-							$minPriceGroup = $arPrice['CATALOG_GROUP_ID'];
-							$minPriceCurrency = $arPrice["CURRENCY"];
-							$minPriceRUR = CCurrencyRates::ConvertCurrency($arPrice['PRICE'], $arPrice["CURRENCY"], $RUR); */
 							if ($arOptimalPrice = CCatalogProduct::GetOptimalPrice(
 								$arOfferItem['ID'],
 								1,
@@ -1257,6 +1340,13 @@ if (empty($arRunErrors))
 					$minPriceRUR = $arCurrentPrice['MIN_PRICE_RUR'];
 					$minPriceGroup = $arCurrentPrice['MIN_PRICE_GROUP'];
 
+					$oldPrice = 0;
+					$arCatalogPrices = CIBlockPriceTools::GetCatalogPrices(false, array('MARGIN'));
+					$arMarginPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arOfferItem, false, array());
+					if ($arMarginPrices["MARGIN"]["DISCOUNT_VALUE"])
+						$oldPrice = $arMarginPrices["MARGIN"]["DISCOUNT_VALUE"];
+
+
 					$arOfferItem['YANDEX_AVAILABLE'] = 'true';
 					$rsProducts = CCatalogProduct::GetList(
 						array(),
@@ -1282,6 +1372,11 @@ if (empty($arRunErrors))
 					else
 						$str_TYPE = '';
 
+					if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+						$str_TYPE = ' type="vendor.model"';
+					else
+						$str_TYPE = '';
+
 					$arOfferItem['YANDEX_TYPE'] = $str_TYPE;
 
 					$strOfferYandex = '';
@@ -1289,9 +1384,21 @@ if (empty($arRunErrors))
 					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
+					if ($oldPrice > 0)
+						$strOfferYandex .= "<oldprice>$oldPrice</oldprice>";
 					$strOfferYandex .= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 					$strOfferYandex .= $arItem['YANDEX_CATEGORY'];
+
+					$strOfferYandex .= $strPickup;
+					$strOfferYandex .= $strDelivery;
+
+					$strOfferYandex .= getDelivOpt($minPrice, $arItem['PROPERTIES'][6]['VALUE']);
+
+					/*if ($minPrice > 2000)
+						$strOfferYandex .= $delivOptBetter2000;
+					else
+						$strOfferYandex .= $delivOptLess2000;*/
 
 					$strFile = '';
 					$arOfferItem["DETAIL_PICTURE"] = (int)$arOfferItem["DETAIL_PICTURE"];
@@ -1320,9 +1427,27 @@ if (empty($arRunErrors))
 					{
 						switch ($key)
 						{
+						case 'typePrefix':
+							if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+								$strOfferYandex .= "<typePrefix>".yandex_text2xml($arItem["PROPERTIES"][253]["VALUE"], true)."</typePrefix>\n";
+							break;
+						case 'vendor':
+							if (array_key_exists($vendorID, $arMakers)) {
+								$strOfferYandex .= "<vendor>".yandex_text2xml($arMakers[$vendorID], true)."</vendor>\n";
+							}
+							break;
+						case 'model':
+							if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+								$strOfferYandex .= "<model>".yandex_text2xml($arItem["PROPERTIES"][252]["VALUE"], true)."</model>\n";
+							break;
 						case 'name':
-							if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
+							/*if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
+								continue;*/
+							if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
 								continue;
+
+							if ($arItem["PROPERTIES"][248]["VALUE"] && strlen($arOfferItem["PROPERTIES"][96]["VALUE"]))
+								$arOfferItem["~NAME"] .= ", ".$arOfferItem["PROPERTIES"][96]["VALUE"];
 
 							$strOfferYandex .= "<name>".yandex_text2xml($arOfferItem["~NAME"], true)."</name>\n";
 							break;
@@ -1342,6 +1467,20 @@ if (empty($arRunErrors))
 							}
 							$strOfferYandex .= "</description>\n";
 							break;
+						case 'sales_notes':
+							if ($arItem["PROPERTIES"][255]["VALUE"])
+								$strOfferYandex .= "<sales_notes>".yandex_text2xml($arItem["PROPERTIES"][255]["VALUE"], true)."</sales_notes>\n";
+							break;
+						case 'country_of_origin':
+							if ($arItem["PROPERTIES"][6]["VALUE"]) {
+								if (array_key_exists($arItem["PROPERTIES"][6]["VALUE"], $arMakersCountry)) {
+									$strOfferYandex .= "<country_of_origin>".yandex_text2xml($arMakersCountry[$arItem["PROPERTIES"][6]["VALUE"]], true)."</country_of_origin>\n";
+								}
+							}
+							break;
+						case 'manufacturer_warranty':
+							$strOfferYandex .= "<manufacturer_warranty>true</manufacturer_warranty>";
+							break;
 						case 'param':
 							if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && is_array($XML_DATA['XML_DATA']['PARAMS']))
 							{
@@ -1357,7 +1496,6 @@ if (empty($arRunErrors))
 								}
 							}
 							break;
-						case 'model':
 						case 'title':
 							if (!is_array($XML_DATA) || !is_array($XML_DATA['XML_DATA']) || !$XML_DATA['XML_DATA'][$key])
 							{
@@ -1397,6 +1535,7 @@ if (empty($arRunErrors))
 							}
 						}
 					}
+					$strOfferYandex .= "<cpa>".($arItem["PROPERTIES"][248]["VALUE"]?1:0)."</cpa>";
 
 					$strOfferYandex .= "</offer>\n";
 					$arItem['OFFERS'][] = $strOfferYandex;
@@ -1449,36 +1588,6 @@ if (empty($arRunErrors))
 						);
 						if ($arPrice = $rsPrices->Fetch())
 						{
-/*							$dbVAT = CCatalogProduct::GetVATInfo($arOfferItem['ID']);
-							if ($arVat = $dbVAT->Fetch())
-							{
-								$arVat['RATE'] = floatval($arVat['RATE'] * 0.01);
-							}
-							else
-							{
-								$arVat = array('RATE' => 0, 'VAT_INCLUDED' => 'N');
-							}
-							$arPrice['VAT_RATE'] = $arVat['RATE'];
-							$arPrice['VAT_INCLUDED'] = $arVat['VAT_INCLUDED'];
-							if ($arPrice['VAT_INCLUDED'] == 'N')
-							{
-								$arPrice['PRICE'] *= (1 + $arPrice['VAT_RATE']);
-								$arPrice['VAT_INCLUDED'] = 'Y';
-							}
-							$arPrice['PRICE'] = roundEx($arPrice['PRICE'], CATALOG_VALUE_PRECISION);
-							$arDiscounts = CCatalogDiscount::GetDiscount(
-								$arOfferItem['ID'],
-								$intOfferIBlockID,
-								array($XML_DATA['PRICE']),
-								array(2),
-								'N',
-								$arOfferIBlock['LID'],
-								false
-							);
-							$minPrice = CCatalogProduct::CountPriceWithDiscount($arPrice['PRICE'], $arPrice["CURRENCY"], $arDiscounts);
-							$minPriceGroup = $arPrice['CATALOG_GROUP_ID'];
-							$minPriceCurrency = $arPrice["CURRENCY"];
-							$minPriceRUR = CCurrencyRates::ConvertCurrency($arPrice['PRICE'], $arPrice["CURRENCY"], $RUR); */
 							if ($arOptimalPrice = CCatalogProduct::GetOptimalPrice(
 								$arOfferItem['ID'],
 								1,
@@ -1518,6 +1627,12 @@ if (empty($arRunErrors))
 					if ($minPrice <= 0)
 						continue;
 
+					$oldPrice = 0;
+					$arCatalogPrices = CIBlockPriceTools::GetCatalogPrices(false, array('MARGIN'));
+					$arMarginPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arOfferItem, false, array());
+					if ($arMarginPrices["MARGIN"]["DISCOUNT_VALUE"])
+						$oldPrice = $arMarginPrices["MARGIN"]["DISCOUNT_VALUE"];
+
 					if (strlen($arOfferItem['DETAIL_PAGE_URL']) <= 0)
 						$arOfferItem['DETAIL_PAGE_URL'] = '/';
 					else
@@ -1528,6 +1643,11 @@ if (empty($arRunErrors))
 					else
 						$str_TYPE = '';
 
+					if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+						$str_TYPE = ' type="vendor.model"';
+					else
+						$str_TYPE = '';
+
 					$arOfferItem['YANDEX_TYPE'] = $str_TYPE;
 
 					$strOfferYandex = '';
@@ -1535,9 +1655,21 @@ if (empty($arRunErrors))
 					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
+					if ($oldPrice > 0)
+						$strOfferYandex .= "<oldprice>$oldPrice</oldprice>";
 					$strOfferYandex .= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 					$strOfferYandex .= $arItem['YANDEX_CATEGORY'];
+
+					$strOfferYandex .= $strPickup;
+					$strOfferYandex .= $strDelivery;
+
+					$strOfferYandex .= getDelivOpt($minPrice, $arItem['PROPERTIES'][6]['VALUE']);
+
+					/*if ($minPrice > 2000)
+						$strOfferYandex .= $delivOptBetter2000;
+					else
+						$strOfferYandex .= $delivOptLess2000;*/
 
 					$strFile = '';
 					$arOfferItem["DETAIL_PICTURE"] = (int)$arOfferItem["DETAIL_PICTURE"];
@@ -1566,9 +1698,27 @@ if (empty($arRunErrors))
 					{
 						switch ($key)
 						{
+						case 'typePrefix':
+							if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+								$strOfferYandex .= "<typePrefix>".yandex_text2xml($arItem["PROPERTIES"][253]["VALUE"], true)."</typePrefix>\n";
+							break;
+						case 'vendor':
+							if (array_key_exists($vendorID, $arMakers)) {
+								$strOfferYandex .= "<vendor>".yandex_text2xml($arMakers[$vendorID], true)."</vendor>\n";
+							}
+							break;
+						case 'model':
+							if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+								$strOfferYandex .= "<model>".yandex_text2xml($arItem["PROPERTIES"][252]["VALUE"], true)."</model>\n";
+							break;
 						case 'name':
-							if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
+							/*if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
+								continue;*/
+							if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
 								continue;
+
+							if ($arItem["PROPERTIES"][248]["VALUE"] && strlen($arOfferItem["PROPERTIES"][96]["VALUE"]))
+								$arOfferItem["~NAME"] .= ", ".$arOfferItem["PROPERTIES"][96]["VALUE"];
 
 							$strOfferYandex .= "<name>".yandex_text2xml($arOfferItem["~NAME"], true)."</name>\n";
 							break;
@@ -1588,6 +1738,20 @@ if (empty($arRunErrors))
 							}
 							$strOfferYandex .= "</description>\n";
 							break;
+						case 'sales_notes':
+							if ($arItem["PROPERTIES"][255]["VALUE"])
+								$strOfferYandex .= "<sales_notes>".yandex_text2xml($arItem["PROPERTIES"][255]["VALUE"], true)."</sales_notes>\n";
+							break;
+						case 'country_of_origin':
+							if ($arItem["PROPERTIES"][6]["VALUE"]) {
+								if (array_key_exists($arItem["PROPERTIES"][6]["VALUE"], $arMakersCountry)) {
+									$strOfferYandex .= "<country_of_origin>".yandex_text2xml($arMakersCountry[$arItem["PROPERTIES"][6]["VALUE"]], true)."</country_of_origin>\n";
+								}
+							}
+							break;
+						case 'manufacturer_warranty':
+							$strOfferYandex .= "<manufacturer_warranty>true</manufacturer_warranty>";
+							break;
 						case 'param':
 							if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && is_array($XML_DATA['XML_DATA']['PARAMS']))
 							{
@@ -1603,7 +1767,6 @@ if (empty($arRunErrors))
 								}
 							}
 							break;
-						case 'model':
 						case 'title':
 							if (!is_array($XML_DATA) || !is_array($XML_DATA['XML_DATA']) || !$XML_DATA['XML_DATA'][$key])
 							{
@@ -1643,6 +1806,7 @@ if (empty($arRunErrors))
 							}
 						}
 					}
+					$strOfferYandex .= "<cpa>".($arItem["PROPERTIES"][248]["VALUE"]?1:0)."</cpa>";
 
 					$strOfferYandex .= "</offer>\n";
 					$arItem['OFFERS'][] = $strOfferYandex;
@@ -1686,36 +1850,6 @@ if (empty($arRunErrors))
 					);
 					if ($arPrice = $rsPrices->Fetch())
 					{
-/*						$dbVAT = CCatalogProduct::GetVATInfo($arItem['ID']);
-						if ($arVat = $dbVAT->Fetch())
-						{
-							$arVat['RATE'] = floatval($arVat['RATE'] * 0.01);
-						}
-						else
-						{
-							$arVat = array('RATE' => 0, 'VAT_INCLUDED' => 'N');
-						}
-						$arPrice['VAT_RATE'] = $arVat['RATE'];
-						$arPrice['VAT_INCLUDED'] = $arVat['VAT_INCLUDED'];
-						if ($arPrice['VAT_INCLUDED'] == 'N')
-						{
-							$arPrice['PRICE'] *= (1 + $arPrice['VAT_RATE']);
-							$arPrice['VAT_INCLUDED'] = 'Y';
-						}
-						$arPrice['PRICE'] = roundEx($arPrice['PRICE'], CATALOG_VALUE_PRECISION);
-						$arDiscounts = CCatalogDiscount::GetDiscount(
-							$arItem['ID'],
-							$IBLOCK_ID,
-							array($XML_DATA['PRICE']),
-							array(2),
-							'N',
-							$ar_iblock['LID'],
-							false
-						);
-						$minPrice = CCatalogProduct::CountPriceWithDiscount($arPrice['PRICE'], $arPrice["CURRENCY"], $arDiscounts);
-						$minPriceGroup = $arPrice['CATALOG_GROUP_ID'];
-						$minPriceCurrency = $arPrice["CURRENCY"];
-						$minPriceRUR = CCurrencyRates::ConvertCurrency($arPrice['PRICE'], $arPrice["CURRENCY"], $RUR); */
 						if ($arOptimalPrice = CCatalogProduct::GetOptimalPrice(
 							$arItem['ID'],
 							1,
@@ -1754,6 +1888,12 @@ if (empty($arRunErrors))
 
 				if ($minPrice <= 0) continue;
 
+				$oldPrice = 0;
+				$arCatalogPrices = CIBlockPriceTools::GetCatalogPrices(false, array('MARGIN'));
+				$arMarginPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arItem, false, array());
+				if ($arMarginPrices["MARGIN"]["DISCOUNT_VALUE"])
+					$oldPrice = $arMarginPrices["MARGIN"]["DISCOUNT_VALUE"];
+
 				if ('' == $arItem['DETAIL_PAGE_URL'])
 				{
 					$arItem['DETAIL_PAGE_URL'] = '/';
@@ -1776,14 +1916,31 @@ if (empty($arRunErrors))
 				else
 					$str_TYPE = '';
 
+				if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+					$str_TYPE = ' type="vendor.model"';
+				else
+					$str_TYPE = '';
+
 				$strOfferYandex = '';
 				$strOfferYandex.= "<offer id=\"".$arItem["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
 				$strOfferYandex.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arItem["~DETAIL_PAGE_URL"]).(strstr($arItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 				$strOfferYandex.= "<price>".$minPrice."</price>\n";
+				if ($oldPrice > 0)
+					$strOfferYandex .= "<oldprice>$oldPrice</oldprice>";
 				$strOfferYandex.= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 				$strOfferYandex.= $arItem['YANDEX_CATEGORY'];
+
+				$strOfferYandex .= $strPickup;
+				$strOfferYandex .= $strDelivery;
+
+				$strOfferYandex .= getDelivOpt($minPrice, $arItem['PROPERTIES'][6]['VALUE']);
+
+				/*if ($minPrice > 2000)
+					$strOfferYandex .= $delivOptBetter2000;
+				else
+					$strOfferYandex .= $delivOptLess2000;*/
 
 				if (!empty($arItem['YANDEX_PICT']))
 				{
@@ -1796,9 +1953,27 @@ if (empty($arRunErrors))
 					$strValue = '';
 					switch ($key)
 					{
+					case 'typePrefix':
+						if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+							$strValue .= "<typePrefix>".yandex_text2xml($arItem["PROPERTIES"][253]["VALUE"], true)."</typePrefix>\n";
+						break;
+					case 'vendor':
+						if (array_key_exists($vendorID, $arMakers)) {
+							$strValue = "<vendor>".yandex_text2xml($arMakers[$vendorID], true)."</vendor>\n";
+						}
+						break;
+					case 'model':
+						if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
+							$strValue .= "<model>".yandex_text2xml($arItem["PROPERTIES"][252]["VALUE"], true)."</model>\n";
+						break;
 					case 'name':
-						if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
+						/*if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
+							continue;*/
+						if ($arItem["PROPERTIES"][253]["VALUE"] && $arItem["PROPERTIES"][252]["VALUE"])
 							continue;
+
+						if ($arItem["PROPERTIES"][248]["VALUE"] && strlen($arItem["PROPERTIES"][236]["VALUE"]))
+								$arItem["~NAME"] .= ", ".$arItem["PROPERTIES"][236]["VALUE"];
 
 						$strValue = "<name>".yandex_text2xml($arItem["~NAME"], true)."</name>\n";
 						break;
@@ -1810,6 +1985,20 @@ if (empty($arRunErrors))
 								strip_tags(preg_replace_callback("'&[^;]*;'", "yandex_replace_special", $arItem["~PREVIEW_TEXT"])) : preg_replace_callback("'&[^;]*;'", "yandex_replace_special", $arItem["~PREVIEW_TEXT"])),
 								255), true).
 							"</description>\n";
+						break;
+					case 'sales_notes':
+						if ($arItem["PROPERTIES"][255]["VALUE"])
+							$strValue .= "<sales_notes>".yandex_text2xml($arItem["PROPERTIES"][255]["VALUE"], true)."</sales_notes>\n";
+						break;
+					case 'country_of_origin':
+						if ($arItem["PROPERTIES"][6]["VALUE"]) {
+							if (array_key_exists($arItem["PROPERTIES"][6]["VALUE"], $arMakersCountry)) {
+								$strValue .= "<country_of_origin>".yandex_text2xml($arMakersCountry[$arItem["PROPERTIES"][6]["VALUE"]], true)."</country_of_origin>\n";
+							}
+						}
+						break;
+					case 'manufacturer_warranty':
+						$strValue .= "<manufacturer_warranty>".($arItem["PROPERTIES"][6]["VALUE"]?"true":"false")."</manufacturer_warranty>";
 						break;
 					case 'param':
 						if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && is_array($XML_DATA['XML_DATA']['PARAMS']))
@@ -1826,7 +2015,6 @@ if (empty($arRunErrors))
 							}
 						}
 						break;
-					case 'model':
 					case 'title':
 						if (!is_array($XML_DATA) || !is_array($XML_DATA['XML_DATA']) || !$XML_DATA['XML_DATA'][$key])
 						{
@@ -1871,6 +2059,8 @@ if (empty($arRunErrors))
 						$strOfferYandex .= $strValue;
 				}
 
+				$strOfferYandex .= "<cpa>".($arItem["PROPERTIES"][248]["VALUE"]?1:0)."</cpa>";
+
 				$strOfferYandex .= "</offer>\n";
 
 				if ('' != $strOfferYandex)
@@ -1906,6 +2096,8 @@ if (empty($arRunErrors))
 	@fwrite($fp, $strTmpCat);
 	@fwrite($fp, "</categories>\n");
 
+	@fwrite($fp, $strTmpDelivery."\n");
+
 	@fwrite($fp, "<offers>\n");
 	@fwrite($fp, $strTmpOff);
 	@fwrite($fp, "</offers>\n");
@@ -1930,4 +2122,18 @@ if ($bTmpUserCreated)
 		unset($USER_TMP);
 	}
 }
-?>
+
+$file = $_SERVER["DOCUMENT_ROOT"].$SETUP_FILE_NAME;
+$copyFile = $_SERVER["DOCUMENT_ROOT"].'/bitrix/backup/export/'.time().'_yandex.php';
+copy($file, $copyFile);
+
+$arFiles = array_diff(scandir($_SERVER["DOCUMENT_ROOT"].'/bitrix/backup/export/'), array('..', '.'));
+foreach ($arFiles as $fileName) {
+	$arF = explode("_", $fileName);
+	if ((int)$arF[0] > 0) {
+		$diff = (time() - (int)$arF[0])/86400;
+		if ($diff > 7) {
+			unlink($_SERVER["DOCUMENT_ROOT"].'/bitrix/backup/export/'.$fileName);
+		}
+	}
+}

@@ -1,0 +1,38 @@
+extends ./layouts/default
+
+block vars
+    //- - var bodyClass = 'has-b-footer-nav';
+
+block content
+    .b-box
+        .b-box__content
+            p Всплывающие окна
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-callback') Заказ обратного звонка
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-choose-city') Это Ваш город?
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-thanks-for-comment') Спасибо за отзыв
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-pay-for-your-purchase') Оплатите вашу покупку
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-purchase-returns') Форма возврата товара
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-pr-options') Нужно выбрать параметры товара, чтобы добавить в корзину
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-secure-online-payments') Безопасность онлайн платежей
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-pr') Товар
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-deliver') Доставка товара в регионы
+            br
+            br
+            button.btn.btn-primary(type='button', data-toggle='modal', data-target='#modal-pr-added-to-cart') Товар добавлен в корзину
+    include includes/partials/modals/index

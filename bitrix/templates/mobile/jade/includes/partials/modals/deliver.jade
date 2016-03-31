@@ -1,0 +1,118 @@
+#modal-deliver.modal.fade(role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+        .modal-content
+            .modal-header
+                button.modal__close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                h3#myModalLabel.modal-title Доставка товара в регион
+            .modal-body
+                .sity-change
+                    span.sity-change__title Ваш город:
+                    span.sity-change__sity Санкт-Петербург
+                    a.sity-change__change.js-sity-change-change(href="#") Изменить
+                    select.sity-change__control.js-sity-change-control
+                        option(value="3620194" selected="selected") Санкт-Петербург
+                br
+                .help-text Список транспортных компаний не полный. После оформления заказа мы подберем для Вас оптимальный вариант доставки.
+                .b-calc__list
+                    //- .scroll-pane.js-scroll-pane
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-shipping.png')
+                        .b-calc__list-content
+                            .b-calc__list-price
+                                span бесплатно!
+                            .b-calc__list-title
+                                | Курьер, 
+                                span 1 день
+                        a(href="#").b-calc__list-button Выбрать
+                        //- можно так
+                        //- button.b-calc__list-button Выбрать
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-bicycle.png')
+                        .b-calc__list-content
+                            .b-calc__list-price
+                                span бесплатно!
+                            .b-calc__list-title Самовывоз
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-boxberry.png')
+                        .b-calc__list-content
+                            .b-calc__list-price 879 р.
+                            .b-calc__list-title
+                                | Boxberry (до пункта выдачи), 
+                                span 1 день
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-ems.png')
+                        .b-calc__list-content
+                            .b-calc__list-price 879 р.
+                            .b-calc__list-title
+                                | Boxberry (до пункта выдачи), 
+                                span 1 день
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-rmail.png')
+                        .b-calc__list-content
+                            .b-calc__list-price 879 р.
+                            .b-calc__list-title
+                                | Boxberry (до пункта выдачи), 
+                                span 1 день
+                            .b-calc__list-description В небольших населенных пунктах доставка производится до почтового отделения!
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-shipping.png')
+                        .b-calc__list-content
+                            .b-calc__list-price
+                                span бесплатно!
+                            .b-calc__list-title
+                                | Курьер, 
+                                span 1 день
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-bicycle.png')
+                        .b-calc__list-content
+                            .b-calc__list-price
+                                span бесплатно!
+                            .b-calc__list-title Самовывоз
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-boxberry.png')
+                        .b-calc__list-content
+                            .b-calc__list-price 879 р.
+                            .b-calc__list-title
+                                | Boxberry (до пункта выдачи), 
+                                span 1 день
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-ems.png')
+                        .b-calc__list-content
+                            .b-calc__list-price 879 р.
+                            .b-calc__list-title
+                                | Boxberry (до пункта выдачи), 
+                                span 1 день
+                    a.b-calc__list-item.js-change-delivery(href='#')
+                        .b-calc__figure
+                            span.b-calc__icon
+                                img(src='images/icons-calc/icon-ems.png')
+                        .b-calc__list-content
+                            .b-calc__list-price 879 р.
+                            .b-calc__list-title
+                                | Boxberry (до пункта выдачи), 
+                                span 1 день
+                            .b-calc__list-description В небольших населенных пунктах доставка производится до почтового отделения!
+            .modal-footer
+                //- button(type='submit').modal__submit Отправить
+link(rel="stylesheet", href="lib-bower/select2/dist/css/select2.css")
+script(src='lib-bower/select2/dist/js/select2.min.js')
+script(src='lib-bower/select2/dist/js/i18n/ru.js')

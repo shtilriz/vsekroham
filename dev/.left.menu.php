@@ -15,6 +15,13 @@ $aMenuLinks = Array(
 		""
 	),
 	Array(
+		"Синхронизация с 1С",
+		"/dev/one-c/",
+		Array(),
+		Array("ICON"=>"fa-exchange"),
+		""
+	),
+	Array(
 		"Габариты и вес товаров",
 		"/dev/parameters/",
 		Array(),

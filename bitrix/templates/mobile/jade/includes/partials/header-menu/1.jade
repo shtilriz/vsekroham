@@ -1,0 +1,30 @@
+ul.page-header__menu.header-menu
+    li.header-menu__item.has-dropdown
+        a(href="#").header-menu__link
+            span.header-menu__icon.sprite-globe
+            //- span.header-menu__text Москва
+            span.header-menu__caret
+        .header-menu-dropdown.js-dropdown-content
+            .b-header-search
+                header.b-header-search__header
+                    a(href="#").b-header-search__button Отмена
+                    .b-header-search__input
+                        a(href="#").icon-close
+                        input(type="text" value="Са")
+                ul.b-header-search__list
+                    each val in ["Саки", "Салават", "Салехард", "Сальск", "Самара", "Санкт-Петербург", "Сальск" ]
+                        li
+                            a(href="#") #{val}
+    li.header-menu__item.has-dropdown
+        a(href="#").header-menu__link
+            span.header-menu__icon.sprite-search
+        .header-menu-dropdown.js-dropdown-content
+            .b-header-search
+                header.b-header-search__header
+                    a(href="#").b-header-search__button Отмена
+                    .b-header-search__input
+                        a(href="#").icon-close
+                        input(type="text" value="Са")
+    li.header-menu__item
+        a(href="#").header-menu__link
+            span.header-menu__icon.sprite-basket

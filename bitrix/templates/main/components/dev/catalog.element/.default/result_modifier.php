@@ -13,7 +13,7 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED!==true) die();
 		unset($arResult["OFFERS"][$keyOffer]);
 	}
 }*/
-
+$arResult["OFFERS_IDS"] = array();
 if (!empty($arResult["OFFERS"])) {
 	$thisSKUProps = array();
 	$arColors = array();
@@ -44,6 +44,7 @@ if (!empty($arResult["OFFERS"])) {
 
 		$ipropValues = new \Bitrix\Iblock\InheritedProperty\ElementValues($arOffer["IBLOCK_ID"], $arOffer["ID"]);
 		$arResult["OFFERS"][$keyOffer]["IPROPERTY_VALUES"] = $ipropValues->getValues();
+		$arResult["OFFERS_IDS"][] = $arOffer["ID"];
 	}
 	$arResult["THIS_SKU_PROPS"] = $thisSKUProps;
 }
@@ -116,13 +117,12 @@ if (CModule::IncludeModule("iblock") && CModule::IncludeModule("highloadblock") 
 }
 
 //подарок
-if ($arResult["PROPERTIES"]["GIFT"]["VALUE"]) {
+if ($gift = DiscountsHelper::getGiftByProduct($arResult['ID'])) {
 	$rsGift = CIBlockElement::GetList(
 		array(),
 		array(
-			"IBLOCK_ID" => $arResult["PROPERTIES"]["GIFT"]["LINK_IBLOCK_ID"],
 			"ACTIVE" => "Y",
-			"ID" => $arResult["PROPERTIES"]["GIFT"]["VALUE"]
+			"ID" => $gift
 		),
 		false,
 		false,
@@ -189,7 +189,8 @@ if (!empty($arData) && is_array($arData)) {
 			array(
 				"IBLOCK_ID" => $arParams["IBLOCK_ID"],
 				"ACTIVE" => "Y",
-				"ID" => $id
+				"ID" => $id,
+				"!PROPERTY_AVAILABLE" => false
 			),
 			false,
 			false,

@@ -1,0 +1,13 @@
+#modal-callback.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+        .modal-content
+            .modal-header
+                button.modal__close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                h3#myModalLabel.modal-title Заказ обратного звонка
+            .modal-body
+                .form-group
+                    label Телефон:
+                    input.form-control(type='tel', placeholder='')
+            .modal-footer
+                button(type='submit').modal__submit Отправить

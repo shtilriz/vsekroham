@@ -1,0 +1,90 @@
+aside.left-off-canvas-menu.sidebar
+    nav.side-menu.js-side-menu
+        ul
+            li
+                a(href='#')
+                    span.icon.sprite-m-shop
+                    | Главная
+            li.deeper
+                a(href='#')
+                    span.icon.sprite-m-book
+                    | Каталог товаров
+                ul
+                    li.deeper
+                        a(href="#") Детские коляски
+                        ul
+                            li
+                                a(href="#") Коляски люльки
+                            li
+                                a(href="#") Коляски 2 в 1
+                            li
+                                a(href="#") Коляски 3 в 1
+                            li
+                                a(href="#") Коляски трансформеры
+                            li
+                                a(href="#") Прогулочные коляски
+                            li
+                                a(href="#") Коляски трости
+                            li
+                                a(href="#") Коляски для двойни и тройни
+                            li
+                                a(href="#") Аксессуары
+                    li.deeper
+                        a(href="#") Детские кроватки
+                        ul
+                            li
+                                a(href="#") test
+                            li
+                                a(href="#") test
+                    li
+                        a(href="#") Детская мебель
+                    li
+                        a(href="#") Детские автокресла
+                    li
+                        a(href="#") Все для кормления
+                    li
+                        a(href="#") Детские манежи
+                    li
+                        a(href="#") Детские шезлонги
+            li
+                a(href='#')
+                    span.icon.sprite-m-tags
+                    | Бренды
+            li
+                a(href='#')
+                    span.icon.sprite-m-tools
+                    | Сборка мебели
+            li
+                a(href='#')
+                    span.icon.sprite-m-umbrella
+                    | Гарантия
+            li
+                a(href='#')
+                    span.icon.sprite-m-car
+                    | Доставка
+            li
+                a(href='#')
+                    span.icon.sprite-m-box-open
+                    | Оптовикам
+            li
+                a(href='#')
+                    span.icon.sprite-m-mail
+                    | Контакты
+a.exit-off-canvas
+
+//- mixin navmenu(menu_items)
+//-     ul
+//-         each top_item in menu_items
+//-             li
+//-                 +navlinks(top_item)
+//-                 if top_item.child
+//-                     ul
+//-                         each child_item in top_item.child
+//-                             li
+//-                                 +navlinks(child_item)
+
+//- mixin navlinks(item)
+//-     a(href="#") #{item.title}
+
+//- - var arr = [{'title' : 'Главная', 'link' : 'index.html'}, {'title' : 'Каталог товаров', 'link' : 'index.html', 'child' : [{'title' : 'Детские коляски', 'link' : 'index.html', 'child' : [{'title' : 'Коляски люльки', 'link' : 'index.html'}, {'title' : 'Коляски 2 в 1', 'link' : 'index.html'}, {'title' : 'Коляски 3 в 1', 'link' : 'index.html'}, {'title' : 'Коляски трансформеры', 'link' : 'index.html'}, {'title' : 'Прогулочные коляски', 'link' : 'index.html'}, {'title' : 'Коляски трости', 'link' : 'index.html'}, {'title' : 'Коляски для двойни и тройни', 'link' : 'index.html'}, {'title' : 'Аксессуары', 'link' : 'index.html'} ]}, {'title' : 'Детские кроватки', 'link' : 'index.html'}, {'title' : 'Детская мебель', 'link' : 'index.html'}, {'title' : 'Детские автокресла', 'link' : 'index.html'}, {'title' : 'Все для кормления', 'link' : 'index.html'}, {'title' : 'Детские манежи', 'link' : 'index.html'}, {'title' : 'Детские шезлонги', 'link' : 'index.html'} ]}, {'title' : 'Бренды', 'link' : 'index.html'}, {'title' : 'Сборка мебели', 'link' : 'index.html'}, {'title' : 'Гарантия', 'link' : 'index.html'}, {'title' : 'Доставка', 'link' : 'index.html'}, {'title' : 'Оптовикам', 'link' : 'index.html'}, {'title' : 'Контакты', 'link' : 'index.html'} ]
+//- +navmenu(arr)

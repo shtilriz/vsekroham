@@ -1,0 +1,109 @@
+.b-content {
+    // margin-bottom: 20px;
+    margin-bottom: 72px;
+    padding: 24px 24px 24px;
+    background: #fff;
+    border-radius: 4px;
+    &__header {
+        margin-bottom: 29px;
+    }
+}
+
+.b-header {
+    @extend .clearfix;
+    position: relative;
+    display: block;
+    // height: 63px;
+    // padding-left: 28px;
+    &__title {
+        position: relative;
+        display: table;
+        width: 100%;
+        height: 100%;
+        color: $title-color;
+        font-size: $title-size * 1.05;
+        line-height: $title-size * 1.05;
+        font-weight: 400;
+        padding-left: 80px;
+        padding-right: 80px;
+        span {
+            display: table-cell;
+            vertical-align: middle;
+        }
+    }
+    &__view {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        margin-top: -29px * .5;
+        height: 29px;
+    }
+    &__back {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        margin-top: -63px * .5;
+    }
+    &__icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        margin-top: -32px * .5;
+    }
+    &_toggle {
+        &:after {
+            content: " ";
+            display: block;
+            position: absolute;
+            right: 16px;
+            top: 40px;
+            border: 7px solid;
+            border-color: #777 transparent;
+            border-bottom-color: transparent;
+        }
+        &.active:after {
+            top: 34px;
+            border-top-color: transparent;
+            border-bottom-color: #777;
+        }
+    }
+    // &_mod-1 {
+    //     text-align: center;
+    //     height: 87px;
+    // }
+    &_mod-1 &__title {
+        text-align: center;
+    }
+    // &_mod-2 {
+    //     text-align: right;
+    // }
+}
+
+.b-header-view {
+    &__link {
+        display: inline-block;
+        margin-left: 17px;
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+}
+
+.b-back {
+    width: 63px;
+    height: 63px;
+    // position: relative;
+    display: block;
+    border: 1px solid #e5e3e3;
+    background: #fff;
+    border-radius: 4px;
+    &:before {
+        content: " ";
+        display: block;
+        position: absolute;
+        @include middle;
+        @include sprite($sprite-left);
+    }
+}
+
+

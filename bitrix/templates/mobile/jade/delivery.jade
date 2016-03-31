@@ -1,0 +1,80 @@
+extends ./layouts/default
+
+block content
+
+    .page-content
+        a.logo(href="#")
+
+        .b-content
+
+            - b_header.title = 'Выбор способа оплаты доставки и оплаты';
+            - b_header.class = 'b-content__header';
+            - b_header.view = true;
+            - b_header.back = true;
+            - b_header.tag = 'a';
+            include includes/partials/b-header/3_1
+
+            a(href="#").btn.btn-gray.btn-lg Вернуться в каталог
+
+            .b-steps
+                .b-step.active 1
+                .b-step 2
+
+            include includes/partials/b-sity-change
+
+            .b-box
+                - b_header.title = 'Доставка';
+                - b_header.class = 'b-box__header';
+                include includes/partials/b-header/6
+
+                .b-box__content
+                    .b-checkers
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check1.checkbox-styled(type='radio', checked='' name='delivery')
+                                label.b-checker__label(for='check1')
+                            .b-checker__content
+                                .b-checker__title Курьер
+                                .b-checker__text Доставка заказов до 2000 руб. стоит 400 руб.
+                                .b-checker__days 5 дней
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check2.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check2')
+                            .b-checker__content
+                                .b-checker__title Самовывоз
+                                .b-checker__text Бесплатно
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check3.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check3')
+                            .b-checker__content
+                                .b-checker__title ЖелДорЭкспедиция (до терминала)
+                                .b-checker__text 495 руб.
+                                .b-checker__days 5 дней
+                    a(href="#").btn-big.btn-gray Выбрать другую компанию
+
+                    p
+                        i После оформления заказк мы подберем вам оптимальную транспортную компанию. Список неполный.
+
+            .b-box
+                - b_header.title = 'Оплата';
+                - b_header.class = 'b-box__header';
+                include includes/partials/b-header/6
+
+                .b-box__content
+                    .b-checkers
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check4.checkbox-styled(type='radio', checked='' name='pay')
+                                label(for='check4')
+                            .b-checker__content
+                                .b-checker__title Наличными
+                                .b-checker__text Оплата заказа по квитанции в любом из  банков Вашего города
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check5.checkbox-styled(type='radio' name='pay')
+                                label(for='check5')
+                            .b-checker__content
+                                .b-checker__title Банковский перевод или карта виза
+                                .b-checker__text Оплата пластиковыми картами Visa. Прием платежей обеспечивает 

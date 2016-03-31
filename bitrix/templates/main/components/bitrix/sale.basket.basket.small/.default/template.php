@@ -17,7 +17,8 @@ if (intval($discount) > 0) {
 
 <?$frame = $this->createFrame("basket_small", false)->begin('');
 $frame->setBrowserStorage(true);
-$frame->setAnimation(true);?>
+//$frame->setAnimation(true);
+?>
 <a href="/basket/">
 	<strong>ваша Корзина</strong>
 	<p class="stuff">Товаров: <span><?=intval($y)?></span> шт.</p>

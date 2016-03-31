@@ -2,7 +2,7 @@
 
 <?php
 //снимает флажок "В наличии" у товаров с отсутствующей ценой
-/*if (CModule::IncludeModule("iblock")) {
+if (CModule::IncludeModule("iblock")) {
 	$arProducts = array();
 	$rsProducts = CIBlockElement::GetList(
 		array("ID" => "ASC"),
@@ -22,5 +22,5 @@
 			CIBlockElement::SetPropertyValuesEx($id, IBLOCK_PRODUCT_ID, array("AVAILABLE" => NULL));
 		}
 	}
-}*/
+}
 ?>

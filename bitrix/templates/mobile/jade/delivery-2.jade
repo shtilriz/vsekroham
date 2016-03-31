@@ -1,0 +1,61 @@
+extends ./layouts/default
+
+block content
+
+    .page-content
+        a.logo(href="#")
+
+        .b-content
+
+            - b_header.title = 'Выбор способа оплаты доставки и оплаты';
+            - b_header.class = 'b-content__header b-header_mod-1';
+            - b_header.view = true;
+            - b_header.back = true;
+            - b_header.tag = 'a';
+            include includes/partials/b-header/3_1
+
+            a(href="#").btn.btn-gray.btn-lg Вернуться в каталог
+
+            .b-steps
+                .b-step.active 1
+                .b-step.active 2
+
+            .b-sity-change
+                span.b-sity-change__title Ваш город:
+                a.b-sity-change__sity(href="#") Владивосток
+
+            .b-box
+                - b_header.title = 'Личные данные';
+                - b_header.class = 'b-box__header';
+                include includes/partials/b-header/6
+
+                .b-box__content
+
+                    .form-group
+                        label Имя
+                        input.form-control(type='text', placeholder='Антон')
+                    .form-group
+                        label Фамилия
+                        input.form-control(type='text', placeholder='Огурцев')
+                    .form-group
+                        label Email
+                        input.form-control(type='email', placeholder='anton@gmail.com')
+                    .form-group
+                        input#check1.checkbox-styled(type='checkbox', checked='')
+                        label(for='check1') Получать скидки и предложения на почту
+                    .form-group
+                        label Телефон
+                        input.form-control(type='text', placeholder='+7 (495) 89 - 55 - 695')
+                    .form-group
+                        label Город
+                        input.form-control(type='text', placeholder='Город')
+                    .form-group
+                        label Адрес
+                        textarea.form-control(name="", rows="5" placeholder="Введите адрес")
+
+                    .total-summ
+                        .total-summ__title Итоговая сумма:
+                        .total-summ__price 13 500 р.
+
+                    button(type='submit').btn-big.btn-primary Подтвердить оформление
+

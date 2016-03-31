@@ -1,0 +1,24 @@
+extends ./layouts/default
+
+block content
+
+    .page-content
+        a.logo(href="#")
+
+        include includes/partials/slider-default
+
+        .b-content
+
+            - b_header.title = 'Автокресла группы 15-36 кг';
+            - b_header.class = 'b-content__header';
+            include includes/partials/b-header/3
+
+            - b_header.class = 'b-box__header';
+            include includes/partials/b-box/1
+
+            - b_header.class = 'b-box__header';
+            include includes/partials/b-box/2
+
+            - b_goods.class = 'b-content__goods';
+            - b_g.title = 'Детские ходунки Dion Kids FL-616 очень длинное название товара';
+            include includes/partials/b-goods/2

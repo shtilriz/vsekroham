@@ -28,14 +28,14 @@ foreach ($arResult["OFFERS"] as $key => $arOffer){
 								BX_RESIZE_IMAGE_PROPORTIONAL,
 								true
 							);?>
-							<img data-title="<?=$arResult["NAME"]?>" data-size="<?=$arResult["PROPERTIES"]["SIZE"]["VALUE"]?>" data-color="<?=$arResult["PROPERTIES"]["COLOR"]["VALUE"]?>" src="<?=$y["src"]?>" width="<?=$y["width"]?>" height="<?=$y["height"]?>" data-id="<?=$arResult["ID"]?>" alt="" data-price="<?=$arResult["OFFERS"][0]["PRICES"]["BASE"]["PRINT_DISCOUNT_VALUE"]?>" data-size="<?=$arResult["OFFERS"][0]["PROPERTIES"]["SIZE"]["VALUE"]?>" />
+							<img data-title="<?=$arResult["NAME"]?>" data-size="<?=$arResult["PROPERTIES"]["SIZE"]["VALUE"]?>" data-color="<?=$arResult["PROPERTIES"]["COLOR"]["VALUE"]?>" src="<?=$y["src"]?>" width="<?=$y["width"]?>" height="<?=$y["height"]?>" data-id="<?=$arResult["ID"]?>" alt="" data-price="<?=$arResult["OFFERS"][0]["PRICES"]["BASE"]["PRINT_DISCOUNT_VALUE"]?>" />
 						</div>
 						<?$i++;?>
 					<?else:?>
 						<?
 						$arTemp = array();
 						foreach ($arResult["OFFERS"] as $key => $arOffer):
-							if (empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]))
+							if (empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]) || !$arOffer["PREVIEW_PICTURE"])
 								continue;
 							/*if ($arOffer["CATALOG_QUANTITY"] <= 0 || empty($arOffer["PROPERTIES"]["COLOR"]["VALUE"]))
 								continue;*/?>

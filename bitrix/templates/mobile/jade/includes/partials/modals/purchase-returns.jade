@@ -1,0 +1,31 @@
+#modal-purchase-returns.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+        .modal-content
+            .modal-header
+                button.modal__close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                h3#myModalLabel.modal-title Форма возврата товара
+            .modal-body
+                .form-group
+                    label Наименование организации (ФИО):
+                    input.form-control(type='text', placeholder='')
+                .form-group
+                    label Город:
+                    input.form-control(type='text', placeholder='')
+                .form-group
+                    label Телефон:
+                    input.form-control(type='tel', placeholder='')
+                .form-group
+                    label E-mail:
+                    input.form-control(type='email', placeholder='')
+                .form-group
+                    label Наименование товара:
+                    input.form-control(type='text', placeholder='')
+                .form-group
+                    label Номер заказа:
+                    input.form-control(type='text', placeholder='')
+                .form-group
+                    label Прикрепить изображение:
+                    input(type='file', placeholder='')
+            .modal-footer
+                button(type='submit').modal__submit Отправить заявку

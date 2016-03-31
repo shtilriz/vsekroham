@@ -75,16 +75,17 @@ elseif ($obCache->StartDataCache()) {
 ?>
 
 <h1>Оформление заказа</h1>
+
 <div class="before-ordering-box">
 	<a href="/basket/">Вернуться в корзину</a>
 </div>
 <div class="ordering-box">
-	<form action="/basket/order-completed.php" method="post" name="orderForm">
+	<form action="order-completed.php" method="post" name="orderForm">
 		<?if (!empty($arResult["USER_PROPS"])):?>
 		<div class="box-content top-controls" id="user-props">
 			<table class="like-inline">
 				<tbody>
-					<?foreach ($arResult["USER_PROPS"] as $key => $arProp):?>					
+					<?foreach ($arResult["USER_PROPS"] as $key => $arProp):?>
 						<tr>
 							<td class="first<?=($arProp["SIZE2"] > 1?' v-top':'')?>"><label class="control-label text-right block-label"><?=$arProp["NAME"]?></label></td>
 							<td class="second">
@@ -125,10 +126,10 @@ elseif ($obCache->StartDataCache()) {
 							<td class="first"></td>
 							<td class="second">
 								<label class="control-label">
-									<input type="radio" name="delivery" value="2" checked="" />Доставка курьером по Москве
+									<input type="radio" name="delivery" value="2"<?=(!isset($_SESSION["DELIVERY_CURRENT"])?' checked':'')?>/>Доставка курьером по Москве
 								</label>
 							</td>
-							<td>						
+							<td>
 								<input type="text" name="date-delivery_mkad" value="<?=date('d.m.Y',time()+86400)?>" class="form-control date-delivery">
 								<i>Выберите дату</i>
 							</td>
@@ -141,7 +142,7 @@ elseif ($obCache->StartDataCache()) {
 									<input type="radio" name="delivery" value="4" />Доставка курьером за пределы МКАД
 								</label>
 							</td>
-							<td>						
+							<td>
 								<input type="text" name="date-delivery_zamkad" value="<?=date('d.m.Y',time()+86400)?>" class="form-control date-delivery">
 								<i>Выберите дату</i>
 							</td>
@@ -152,10 +153,10 @@ elseif ($obCache->StartDataCache()) {
 							<td class="first"></td>
 							<td class="second">
 								<label class="control-label">
-									<input type="radio" name="delivery" value="1" checked="" />Доставка курьером по Москве
+									<input type="radio" name="delivery" value="1"<?=(empty($_SESSION["DELIVERY_CURRENT"])?' checked':'')?>/>Доставка курьером по Москве
 								</label>
 							</td>
-							<td>						
+							<td>
 								<input type="text" name="date-delivery_mkad" value="<?=date('d.m.Y',time()+86400)?>" class="form-control date-delivery">
 								<i>Выберите дату</i>
 							</td>
@@ -168,7 +169,7 @@ elseif ($obCache->StartDataCache()) {
 									<input type="radio" name="delivery" value="3" />Доставка курьером за пределы МКАД
 								</label>
 							</td>
-							<td>						
+							<td>
 								<input type="text" name="date-delivery_zamkad" value="<?=date('d.m.Y',time()+86400)?>" class="form-control date-delivery">
 								<i>Выберите дату</i>
 							</td>
@@ -179,14 +180,18 @@ elseif ($obCache->StartDataCache()) {
 						<td class="first"></td>
 						<td class="second">
 							<label class="control-label">
-								<input type="radio" name="delivery" value="6">Доставка транспортной компанией
+								<input type="radio" name="delivery" value="6"<?=(!empty($_SESSION["DELIVERY_CURRENT"])?' checked':'')?>>Доставка транспортной компанией
 							</label>
 						</td>
 						<td colspan="2" class="text-right">
+							<?if (isset($_SESSION["DELIVERY_CURRENT"])):?>
+							<div id="deliveryCalc2Product" class="order-delivery-row" data-weight="<?=$_SESSION["DELIVERY_CURRENT"]["weight"]?>" data-width="<?=$_SESSION["DELIVERY_CURRENT"]["width"]?>" data-length="<?=$_SESSION["DELIVERY_CURRENT"]["length"]?>" data-height="<?=$_SESSION["DELIVERY_CURRENT"]["height"]?>" data-price="<?=getSummBasket()?>" data-page="order"></div>
+							<?else:?>
 							<span class="text-green">РАСЧИТЫВАЕТСЯ ИНДИВИДУАЛЬНО</span>
+							<?endif;?>
 						</td>
 					</tr>
-					
+
 					<tr>
 						<td class="first"></td>
 						<td class="second">
@@ -317,15 +322,25 @@ elseif ($obCache->StartDataCache()) {
 				</tbody>
 			</table>
 		</div>
-		<div class="box-heading">Итоговая сумма</div>
+		<?/*<div class="box-heading">Итоговая сумма</div>*/?>
 		<div class="box-content">
 			<table class="like-inline like-inline-lead">
 				<tbody>
 					<tr>
 						<td class="first"></td>
 						<td colspan="3">
-							<span class="box-price"><?=SaleFormatCurrency(getSummBasket(), "RUB");?></span><span class="lead"></span>
-							<div><button type="submit" class="form-button lg">Подтвердить оформление</button></div>
+							<?/*
+							<div class="itogo">
+								<div class="clearfix box-price">
+									<span>Стоимость заказа: </span>
+									<span class="item-price"><?=SaleFormatCurrency(getSummBasket(), "RUB");?></span>
+								</div>
+								<div class="clearfix box-price" id="eDeliveryTotalPrice" style="display: none;">
+									<span><small>Стоимость доставки:</small> </span>
+									<span class="item-price"></span>
+								</div>
+							</div>*/?>
+							<div><button type="submit" class="ordering-box__submit">Подтвердить оформление</button></div>
 						</td>
 					</tr>
 				</tbody>

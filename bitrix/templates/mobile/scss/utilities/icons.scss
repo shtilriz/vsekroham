@@ -1,0 +1,12 @@
+@include sprites($spritesheet-sprites);
+.icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.icon-close {
+    display: inline-block;
+    border: none;
+    background-color: transparent;
+    @include sprite($sprite-close);
+}

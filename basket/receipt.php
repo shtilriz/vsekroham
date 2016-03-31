@@ -1,59 +1,54 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
+
 $ORDER_ID = abs((int)$_GET["order"]);
 if ($ORDER_ID && CModule::IncludeModule("sale")) {
     $arResult = array();
-    $arFilter = Array(
-        "ID" => $ORDER_ID
-    );
-    $rsOrder = CSaleOrder::GetList(array("DATE_INSERT" => "ASC"), $arFilter);
+    $rsOrder = CSaleOrder::GetList(array(), Array("ID" => $ORDER_ID));
     if ($arOrder = $rsOrder->Fetch()) {
-        $rsOrderProps = CSaleOrderPropsValue::GetOrderProps($arOrder["ID"]);
-        while ($arProp = $rsOrderProps->Fetch()) {
-            if (in_array($arProp["CODE"], array("MANAGER")))
-                continue;
-            $arOrder["PROPS"][$arProp["CODE"]] = $arProp;
-        }
+        $arOrder["PRICE"] = (int)$arOrder["PRICE"];
+        $arOrder["NDS"] = round($arOrder["PRICE"]/110*10);
         $arResult = $arOrder;
     }
-}
-?>
+}?>
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+
+    <style>
+        body {font-size: 12px;color: #000;}
+        table {width: 100%; border-collapse: collapse;}
+        table td {padding: 0; vertical-align: top; text-align: left;}
+
+        table.numbers {}
+        table.numbers td {border: 1px solid #000; padding: 0 2px; text-align: center; font-weight: bold;}
+        .u {border-bottom: 1px solid #000;}
+        .help-text {font-size: 8px; text-align: center; padding-top: 0;}
+        table.container {width: 685px;}
+        table.container > tbody > tr > td {padding: 5px 19px 5px 5px; border: 1px solid #000; vertical-align: top;}
+        table.container > tbody > tr > td:first-child {padding-right: 5px;}
+        table.f {table-layout: fixed;}
+        .i {font-style: italic;}
+        .c {text-align: center;}
+        .b {font-weight: bold;}
+
+        .w50 {width: 50%;}
+        .w48 {width: 48%;}
+        .w100 {width: 100%;}
+
+        .ib {display: inline-block; vertical-align: middle; position: relative; top: 1px;}
+
+        .nowrap {white-space: nowrap;}
+
+        .block2 .r-table > tbody > tr > td {padding-bottom: 1px;}
+        .add-offset > td {padding-bottom: 6px !important;}
+    </style>
+
 </head>
 <body>
-<style>
-    body {font-size: 12px;}
-    table {width: 100%; border-collapse: collapse;}
-    table td {padding: 0; vertical-align: top; text-align: left;}
-
-    table.numbers {}
-    table.numbers td {border: 1px solid #000; padding: 0 2px; text-align: center; font-weight: bold;}
-    .u {border-bottom: 1px solid #000;}
-    .help-text {font-size: 8px; text-align: center; padding-top: 0;}
-    table.container {width: 685px;}
-    table.container > tbody > tr > td {padding: 5px 19px 5px 5px; border: 1px solid #000; vertical-align: top;}
-    table.container > tbody > tr > td:first-child {padding-right: 5px;}
-    table.f {table-layout: fixed;}
-    .i {font-style: italic;}
-    .c {text-align: center;}
-    .b {font-weight: bold;}
-
-    .w50 {width: 50%;}
-    .w48 {width: 48%;}
-    .w100 {width: 100%;}
-
-    .ib {display: inline-block; vertical-align: middle; position: relative; top: 1px;}
-
-    .nowrap {white-space: nowrap;}
-
-    .block2 .r-table > tbody > tr > td {padding-bottom: 1px;}
-    .add-offset > td {padding-bottom: 6px !important;}
-</style>
     <table class="container">
         <tbody>
             <tr>
@@ -70,7 +65,7 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                 <td class="b i" style="text-align: right; font-size: 10px; padding-top: 2px; padding-bottom: 9px;">Форма № ПД-4</td>
                             </tr>
                             <tr>
-                                <td class="u c" style="font-family: arial, sans-serif; font-size: 16px; line-height: 16px;">«ВАВИЛОН»</td>
+                                <td class="u c" style="font-family: arial, sans-serif; font-size: 16px; line-height: 16px;">ООО «ВАВИЛОН»</td>
                             </tr>
                             <tr>
                                 <td class="help-text">(наименование получателя платежа)</td>
@@ -100,26 +95,26 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                             <td>
                                                 <table class="numbers">
                                                     <tr>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
+                                                        <td>4</td>
+                                                        <td>0</td>
+                                                        <td>7</td>
+                                                        <td>0</td>
+                                                        <td>2</td>
+                                                        <td>8</td>
+                                                        <td>1</td>
+                                                        <td>0</td>
+                                                        <td>1</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>8</td>
+                                                        <td>2</td>
+                                                        <td>1</td>
+                                                        <td>6</td>
+                                                        <td>4</td>
                                                     </tr>
                                                 </table>
                                                 <div class="help-text">(номер счета получателя платежа)</div>
@@ -204,7 +199,7 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                 <td style="">
                                     <table>
                                         <tr>
-                                            <td class="u w48">Оплата заказа № <?=$arOrder["ID"]?></td>
+                                            <td class="u w48">Оплата заказа № <?=$arResult["ID"]?></td>
                                             <td width="40"></td>
                                             <td class="u w48"></td>
                                         </tr>
@@ -244,7 +239,7 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                                 <table>
                                                     <tr>
                                                         <td class="nowrap">Сумма платежа</td>
-                                                        <td width="70" class="u b i c"><?=(int)$arResult["PRICE"]?></td>
+                                                        <td width="70" class="u b i c"><?=$arResult["PRICE"]?></td>
                                                         <td>руб.</td>
                                                         <td width="30" class="u b i c">00</td>
                                                         <td>коп.</td>
@@ -253,15 +248,11 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                             </td>
                                             <td width="30"></td>
                                             <td width="250">
-                                                <?/*<table style="text-align: right;">
+                                                <table>
                                                     <tr>
-                                                        <td width="170">Сумма платы за услуги</td>
-                                                        <td width="70" class="u b i c">&nbsp;</td>
-                                                        <td>руб.</td>
-                                                        <td width="30" class="u b i c">&nbsp;</td>
-                                                        <td>коп.</td>
+                                                        <td style="text-align: left;">включая НДС 10% (<?=$arOrder["NDS"]?> руб.)</td>
                                                     </tr>
-                                                </table>*/?>
+                                                </table>
                                             </td>
                                         </tr>
                                     </table>
@@ -275,7 +266,7 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                                 <table>
                                                     <tr>
                                                         <td>Итого</td>
-                                                        <td width="70" class="u b i c"><?=(int)$arResult["PRICE"]?></td>
+                                                        <td width="70" class="u b i c"><?=$arResult["PRICE"]?></td>
                                                         <td>руб.</td>
                                                         <td width="30" class="u b i c">00</td>
                                                         <td>коп.</td>
@@ -346,7 +337,7 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                     <table class="r-table">
                         <tbody>
                             <tr>
-                                <td class="u c" style="font-family: arial, sans-serif; font-size: 16px; line-height: 16px;">«ВАВИЛОН»</td>
+                                <td class="u c" style="font-family: arial, sans-serif; font-size: 16px; line-height: 16px;">ООО «ВАВИЛОН»</td>
                             </tr>
                             <tr>
                                 <td class="help-text">(наименование получателя платежа)</td>
@@ -376,26 +367,26 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                             <td>
                                                 <table class="numbers">
                                                     <tr>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
-                                                        <td>&nbsp;</td>
+                                                        <td>4</td>
+                                                        <td>0</td>
+                                                        <td>7</td>
+                                                        <td>0</td>
+                                                        <td>2</td>
+                                                        <td>8</td>
+                                                        <td>1</td>
+                                                        <td>0</td>
+                                                        <td>1</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>8</td>
+                                                        <td>2</td>
+                                                        <td>1</td>
+                                                        <td>6</td>
+                                                        <td>4</td>
                                                     </tr>
                                                 </table>
                                                 <div class="help-text">(номер счета получателя платежа)</div>
@@ -480,7 +471,7 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                 <td style="">
                                     <table>
                                         <tr>
-                                            <td class="u w48">Оплата заказа № <?=$arOrder["ID"]?></td>
+                                            <td class="u w48">Оплата заказа № <?=$arResult["ID"]?></td>
                                             <td width="40"></td>
                                             <td class="u w48"></td>
                                         </tr>
@@ -520,7 +511,7 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                                 <table>
                                                     <tr>
                                                         <td class="nowrap">Сумма платежа</td>
-                                                        <td width="70" class="u b i c"><?=(int)$arResult["PRICE"]?></td>
+                                                        <td width="70" class="u b i c"><?=$arResult["PRICE"]?></td>
                                                         <td>руб.</td>
                                                         <td width="30" class="u b i c">00</td>
                                                         <td>коп.</td>
@@ -529,15 +520,11 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                             </td>
                                             <td width="30"></td>
                                             <td width="250">
-                                                <?/*<table style="text-align: right;">
+                                                <table>
                                                     <tr>
-                                                        <td width="170">Сумма платы за услуги</td>
-                                                        <td width="70" class="u b i c">&nbsp;</td>
-                                                        <td>руб.</td>
-                                                        <td width="30" class="u b i c">&nbsp;</td>
-                                                        <td>коп.</td>
+                                                        <td style="text-align: left;">включая НДС 10% (<?=$arOrder["NDS"]?> руб.)</td>
                                                     </tr>
-                                                </table>*/?>
+                                                </table>
                                             </td>
                                         </tr>
                                     </table>
@@ -551,7 +538,7 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
                                                 <table>
                                                     <tr>
                                                         <td>Итого</td>
-                                                        <td width="70" class="u b i c"><?=(int)$arResult["PRICE"]?></td>
+                                                        <td width="70" class="u b i c"><?=$arResult["PRICE"]?></td>
                                                         <td>руб.</td>
                                                         <td width="30" class="u b i c">00</td>
                                                         <td>коп.</td>
@@ -612,5 +599,23 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
             </tr>
         </tbody>
     </table>
+    <script type="text/javascript" src="/bitrix/templates/main/js/libs/jquery.min.js"></script>
+    <script type="text/javascript" src="/bitrix/templates/main/js/html2canvas.js"></script>
+    <br/>
+    <br/>
+    <br/>
+    <a id="downloadImgLink" download="Заказ №4463.png" href="#" target="_blank" style="font-size:16px; display: inline-block; border: 1px solid #ccc; color: #000; padding: 3px 8px; text-decoration: none;">Скачать квитанцию</a>
+    <script type="text/javascript">
+        html2canvas(
+            document.body,
+            {
+                onrendered: function(canvas) {
+                    $('#downloadImgLink').attr('href', canvas.toDataURL());
+                },
+                width: 700,
+                height: 585
+            }
+        );
+    </script>
 </body>
 </html>

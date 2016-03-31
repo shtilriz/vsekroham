@@ -52,9 +52,9 @@
 							<?if (!empty($arItem["PROPERTIES"]["GIFT"]["VALUE"])):?>
 								<div class="badge badge_type_gift">+ Подарок</div>
 							<?endif;?>
-							<?if (in_array($arItem["IBLOCK_SECTION_ID"], array(141,157,165,170,174,180,184,190))&&$arItem["PROPERTIES"]["MAKER"]["VALUE"]==15419):?>
+							<?/*if (in_array($arItem["IBLOCK_SECTION_ID"], array(141,157,165,170,174,180,184,190))&&$arItem["PROPERTIES"]["MAKER"]["VALUE"]==15419):?>
 								<div class="badge badge_type_bonus">Бонус 2000 р.</div>
-							<?endif;?>
+							<?endif;*/?>
 						</div>
 					</div>
 				</div>

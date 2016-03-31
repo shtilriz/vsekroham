@@ -8,6 +8,13 @@ $aMenuLinks = Array(
 		"" 
 	),
 	Array(
+		"Покупка и оплата", 
+		"/buy/", 
+		Array(), 
+		Array(), 
+		"" 
+	),
+	Array(
 		"Сборка мебели", 
 		"/mebel/", 
 		Array(), 
@@ -36,8 +43,15 @@ $aMenuLinks = Array(
 		"" 
 	),
 	Array(
+		"Выгодная покупка", 
+		"/sales/", 
+		Array(), 
+		Array(), 
+		"" 
+	),
+	Array(
 		"Контакты", 
-		"/our_mags/", 
+		"/contacts/", 
 		Array(), 
 		Array(), 
 		"" 

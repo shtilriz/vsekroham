@@ -23,14 +23,14 @@
 		$arPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arItem, false, array());
 
 		$IBLOCK_SECTION_ID = $arItem["IBLOCK_SECTION_ID"];
-		
+
 		$y=CFile::ResizeImageGet(
 			$arItem["PREVIEW_PICTURE"],
 			array("width" => 100, "height" => 200),
 			BX_RESIZE_IMAGE_PROPORTIONAL,
 			true
 		);
-		
+
 		$arResult = array(
 			"IBLOCK_ID" => $arItem["IBLOCK_ID"],
 			"ID" => $arItem["ID"],
@@ -84,6 +84,7 @@
 		$xml_string = file_get_contents($query);
 		$arData = json_decode($xml_string,true);
 		$arResult["RECOMMEND"]["IDS"] = $arData;
+		$arResult["RECOMMEND"]["TYPE"] = "CrossSellItemToItems";
 
 		if (!empty($arData) && is_array($arData)) {
 			foreach ($arData as $key => $id) {
@@ -108,7 +109,7 @@
 			}
 		}
 	}?>
-	
+
 	<div class="cart-added popup" id="add2basketModal">
 		<div class="popup__top">
 			<a href="#" class="popup__close">X</a>
@@ -135,11 +136,11 @@
 				</table>
 			</div>
 			<div class="btm-links">
-				<a href="#" class="form-button form-button_bg_gray popup__button__close">Продолжить покупки</a>
-				<a href="/basket/" class="form-button">Оформить заказ</a>
+				<a href="#" class="cart-added__cancel popup__button__close">Продолжить покупки</a>
+				<a href="/basket/" class="cart-added__submit">Оформить заказ</a>
 			</div>
 		</div>
-		
+
 		<?if (!empty($arResult["RECOMMEND"]["ITEMS"])):?>
 		<div class="popup__footer">
 			<div class="slider slider_size_mini">
@@ -165,12 +166,14 @@
 							<?endif;?>
 							<div class="stuff-list__bottom">
 								<a class="add-to-basket form-button" href="<?=$arItem["DETAIL_PAGE_URL"];?>" onmousedown="try { rrApi.recomMouseDown(<?=$arItem["ID"]?>, {methodName: '<?=$arResult["RECOMMEND"]["TYPE"]?>'}) } catch(e) {}">Подробнее</a>
-								<?if ($arItem["PRICES"]["BASE"]["DISCOUNT_DIFF_PERCENT"] > 0):?>
-									<div class="badge badge_type_discount">Cкидка <?=$arItem["PRICES"]["BASE"]["DISCOUNT_DIFF_PERCENT"]?>%</div>
-								<?endif;?>
-								<?if (!empty($arItem["PROPERTIES"]["GIFT"]["VALUE"])):?>
-									<div class="badge badge_type_gift">+ Подарок</div>
-								<?endif;?>								
+								<div class="badge-wrapper">
+									<?if ($arItem["PRICES"]["BASE"]["DISCOUNT_DIFF_PERCENT"] > 0):?>
+										<div class="badge badge_type_discount">Cкидка <?=$arItem["PRICES"]["BASE"]["DISCOUNT_DIFF_PERCENT"]?>%</div>
+									<?endif;?>
+									<?if (!empty($arItem["PROPERTIES"]["GIFT"]["VALUE"])):?>
+										<div class="badge badge_type_gift">+ Подарок</div>
+									<?endif;?>
+								</div>
 							</div>
 						</div>
 					<?endforeach;?>
@@ -182,7 +185,7 @@
 		</div>
 		<script type="text/javascript">
 		if ($('.cart-added .slider_size_mini').length > 0) {
-			$('.cart-added .slider_size_mini #slider img').on('load', function() {				
+			$('.cart-added .slider_size_mini #slider img').on('load', function() {
 				$('.cart-added .slider_size_mini #slider').carouFredSel({
 					scroll: {
 						items: 1,

@@ -1,0 +1,34 @@
+#modal-pr-added-to-cart.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+        .modal-content
+            .modal-header
+                button.modal__close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                h3#myModalLabel.modal-title Товар добавлен в корзину
+            .modal-body
+                .b-g.b-g_list
+                    a(href="#").b-g__img
+                        img(src="images/temp/goods/img1.jpg", alt="")
+                    .b-g__content
+                        a(href="#").b-g__title Детская коляска для новорожденных Navington Caravel 14 колеса
+                        .b-g__price 14 000 р.
+                        .modal-pr__opts
+                            dl.modal-pr__opts-list
+                                dt Цвет:
+                                dd light-blue
+                button(type='button').modal__dismiss Продолжить покупки
+                button(type='submit').modal__submit Оформить заказ
+
+                h3.slider-related-title Рекомендуем купить
+                .slider-related
+                        each val in [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4]
+                            .b-g.b-g--offset.b-g--button-offset
+                                a(href="#")
+                                    img(src="images/temp/goods/img#{val}.jpg", alt="")
+                                .b-g__content
+                                    a(href="#").b-g__title
+                                        | #{goodTitle || 'Детские ходунки Dion Kids FL-616'}
+                                    .b-g__price 14 000 р.
+                                footer.b-g__footer
+                                    a(href="#").b-g__button Подробнее
+            .modal-footer

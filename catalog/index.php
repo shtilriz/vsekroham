@@ -28,8 +28,6 @@ $APPLICATION->SetTitle("Каталог товаров");
 
 <?
 include($_SERVER["DOCUMENT_ROOT"].'/include/catalog-sort.php');
-$GLOBALS["arrFilter"]["!PROPERTY_AVAILABLE"] = false;
-$GLOBALS["arrFilter"]["!CATALOG_PRICE_1"] = false;
 include($_SERVER["DOCUMENT_ROOT"].'/include/catalog-section.php');
 ?>
 

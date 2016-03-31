@@ -1,0 +1,76 @@
+.b-footer {
+    @include span(2);
+    position: relative;
+    height: 186px;
+    margin-bottom: gutter();
+    padding: 24px 0 24px 24px;
+    border-radius: 10px;
+    // background-color: #d7efa9;
+    background-color: rgba(215, 239, 169, .85);
+    &:nth-of-type(0n+2), &:nth-of-type(0n+4) {
+        @include span(2 last);
+    }
+    &__title {
+        display: table-cell;
+        padding-left: 50px;
+        color: #6c9e15;
+        font-size: 24px;
+        line-height: 24px;
+        height: 42px;
+        font-weight: 400;
+        vertical-align: middle;
+    }
+    .icon-wr {
+        position: absolute;
+        left: 24px;
+        top: 24px;
+        width: 39px;
+        height: 39px;
+        border: 2px solid #008bcc;
+        border-radius: 50%;
+        span {
+            @include middle;
+        }
+    }
+    &__content {
+        padding-left: 0px;
+        text-align: center;
+        .phone {
+            display: block;
+            color: #4b7305;
+            font-size: 30px;
+            font-weight: 300;
+            text-align: left;
+        }
+        @media (min-width: 768px) {
+            padding-left: 62px;
+            text-align: left;
+        }
+    }
+    &__work {
+        @include list-reset;
+        font-size: 28px;
+        font-weight: 300;
+        line-height: 38px;
+        color: #4b7305;
+        text-align: left;
+        span {
+            color: #6c9e15;
+        }
+    }
+    &__cards {
+        margin-top: 27px;
+        span {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+    }
+    &__socials {
+        // display: inline-block;
+        margin-top: 32px;
+        // @media (min-width: 768px) {
+        //     display: block;
+        // }
+    }
+}

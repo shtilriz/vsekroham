@@ -1,6 +1,12 @@
-<?if (!isset($_SESSION["YOUR_CITY"])) {
-	$_SESSION["YOUR_CITY"] = getYourCity();
-}?>
+<?
+if (!isset($_SESSION["YOUR_CITY"])) {
+	if (isset($_COOKIE["MY_CITY"]) && strlen($_COOKIE["MY_CITY"]))
+		$_SESSION["YOUR_CITY"] = $_COOKIE["MY_CITY"];
+	else
+		$_SESSION["YOUR_CITY"] = getYourCity();
+}
+require_once($_SERVER["DOCUMENT_ROOT"]."/include/arCity.php");
+?>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -10,15 +16,17 @@
 <head>
 	<title><?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowTitle())?></title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.11.0/themes/ui-lightness/jquery-ui.css" />
-	<link rel="stylesheet" type="text/css" href="<?=SITE_TEMPLATE_PATH?>/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="<?=SITE_TEMPLATE_PATH?>/css/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="<?=SITE_TEMPLATE_PATH?>/css/bootstrap.min.css">
+	<link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/css/jquery.nouislider.min.css">
 	<?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowHead())?>
-	<link rel="stylesheet" type="text/css" href="<?=SITE_TEMPLATE_PATH?>/addon_styles.css">
+	<link rel="stylesheet" type="text/css" href="<?=SITE_TEMPLATE_PATH?>/css/addon_styles.css">
 	<?if ($APPLICATION->GetCurPage() == "/basket/order.php"):?>
 		<link rel="stylesheet" type="text/css" href="<?=SITE_TEMPLATE_PATH?>/js/datepicker/datepicker3.css">
 	<?endif?>
 
 	<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/libs/jquery.min.js"></script>
+	<script type="text/javascript" src="https://yastatic.net/jquery/cookie/1.0/jquery.cookie.min.js"></script>
 	<?/*<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/libs/modernizr.min.js"></script>
 	<script type="text/javascript" src="//code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>*/?>
 	<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery-ui.min.js"></script>
@@ -29,7 +37,7 @@
 
 	<link rel="icon" href="/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-	<?if ($APPLICATION->GetCurDir() != "/"):?>
+
 	<script>
 		var rrPartnerId = "53a000601e994424286fc7d9";
 		var rrApi = {};
@@ -47,7 +55,7 @@
 			ref.parentNode.insertBefore(apiJs, ref);
 		}(document));
 	</script>
-	<?endif;?>
+
 	<?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowViewContent("OpenGraph"));?>
 	<link rel="apple-touch-icon" href="<?=SITE_TEMPLATE_PATH?>/images/ios/icon60.png">
 	<link rel="apple-touch-icon" sizes="76x76" href="<?=SITE_TEMPLATE_PATH?>/images/ios/icon76.png">
@@ -60,6 +68,18 @@
 		<link rel="canonical" href="http://<?=$_SERVER["SERVER_NAME"].GetPagePath(false, false);?>"/>
 	<?endif;?>
 	<?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowViewContent("Canonical"));?>
+	<script type="text/javascript">(window.Image ? (new Image()) : document.createElement('img')).src = location.protocol + '//vk.com/rtrg?r=wZZcqlPPHkj/XsnIQNN7/GvwoDgY0xLynoWQ1Mjr3OeGJAqVgVjrg2MPwWGgvBE7xGu849133st4WtkevWlmQXq*g/MXTkPBYNjjZ075VcPymlED16dYUfurZUHlnXeZCAANHYtzD/dF1QyR9*iJ7p5Do5H4zvnVxrZ7ppb3D/k-';</script>
+	<script type="text/javascript">
+		var cityobj = {
+			YOUR_CITY: '<?=trim($_SESSION["YOUR_CITY"])?>',
+			CITY_ALL: <?=json_encode($arCity);?>,
+			CITY_MOSKOW_REGION: <?=json_encode($arCityMoskowRegion);?>
+		};
+	</script>
+	<script src="https://cdn.jsdelivr.net/stopsovetnik/latest/ss.min.js"></script>
+	<script type="text/javascript">
+		window.dataLayer = window.dataLayer || [];
+	</script>
 </head>
 <body>
 <?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowPanel());?>
@@ -73,7 +93,7 @@
 <![endif]-->
 <?endif;?>
 
-<div id="page" class="<?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowProperty("cssclass", "one-column"));?>">
+<div id="page" class="js-page <?($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest'?'':$APPLICATION->ShowProperty("cssclass", "one-column"));?>">
 	<div class="layout">
 		<header class="header">
 			<div class="header__inner">
@@ -162,37 +182,32 @@
 					</div>
 				</div>
 
-				<div class="header__bottom">
-					<?$APPLICATION->IncludeComponent(
-						"dev:banners.main.list",
-						".default",
-						array(
-							"BLOCK_ID" => "5",
-							"SORT_BY" => "UF_SORT",
-							"SORT_ORDER" => "ASC"
-						),
-						false
-					);?>
-					<noindex>
-						<div class="vk-widget">
-							<div class="vk-widget__inner">
-									<script type="text/javascript" src="https://vk.com/js/api/openapi.js?110"></script>
-									<div id="vk_groups"></div>
-									<script type="text/javascript">
-										VK.Widgets.Group("vk_groups", {mode: 0, width: "220", height: "255", color1: 'FFFFFF', color2: '2B587A', color3: '5B7FA6'}, 62994219);
-									</script>
-							</div>
-						</div>
-					</noindex>
-				</div>
+				<?$APPLICATION->IncludeFile('/include/baners.php');?>
+
 			</div>
 		</header>
 
-		<?/*
+		<?/*<div id="ny-baners">
+			<?Bitrix\Main\Page\Frame::getInstance()->startDynamicWithID("ny-baners");?>
+			<?if (!(strrpos($_SERVER["REQUEST_URI"],'/basket/')===0) && $GLOBALS["B_SHOW_SLIDER"]):?>
+
+			<?else:?>
+				<div class="b-ribbon b-ribbon--ny">
+					<div class="b-ribbon__inner">
+						<a href="/sales/ng2016.php" style="text-decoration: none;">
+							<img class="b-ribbon__img" alt="" src="<?=SITE_TEMPLATE_PATH?>/images/temp/ny-ribbon_optimized.png">
+							<div class="b-ribbon__title">Время новогодних скидок!<br>Гарантированно лучшая цена с 10 по 20 декабря</div>
+						</a>
+					</div>
+				</div>
+			<?endif;?>
+			<?Bitrix\Main\Page\Frame::getInstance()->finishDynamicWithID("ny-baners", "");?>
+		</div>
+
 		<div id="sv-ribbon">
 			<?Bitrix\Main\Page\Frame::getInstance()->startDynamicWithID("sv-ribbon");?>
 			<?if (getYourCity() == "Москва"):?>
-			<a class="sv-ribbon" href="https://www.vsekroham.ru/our_mags/#bx_3218110189_13908">
+			<a class="sv-ribbon" href="/our_mags/">
 				Только 14 и 15 февраля. Зайдите в любой из наших магазинов
 				<br>
 				и получите скидку 6% на весь ассортимент!
@@ -203,17 +218,16 @@
 			<?Bitrix\Main\Page\Frame::getInstance()->finishDynamicWithID("sv-ribbon", "");?>
 		</div>
 		*/?>
-
 		<div class="before-content">
-			<div class="address-search">
+			<div class="address-search address-search--ver-1">
 				<div id="selectYourCity">
 					<?Bitrix\Main\Page\Frame::getInstance()->startDynamicWithID("selectYourCity");?>
 					<a href="javascript:void(0);" class="address-search__title"><?=($_SESSION["YOUR_CITY"]?$_SESSION["YOUR_CITY"]:'Выберите ваш город');?> <span class="address-search__spinner"></span></a>
 					<?Bitrix\Main\Page\Frame::getInstance()->finishDynamicWithID("selectYourCity", "");?>
 				</div>
+				<?/*
 				<div class="address-search__dropdown address-dropdown">
 					<div class="address-dropdown__top">
-						<?/*<div class="address-dropdown__title">Москва</div>*/?>
 						<form name="selectCity">
 							<input type="text" class="address-dropdown__input" placeholder="Введите Ваш Город" name="YOUR_CITY">
 						</form>
@@ -221,6 +235,30 @@
 					<div class="address-dropdown__list-wrapper" id="cityBlock">
 						<?//сюда будут подгружаться выбираемые города?>
 					</div>
+				</div>
+				*/?>
+				<div class="address-search__dropdown address-dropdown js-address-search__dropdown">
+					<?if ($_SESSION["YOUR_CITY"] && !in_array($_SESSION["YOUR_CITY"], $arCityMoskowRegion)):?>
+					<div class="address-dropdown-s-top">
+						<div class="address-dropdown-s-top__buttons">
+							<a href="#" class="js-address-dropdown-close address-dropdown-s-top__button c-button c-button--green">Да</a>
+							<a href="#" class="js-address-dropdown-link-content address-dropdown-s-top__button c-button c-button--red">Нет</a>
+						</div>
+						<div class="address-dropdown-s-top__title">Верно ли указан Ваш город?</div>
+					</div>
+					<?endif;?>
+
+					<div class="address-search__dropdown-content js-address-search-dropdown-content">
+						<div class="address-dropdown__top">
+							<form name="selectCity">
+								<input type="text" class="address-dropdown__input" placeholder="Введите Ваш Город" name="YOUR_CITY">
+							</form>
+						</div>
+						<div class="address-dropdown__list-wrapper scroll-pane js-scroll-pane" id="cityBlock">
+							<?//сюда будут подгружаться выбираемые города?>
+						</div>
+					</div>
+
 				</div>
 			</div>
 			<?$APPLICATION->IncludeComponent(
@@ -250,8 +288,9 @@
 		</div>
 
 		<div id="content">
+			<?global $USER;?>
 			<?if ($APPLICATION->GetCurPage() == "/" || strrpos($_SERVER["REQUEST_URI"],'/catalog/')===0):?>
-				<?$APPLICATION->IncludeFile("/include/catalog-filter.php");?>
+				<?$APPLICATION->IncludeFile("/include/filter/catalog-filter.php");?>
 			<?elseif (!(strrpos($_SERVER["REQUEST_URI"],'/product/')===0)):?>
 				<?$APPLICATION->IncludeComponent("bitrix:breadcrumb", ".default", Array(
 					"START_FROM" => "0",

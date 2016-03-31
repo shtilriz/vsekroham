@@ -1,0 +1,27 @@
+include ../includes/data
+
+<!DOCTYPE html>
+html.off-canvas-wrap(lang="en" data-offcanvas='')
+
+    include ../includes/head
+
+    - var bodyClass = 'has-b-footer-nav';
+
+    block vars
+
+    body(class='#{bodyClass} inner-wrap')
+        #main
+            include ../includes/partials/side-menu/1
+
+            include ../includes/header
+
+            block content
+            include ../includes/partials/b-contacts/index
+            .root-footer
+        include ../includes/footer
+
+        script(src='lib-bower/slick.js/slick/slick.min.js')
+        script(src='lib-bower/bootstrap-sass/assets/javascripts/bootstrap/modal.js',)
+        script(src='lib-bower/bootstrap-sass/assets/javascripts/bootstrap/dropdown.js',)
+        script(src='lib-bower/bootstrap-select/dist/js/bootstrap-select.js')
+        script(src='js/main.js')

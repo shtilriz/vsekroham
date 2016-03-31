@@ -1,0 +1,13 @@
+// $susy: ( columns: 4, container: auto, global-box-sizing: border-box);
+// @include with-layout(100% 12 (347px 48px) inside-static) {
+//     @include span(3);
+// }
+// $susy: (
+//   container: 100%,
+//   columns: 4,
+//   column-width: 149px,
+//   gutter: 50px/149px,
+//   gutter-position: inside-static,
+// );
+@include border-box-sizing;
+$susy: ( container: 750px, columns: 4, gutters: 1/7, gutter-position: after, global-box-sizing: border-box);

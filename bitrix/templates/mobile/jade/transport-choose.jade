@@ -1,0 +1,101 @@
+extends ./layouts/default
+
+block content
+
+    .page-content
+        a.logo(href="#")
+
+        .b-content
+
+            - b_header.title = 'Доступные способы доставки';
+            - b_header.class = 'b-content__header';
+            include includes/partials/b-header/3_1
+
+            include includes/partials/b-sity-change
+
+            p
+                i После оформления заказк мы подберем вам оптимальную транспортную компанию. Список неполный.
+
+            .b-box
+                .b-box__content
+                    .b-checkers
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check1.checkbox-styled(type='radio', checked='' name='delivery')
+                                label.b-checker__label(for='check1')
+                            .b-checker__content
+                                .b-checker__title Курьер
+                                .b-checker__text Доставка заказов до 2000 руб. стоит 400 руб.
+                                .b-checker__days 5 дней
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check2.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check2')
+                            .b-checker__content
+                                .b-checker__title Самовывоз
+                                .b-checker__text Бесплатно
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check3.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check3')
+                            .b-checker__content
+                                .b-checker__title ЖелДорЭкспедиция (до терминала)
+                                .b-checker__text 495 руб.
+                                .b-checker__days 5 дней
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check4.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check4')
+                            .b-checker__content
+                                .b-checker__title Boxberry (до пункта выдачи)
+                                .b-checker__text Бесплатно
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check5.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check5')
+                            .b-checker__content
+                                .b-checker__title Почта России
+                                .b-checker__text 495 руб.
+                                .b-checker__days 5 дней
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check6.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check6')
+                            .b-checker__content
+                                .b-checker__title EMS Почта России
+                                .b-checker__text Бесплатно
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check7.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check7')
+                            .b-checker__content
+                                .b-checker__title ПЭК
+                                .b-checker__text 495 руб.
+                                .b-checker__days 5 дней
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check8.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check8')
+                            .b-checker__content
+                                .b-checker__title Самовывоз
+                                .b-checker__text Бесплатно
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check9.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check9')
+                            .b-checker__content
+                                .b-checker__title ЖелДорЭкспедиция (до терминала)
+                                .b-checker__text 495 руб.
+                                .b-checker__days 5 дней
+                        .b-checker.js-b-checker
+                            .b-checker__check
+                                input#check10.checkbox-styled(type='radio' name='delivery')
+                                label.b-checker__label(for='check10')
+                            .b-checker__content
+                                .b-checker__title Самовывоз
+                                .b-checker__text Бесплатно
+
+                    a(href="#").btn-big.btn-gray Выбрать доставку этой компании
+
+                    p
+                        i После оформления заказк мы подберем вам оптимальную транспортную компанию. Список неполный.

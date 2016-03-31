@@ -1,6 +1,5 @@
 <?
 //<title>Aport</title>
-
 IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/export_yandex.php');
 set_time_limit(0);
 
@@ -563,6 +562,45 @@ if (empty($arRunErrors))
 	}
 }
 
+/* Производители */
+use Bitrix\Highloadblock as HL;
+use Bitrix\Main\Entity;
+use Bitrix\Main\Type as FieldType;
+CModule::IncludeModule("highloadblock");
+$arMakers = array();
+$arMakersCountry = array();
+$rsMaker = CIBlockElement::GetList(
+	array(),
+	array(
+		"IBLOCK_ID" => 3,
+		//"ACTIVE" => "Y"
+	),
+	false,
+	false,
+	array("ID", "NAME", "PROPERTY_COUNTRY")
+);
+while ($arMaker = $rsMaker->GetNext()) {
+
+	$arMakers[$arMaker["ID"]] = $arMaker["NAME"];
+
+	$countryID = $arMaker["PROPERTY_COUNTRY_VALUE"];
+
+	if (intval($countryID) > 0) {
+		$hlblock = HL\HighloadBlockTable::getById(1)->fetch();
+		$entity = HL\HighloadBlockTable::compileEntity($hlblock);
+		$entity_data_class = $entity->getDataClass();
+		$rsData = $entity_data_class::getList(array(
+			"select" => array("UF_NAME"),
+			"order" => array(),
+			"filter" => array("UF_XML_ID" => intval($countryID))
+		));
+		if ($arCountry = $rsData->Fetch()) {
+			$arMakersCountry[$arMaker["ID"]] = $arCountry["UF_NAME"];
+			//$arResult["COUNTRY"] = $arCountry;
+		}
+	}
+}
+
 if (empty($arRunErrors))
 {
 	@fwrite($fp, '<? header("Content-Type: text/xml; charset=windows-1251");?>');
@@ -701,7 +739,7 @@ if (empty($arRunErrors))
 
 	if ('D' == $arCatalog['CATALOG_TYPE'] || 'O' == $arCatalog['CATALOG_TYPE'])
 	{
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL");
+		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL", "CATALOG_GROUP_1", "CATALOG_GROUP_2");
 
 		$filter = array("IBLOCK_ID" => $IBLOCK_ID);
 		if (!$bAllSections && !empty($arSectionIDs))
@@ -709,8 +747,16 @@ if (empty($arRunErrors))
 			$filter["INCLUDE_SUBSECTIONS"] = "Y";
 			$filter["SECTION_ID"] = $arSectionIDs;
 		}
+		if ($CHECK_MARKET == "Y") {
+			$filter["!PROPERTY_MARKET"] = false;
+		}
+		if ($CHECK_AVAILABLE == "Y") {
+			$filter["!PROPERTY_AVAILABLE"] = false;
+		}
 		$filter["ACTIVE"] = "Y";
 		$filter["ACTIVE_DATE"] = "Y";
+		if (!empty($MAKERS))
+			$filter["PROPERTY_MAKER"] = $MAKERS;
 		$res = CIBlockElement::GetList(array(), $filter, false, false, $arSelect);
 
 		$total_sum = 0;
@@ -827,6 +873,12 @@ if (empty($arRunErrors))
 
 			if ($minPrice <= 0) continue;
 
+			$oldPrice = 0;
+			$arCatalogPrices = CIBlockPriceTools::GetCatalogPrices(false, array('MARGIN'));
+			$arMarginPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arAcc, false, array());
+			if ($arMarginPrices["MARGIN"]["DISCOUNT_VALUE"])
+				$oldPrice = $arMarginPrices["MARGIN"]["DISCOUNT_VALUE"];
+
 			$boolCurrentSections = false;
 			$bNoActiveGroup = true;
 			$strTmpOff_tmp = "";
@@ -868,6 +920,8 @@ if (empty($arRunErrors))
 			$strTmpOff.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arAcc["~DETAIL_PAGE_URL"]).(strstr($arAcc['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 			$strTmpOff.= "<price>".$minPrice."</price>\n";
+			if ($oldPrice > 0)
+				$strTmpOff .= "<oldprice>$oldPrice</oldprice>\n";
 			$strTmpOff.= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 			$strTmpOff.= $strTmpOff_tmp;
@@ -898,7 +952,10 @@ if (empty($arRunErrors))
 				case 'name':
 					if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
 						continue;
-					$arAccName = $arAcc["~NAME"].($arAcc["PROPERTIES"][96]["VALUE"]?'. Цвет: '.$arAcc["PROPERTIES"][96]["VALUE"]:'');
+					if ($SETUP_FILE_NAME == "/bitrix/catalog_export/vk2.php")
+						$arAccName = $arAcc["~NAME"];
+					else
+						$arAccName = $arAcc["~NAME"].($arAcc["PROPERTIES"][96]["VALUE"]?'. Цвет: '.$arAcc["PROPERTIES"][96]["VALUE"]:'');
 					$strTmpOff .= "<name>".yandex_text2xml($arAccName, true)."</name>\n";
 					break;
 				case 'description':
@@ -983,7 +1040,7 @@ if (empty($arRunErrors))
 	}
 	elseif ('P' == $arCatalog['CATALOG_TYPE'] || 'X' == $arCatalog['CATALOG_TYPE'])
 	{
-		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL", "CATALOG_GROUP_1", "CATALOG_GROUP_2");
 		$arOfferFilter = array('IBLOCK_ID' => $intOfferIBlockID, 'PROPERTY_'.$arOffers['SKU_PROPERTY_ID'] => 0, "ACTIVE" => "Y", "ACTIVE_DATE" => "Y");
 		if (YANDEX_SKU_EXPORT_PROP == $arSKUExport['SKU_EXPORT_COND'])
 		{
@@ -997,7 +1054,7 @@ if (empty($arRunErrors))
 			$arOfferFilter[$strExportKey] = $mxValues;
 		}
 
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL", "CATALOG_GROUP_1", "CATALOG_GROUP_2");
 		$arFilter = array("IBLOCK_ID" => $IBLOCK_ID);
 		if (!$bAllSections && !empty($arSectionIDs))
 		{
@@ -1007,7 +1064,16 @@ if (empty($arRunErrors))
 		$arFilter["ACTIVE"] = "Y";
 		$arFilter["ACTIVE_DATE"] = "Y";
 		$arFilter["ACTIVE_DATE"] = "Y";
-		$arFilter["!PROPERTY_AVAILABLE"] = false;
+
+		if ($CHECK_MARKET == "Y") {
+			$arFilter["!PROPERTY_MARKET"] = false;
+		}
+		if ($CHECK_AVAILABLE == "Y") {
+			$arFilter["!PROPERTY_AVAILABLE"] = false;
+		}
+
+		if (!empty($MAKERS))
+			$arFilter["PROPERTY_MAKER"] = $MAKERS;
 
 		$strOfferTemplateURL = '';
 		if (!empty($arSKUExport['SKU_URL_TEMPLATE_TYPE']))
@@ -1104,6 +1170,11 @@ if (empty($arRunErrors))
 							255), true);
 
 			$arOfferFilter['PROPERTY_'.$arOffers['SKU_PROPERTY_ID']] = $arItem['ID'];
+
+			if ($IS_PICTURE == 'Y') {
+				$arOfferFilter['!PREVIEW_PICTURE'] = false;
+			}
+
 			$rsOfferItems = CIBlockElement::GetList(array(),$arOfferFilter,false,false,$arOfferSelect);
 
 			if (!empty($strOfferTemplateURL))
@@ -1256,6 +1327,12 @@ if (empty($arRunErrors))
 					$minPriceRUR = $arCurrentPrice['MIN_PRICE_RUR'];
 					$minPriceGroup = $arCurrentPrice['MIN_PRICE_GROUP'];
 
+					$oldPrice = 0;
+					$arCatalogPrices = CIBlockPriceTools::GetCatalogPrices(false, array('MARGIN'));
+					$arMarginPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arOfferItem, false, array());
+					if ($arMarginPrices["MARGIN"]["DISCOUNT_VALUE"])
+						$oldPrice = $arMarginPrices["MARGIN"]["DISCOUNT_VALUE"];
+
 					$arOfferItem['YANDEX_AVAILABLE'] = 'true';
 					$rsProducts = CCatalogProduct::GetList(
 						array(),
@@ -1285,9 +1362,12 @@ if (empty($arRunErrors))
 
 					$strOfferYandex = '';
 					$strOfferYandex .= "<offer id=\"".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
-					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."utm_source=aport&amp;utm_medium=cpc&amp;utm_campaign=price1</url>\n";
+					$str_utm = ($SHOW_UTM?"&amp;utm_campaign=".yandex_text2xml($arMakers[$arItem["PROPERTIES"][6]["VALUE"]], true)."&amp;utm_term=".yandex_text2xml($arItem["CODE"], true):"");
+					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '' : '&amp;').($GET_PARAMS?'?'.$GET_PARAMS:'').$str_utm."</url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
+					if ($oldPrice > 0)
+						$strOfferYandex .= "<oldprice>$oldPrice</oldprice>\n";
 					$strOfferYandex .= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 					$strOfferYandex .= $arItem['YANDEX_CATEGORY'];
@@ -1322,7 +1402,12 @@ if (empty($arRunErrors))
 						case 'name':
 							if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
 								continue;
-							$arOfferItemName = $arOfferItem["~NAME"].($arOfferItem["PROPERTIES"][96]["VALUE"]?'. Цвет: '.$arOfferItem["PROPERTIES"][96]["VALUE"]:'');
+
+							if ($SETUP_FILE_NAME == "/bitrix/catalog_export/vk2.php")
+								$arOfferItemName = $arOfferItem["~NAME"];
+							else
+								$arOfferItemName = $arOfferItem["~NAME"].($arOfferItem["PROPERTIES"][96]["VALUE"]?'. Цвет: '.$arOfferItem["PROPERTIES"][96]["VALUE"]:'');
+
 							$strOfferYandex .= "<name>".yandex_text2xml($arOfferItemName, true)."</name>\n";
 							break;
 						case 'description':
@@ -1517,6 +1602,12 @@ if (empty($arRunErrors))
 					if ($minPrice <= 0)
 						continue;
 
+					$oldPrice = 0;
+					$arCatalogPrices = CIBlockPriceTools::GetCatalogPrices(false, array('MARGIN'));
+					$arMarginPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arOfferItem, false, array());
+					if ($arMarginPrices["MARGIN"]["DISCOUNT_VALUE"])
+						$oldPrice = $arMarginPrices["MARGIN"]["DISCOUNT_VALUE"];
+
 					if (strlen($arOfferItem['DETAIL_PAGE_URL']) <= 0)
 						$arOfferItem['DETAIL_PAGE_URL'] = '/';
 					else
@@ -1531,9 +1622,12 @@ if (empty($arRunErrors))
 
 					$strOfferYandex = '';
 					$strOfferYandex .= "<offer id=\"".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
-					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."utm_source=aport&amp;utm_medium=cpc&amp;utm_campaign=price1</url>\n";
+					$str_utm = ($SHOW_UTM?"&amp;utm_campaign=".yandex_text2xml($arMakers[$arItem["PROPERTIES"][6]["VALUE"]], true)."&amp;utm_term=".yandex_text2xml($arItem["CODE"], true):"");
+					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '' : '&amp;').($GET_PARAMS?'?'.$GET_PARAMS:'').$str_utm."</url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
+					if ($oldPrice > 0)
+						$strOfferYandex .= "<oldprice>$oldPrice</oldprice>\n";
 					$strOfferYandex .= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 					$strOfferYandex .= $arItem['YANDEX_CATEGORY'];
@@ -1568,7 +1662,11 @@ if (empty($arRunErrors))
 						case 'name':
 							if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
 								continue;
-							$arOfferItemName = $arOfferItem["~NAME"].($arOfferItem["PROPERTIES"][96]["VALUE"]?'. Цвет: '.$arOfferItem["PROPERTIES"][96]["VALUE"]:'');
+							if ($SETUP_FILE_NAME == "/bitrix/catalog_export/vk2.php")
+								$arOfferItemName = $arOfferItem["~NAME"];
+							else
+								$arOfferItemName = $arOfferItem["~NAME"].($arOfferItem["PROPERTIES"][96]["VALUE"]?'. Цвет: '.$arOfferItem["PROPERTIES"][96]["VALUE"]:'');
+
 							$strOfferYandex .= "<name>".yandex_text2xml($arOfferItemName, true)."</name>\n";
 							break;
 						case 'description':
@@ -1753,6 +1851,12 @@ if (empty($arRunErrors))
 
 				if ($minPrice <= 0) continue;
 
+				$oldPrice = 0;
+				$arCatalogPrices = CIBlockPriceTools::GetCatalogPrices(false, array('MARGIN'));
+				$arMarginPrices = CIBlockPriceTools::GetItemPrices(false, $arCatalogPrices, $arItem, false, array());
+				if ($arMarginPrices["MARGIN"]["DISCOUNT_VALUE"])
+					$oldPrice = $arMarginPrices["MARGIN"]["DISCOUNT_VALUE"];
+
 				if ('' == $arItem['DETAIL_PAGE_URL'])
 				{
 					$arItem['DETAIL_PAGE_URL'] = '/';
@@ -1777,9 +1881,12 @@ if (empty($arRunErrors))
 
 				$strOfferYandex = '';
 				$strOfferYandex.= "<offer id=\"".$arItem["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
-				$strOfferYandex.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arItem["~DETAIL_PAGE_URL"]).(strstr($arItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."utm_source=aport&amp;utm_medium=cpc&amp;utm_campaign=price1</url>\n";
+				$str_utm = ($SHOW_UTM?"&amp;utm_campaign=".yandex_text2xml($arMakers[$arItem["PROPERTIES"][6]["VALUE"]], true)."&amp;utm_term=".yandex_text2xml($arItem["CODE"], true):"");
+				$strOfferYandex.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arItem["~DETAIL_PAGE_URL"]).(strstr($arItem['DETAIL_PAGE_URL'], '?') === false ? '' : '&amp;').($GET_PARAMS?'?'.$GET_PARAMS:'').$str_utm."</url>\n";
 
 				$strOfferYandex.= "<price>".$minPrice."</price>\n";
+				if ($oldPrice > 0)
+					$strOfferYandex .= "<oldprice>$oldPrice</oldprice>\n";
 				$strOfferYandex.= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 				$strOfferYandex.= $arItem['YANDEX_CATEGORY'];
@@ -1798,7 +1905,12 @@ if (empty($arRunErrors))
 					case 'name':
 						if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
 							continue;
-						$arItemName = $arItem["~NAME"].($arItem["PROPERTIES"][96]["VALUE"]?'. Цвет: '.$arItem["PROPERTIES"][96]["VALUE"]:'');
+
+						if ($SETUP_FILE_NAME == "/bitrix/catalog_export/vk2.php")
+							$arItemName = $arItem["~NAME"];
+						else
+							$arItemName = $arItem["~NAME"].($arItem["PROPERTIES"][96]["VALUE"]?'. Цвет: '.$arItem["PROPERTIES"][96]["VALUE"]:'');
+
 						$strValue = "<name>".yandex_text2xml($arItemName, true)."</name>\n";
 						break;
 					case 'description':

@@ -1,0 +1,96 @@
+extends ./layouts/default
+
+block content
+
+    .page-content
+        a.logo(href="#")
+
+        .b-content
+
+            - b_header.title = 'Контакты';
+            - b_header.class = 'b-content__header';
+            include includes/partials/b-header/3_1
+
+            .b-block-1
+                .b-block-1__item
+                    .b-block-1__icon
+                        span.sprite-alarm1
+                    .b-block-1__content
+                        .b-block-1__title Время работы интернет-магазина
+                        .b-block-1__text 
+                            | Будние дни c 9:00 до 19:00 по Московскому времени 
+                            br
+                            |Выходные дни с 10:00 до 18:00 по Московскому времени
+                .b-block-1__item
+                    .b-block-1__icon
+                        span.sprite-phone-blue
+                    .b-block-1__content
+                        .b-block-1__title Телефоны
+                        .b-block-1__text 
+                            | <a class="link-tel" href="tel:+74993720483">+7 (499) 372-04-83</a> - многоканальный по Москве
+                            br
+                            | &nbsp;<a class="link-tel" href="tel:88007759548">8 (800) 775-95-48</a> - бесплатный для регионов России
+                .b-block-1__item
+                    .b-block-1__icon
+                        span.sprite-mail-blue
+                    .b-block-1__content
+                        .b-block-1__title Электронная почта
+                        .b-block-1__text 
+                            | <a class="link-mailto" href="mailto:sales@vsekroham.ru">sales@vsekroham.ru</a> - розничный отдел
+                            br
+                            | <a class="link-mailto" href="mailto:optom@vsekroham.ru">optom@vsekroham.ru</a> - оптовый отдел
+                .b-block-1__item
+                    .b-block-1__icon
+                        span.sprite-shop-1
+                    .b-block-1__content
+                        .b-block-1__title Адрес интернет-магазина
+                        .b-block-1__text 
+                            | г. Москва, Ул. 6-я Радиальная, д. 17
+                .b-block-1__item
+                    .b-block-1__icon
+                        span.sprite-credit-card-1
+                    .b-block-1__content
+                        .b-block-1__title Наши реквизиты
+                        .b-block-1__text 
+                            | ООО "Вавилон"; ИНН/КПП 7723881219/772301001, ОГРН 1137746759853 
+                            br
+                            | Юридический адрес: 109559, г. Москва, ул. Маршала Баграмяна, д.8
+
+            .b-block-2
+                .b-block-2__title Розничный магазин детских товаров на Авиамоторной
+                .b-block-2__img
+                    img(src="images/temp/55.jpg", alt="")
+                    .b-block-2__tel +7 (495) 707-18-83
+                ul.b-block-2__list
+                    li
+                        span.icon.sprite-pin-1-xs
+                        | г. Москва (м. Авиамоторная, м. Семёновская), ул. Авиамоторная, дом 5
+                    li
+                        span.icon.sprite-alarm-xs
+                        | ПН-ВС с 9:00 до 21:00
+
+            .b-block-2
+                .b-block-2__title Розничный магазин детских товаров на Авиаторов
+                .b-block-2__img
+                    img(src="images/temp/55.jpg", alt="")
+                    .b-block-2__tel +7 (926) 235-09-84
+                ul.b-block-2__list
+                    li
+                        span.icon.sprite-pin-1-xs
+                        | Московская область г. Люберцы, ул. Авиаторов, дом 11
+                    li
+                        span.icon.sprite-alarm-xs
+                        | ПН-ВС с 9:00 до 21:00
+
+            .b-block-2
+                .b-block-2__title Оптово-розничный склад детских товаров на Радиальной
+                .b-block-2__img
+                    img(src="images/temp/55.jpg", alt="")
+                    .b-block-2__tel +7 (499) 372-04-83
+                ul.b-block-2__list
+                    li
+                        span.icon.sprite-pin-1-xs
+                        | г. Москва, ул. 6-я Радиальная, 17 (метро «Царицино»)
+                    li
+                        span.icon.sprite-alarm-xs
+                        | ПН-ПТ с 9:00 до 19:00, СБ-ВС с 10:00 до 18:00

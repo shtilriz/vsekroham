@@ -52,16 +52,39 @@
 					);?>
 				</div>
 				*/?>
+
+				<?if ($APPLICATION->GetCurDir() == "/"):?>
+					<div class="banner">
+						<a href="/brands/anex/"><img src="<?=SITE_TEMPLATE_PATH?>/images/Anex_Banner_Classic.png"></a>
+					</div>
+				<?endif;?>
+				<?$APPLICATION->ShowViewContent("baner-anex");?>
+
+				<div id="vk_left">
+					<?Bitrix\Main\Page\Frame::getInstance()->startDynamicWithID("vk_left");?>
+						<?if ($GLOBALS["VK_LEFT"]):?>
+						<div class="vk_left">
+						<script type="text/javascript" src="https://vk.com/js/api/openapi.js?110"></script>
+						<div id="vk_groups"></div>
+						<script type="text/javascript">
+							VK.Widgets.Group("vk_groups", {mode: 0, width: "202", height: "320", color1: 'FFFFFF', color2: '2B587A', color3: '5B7FA6'}, 62994219);
+						</script>
+						</div>
+						<?endif;?>
+					<?Bitrix\Main\Page\Frame::getInstance()->finishDynamicWithID("vk_left", "");?>
+				</div>
 			</aside>
 			<!-- !end .left-column -->
 		</div><!-- !end #content -->
 
+		<?if ($APPLICATION->GetCurPage() != "/sales/ng2016.php"):?>
 		<?$textdescription = $APPLICATION->GetPageProperty("textdescription");?>
 		<?if($textdescription):?>
 			<div class="content__bottom content__bottom_bgcolor_gray"><?=$textdescription;?></div>
 		<?else:?>
 			<div class="content__bottom"><?$APPLICATION->ShowViewContent("textdescription");?></div>
 		<?endif?>
+		<?endif;?>
 
 		<div class="forfooter"></div>
 	</div><!-- !end .layout -->
@@ -128,7 +151,6 @@
 			</div>
 		</div>
 	</footer>
-
 </div>
 
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/custom.forms.js"></script>
@@ -144,15 +166,32 @@
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery.mousewheel.js"></script>
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/autosize.js"></script>
 <?/*<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/fancybox.js"></script>*/?>
+<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery.nouislider.all.min.js"></script>
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery.validate.min.js"></script>
 <?if ($APPLICATION->GetCurPage() == "/basket/order.php"):?>
 	<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/datepicker/bootstrap-datepicker.js"></script>
 	<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/datepicker/locales/bootstrap-datepicker.ru.js"></script>
 <?endif?>
-<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/effects.js"></script>
-<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/main.js"></script>
+<?if ($APPLICATION->GetCurPage() == "/sales/ng2016.php"):?>
+	<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery.countdown.min.js"></script>
+	<script type="text/javascript">
+	$(function () {
+		$('.js-ny-countdown').countdown('2015/12/10', function(event) {
+			$('.js-ny-countdown-days').html(event.strftime('%D'));
+			$('.js-ny-countdown-hours').html(event.strftime('%H'));
+			$('.js-ny-countdown-minutes').html(event.strftime('%M'));
+			$('.js-ny-countdown-seconds').html(event.strftime('%S'));
+		});
+	});
+	</script>
+<?endif;?>
+<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/effects.js?t=<?=filemtime($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH.'/js/effects.js')?>"></script>
+<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/delivery.js?t=<?=filemtime($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH.'/js/delivery.js')?>"></script>
+<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/main.js?t=<?=filemtime($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH.'/js/main.js')?>"></script>
 
+<?global $USER;?>
+<?if ($USER->GetID() != 1):?>
 <!-- Yandex.Metrika counter -->
 <?if (strlen($GLOBALS["YAPARAMS"])):?>
 <script type="text/javascript">
@@ -160,34 +199,39 @@
 </script>
 <?endif;?>
 
+<!-- Yandex.Metrika counter -->
 <script type="text/javascript">
-(function (d, w, c) {
-    (w[c] = w[c] || []).push(function() {
-        try {
-            w.yaCounter15270730 = new Ya.Metrika({id:15270730,
-                    webvisor:true,
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter15270730 = new Ya.Metrika({
+                    id:15270730,
                     clickmap:true,
                     trackLinks:true,
                     accurateTrackBounce:true,
-                    trackHash:true,params:window.yaParams||{ }});
-        } catch(e) { }
-    });
+                    webvisor:true,
+                    trackHash:true,
+                    ecommerce:"dataLayer"
+                });
+            } catch(e) { }
+        });
 
-    var n = d.getElementsByTagName("script")[0],
-        s = d.createElement("script"),
-        f = function () { n.parentNode.insertBefore(s, n); };
-    s.type = "text/javascript";
-    s.async = true;
-    s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
 
-    if (w.opera == "[object Opera]") {
-        d.addEventListener("DOMContentLoaded", f, false);
-    } else { f(); }
-})(document, window, "yandex_metrika_callbacks");
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
 </script>
-<noscript><div><img src="//mc.yandex.ru/watch/15270730" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<noscript><div><img src="https://mc.yandex.ru/watch/15270730" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
-<!-- google Analitycs -->
+
+<?/*<!-- google Analitycs -->
 <script type="text/javascript">
 var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-42061895-1']);
@@ -199,7 +243,40 @@ ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www')
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 </script>
-<!-- /google Analitycs -->
+<!-- /google Analitycs -->*/?>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+  ga('create', 'UA-42061895-1', 'auto');
+  ga('send', 'pageview');
+  <?=$GLOBALS["GAPARAMS"];?>
+</script>
+<?/*<script type="text/javascript" src="//cdn.callbackhunter.com/cbh.js?hunter_code=4451571cd2ae78e50a846a30bc417163" charset="UTF-8" async></script>*/?>
+
+<script type="text/javascript">
+var google_tag_params = {
+ecomm_prodid: <?=(isset($GLOBALS["GOOGLE_TAG_PARAMS"]["ECOMM_PRODID"])?$GLOBALS["GOOGLE_TAG_PARAMS"]["ECOMM_PRODID"]:"''")?>,
+ecomm_pagetype: '<?=($APPLICATION->GetPageProperty("ecomm_pagetype") ? $APPLICATION->GetPageProperty("ecomm_pagetype") : $APPLICATION->GetDirProperty("ecomm_pagetype"));?>',
+ecomm_totalvalue: <?=(isset($GLOBALS["GOOGLE_TAG_PARAMS"]["ECOMM_TOTALVALUE"])?$GLOBALS["GOOGLE_TAG_PARAMS"]["ECOMM_TOTALVALUE"]:"''")?>
+};
+</script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1022774750;
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/1022774750/?value=0&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+<?endif;?>
 </body>
 </html>

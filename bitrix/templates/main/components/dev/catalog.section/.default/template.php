@@ -79,6 +79,10 @@ $this->setFrameMode(true);?>
 <?$this->EndViewTarget();?>
 <?endif?>
 
+<?/*$this->SetViewTarget("countFindProducts");?>
+	<span class="find-result">Нашлось <span><?=$arResult["NAV_RESULT"]->NavRecordCount?> </span>товаров</span>
+<?$this->EndViewTarget();*/?>
+
 <?if ($arResult["ID"] > 0):?>
 <script type="text/javascript">
     rrApiOnReady.push(function() {
@@ -97,6 +101,7 @@ $this->setFrameMode(true);?>
 	?>
 	<meta property="og:description" content="<?=trim(strip_tags($TEXT))?>" />
 	<meta property="og:image" content="https://<?=$_SERVER["SERVER_NAME"].$arResult["PICTURE"]["SRC"]?>" />
+	<meta property="og:type" content="website"/>
 	<meta property="og:url" content="https://<?=$_SERVER["SERVER_NAME"].$arResult["SECTION_PAGE_URL"]?>" />
 	<?$this->EndViewTarget();?>
 <?endif;?>

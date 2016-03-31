@@ -1,0 +1,26 @@
+#modal-pr-options.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+        .modal-content
+            .modal-header
+                button.modal__close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                h3#myModalLabel.modal-title Нужно выбрать параметры товара, чтобы добавить в корзину
+            .modal-body
+                .b-g.b-g_list
+                    a(href="#").b-g__img
+                        img(src="images/temp/goods/img1.jpg", alt="")
+                    .b-g__content
+                        a(href="#").b-g__title Детская коляска для новорожденных Navington Caravel 14 колеса
+                        .b-g__price 14 000 р.
+                .form-group
+                    label Цвет:
+                    select.selectpicker.col-xs-12(name="")
+                        each val in [1,2,3,4,5]
+                            option(value=val) #{val}
+                .form-group
+                    label Размер:
+                    select.selectpicker.col-xs-12(name="")
+                        each val in [1,2,3,4,5]
+                            option(value=val) #{val}
+            .modal-footer
+                button(type='submit').modal__submit Отправить

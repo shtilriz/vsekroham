@@ -1,0 +1,14 @@
+- var n = 0;
+
+div(class='#{b_goods.class} b-goods')
+    while n < b_g.counter
+        .b-g.b-g_list
+            a(href="#").b-g__img
+                img(src="images/temp/goods/img1.jpg", alt="")
+            .b-g__content
+                a(href="#").b-g__title #{b_g.title}
+                .b-g__price 14 000 р.
+                .b-g__stars.b-stars.b-stars-3
+                a(href="#").b-g__count-comments 20 отзывов
+            a(href="#").b-g__next
+        - n++;

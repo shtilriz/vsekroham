@@ -28,7 +28,7 @@ if ($normalCount > 0):?>
 		</thead>
 		<tbody>
 		<?foreach ($arResult["GRID"]["ROWS"] as $k => $arItem):?>
-			<?if ($arItem["DELAY"] == "N" && $arItem["CAN_BUY"] == "Y"):?>
+			<?if ($arItem["DELAY"] == "N"):?>
 			<tr>
 				<td>
 					<a href="<?=$arItem["DETAIL_PAGE_URL"]?>" class="item-img">
@@ -48,11 +48,12 @@ if ($normalCount > 0):?>
 					}?>
 				</td>
 				<td>
-					<?if ($arItem["DISCOUNT_PRICE_PERCENT"] > 0):?>
+					<?if ($arItem["DISCOUNT_PRICE_PERCENT"] > 0 && $arItem["CAN_BUY"] == "Y"):?>
 						<span class="item-discount"><?=$arItem["DISCOUNT_PRICE_PERCENT_FORMATED"]?></span>
 					<?endif;?>
 				</td>
 				<td>
+					<?if ($arItem["CAN_BUY"] == "Y"):?>
 					<div class="item-count">
 						<div class="form-field__inputtext plus-minus">
 							<?/*<input id="item-count" name="item-count" type="text" value="1">*/?>
@@ -64,8 +65,10 @@ if ($normalCount > 0):?>
 							<a class="decrease" href="#"><span>−</span></a>
 						</div>
 					</div>
+					<?endif;?>
 				</td>
 				<td>
+					<?if ($arItem["CAN_BUY"] == "Y"):?>
 					<div class="current_price" id="current_price_<?=$arItem["ID"]?>">
 					<?if (floatval($arItem["DISCOUNT_PRICE_PERCENT"]) > 0):?>
 						<span class="item-price item-price_type_old"><?=number_format($arItem["FULL_PRICE"]*$arItem["QUANTITY"], 0, '', ' ')?> р.</span>
@@ -74,6 +77,9 @@ if ($normalCount > 0):?>
 					<?endif;?>
 					<span class="item-price"><?=number_format($arItem["PRICE"]*$arItem["QUANTITY"], 0, '', ' ')?> р.</span>
 					</div>
+					<?else:?>
+						<span class="item-price" style="font-size: 16px;">нет в продаже</span>
+					<?endif;?>
 				</td>
 				<?/*<td><a class="item-hold" href="#">Отложить</a></td>*/?>
 				<td><a class="item-remove" href="#">Удалить</a><input type="checkbox" name="DELETE_<?=$arItem["ID"]?>" value="Y" style="display: none" class="productDel"></td>

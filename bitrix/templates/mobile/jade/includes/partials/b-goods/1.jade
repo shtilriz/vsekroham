@@ -1,0 +1,13 @@
+div(class='#{b_goods.class} b-goods')
+    each val in [1, 2, 3, 4]
+        .b-g.b-g_floors
+            a(href="#").b-g__img
+                img(src="images/temp/goods/img#{val}.jpg", alt="")
+            .b-g__content
+                a(href="#").b-g__title
+                    | #{goodTitle || 'Детские ходунки Dion Kids FL-616'}
+                .b-g__stars.b-stars.b-stars-3
+                a(href="#").b-g__count-comments 20 отзывов
+                .b-g__price 14 000 р.
+            footer.b-g__footer
+                a(href="#").b-g__button В корзину

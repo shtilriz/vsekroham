@@ -16,6 +16,18 @@ if (($ACTION == 'EXPORT_EDIT' || $ACTION == 'EXPORT_COPY') && $STEP == 1)
 		$SETUP_FILE_NAME = str_replace($strAllowExportPath,'',$arOldSetupVars['SETUP_FILE_NAME']);
 	if (array_key_exists('SETUP_PROFILE_NAME', $arOldSetupVars))
 		$SETUP_PROFILE_NAME = $arOldSetupVars['SETUP_PROFILE_NAME'];
+	if (array_key_exists('GET_PARAMS', $arOldSetupVars))
+		$GET_PARAMS = $arOldSetupVars['GET_PARAMS'];
+	if (array_key_exists('CHECK_MARKET', $arOldSetupVars))
+		$CHECK_MARKET = $arOldSetupVars['CHECK_MARKET'];
+	if (array_key_exists('CHECK_AVAILABLE', $arOldSetupVars))
+		$CHECK_AVAILABLE = $arOldSetupVars['CHECK_AVAILABLE'];
+	if (array_key_exists('SHOW_UTM', $arOldSetupVars))
+		$SHOW_UTM = $arOldSetupVars['SHOW_UTM'];
+	if (array_key_exists('MAKERS', $arOldSetupVars))
+		$MAKERS = $arOldSetupVars['MAKERS'];
+	if (array_key_exists('IS_PICTURE', $arOldSetupVars))
+		$IS_PICTURE = $arOldSetupVars['IS_PICTURE'];
 	if (array_key_exists('V', $arOldSetupVars))
 		$V = $arOldSetupVars['V'];
 	if (array_key_exists('XML_DATA', $arOldSetupVars))
@@ -361,6 +373,32 @@ if ($STEP==1)
 </tr>
 
 <tr>
+	<td width="40%">Производители:</td>
+	<td width="60%">
+		<?
+		$arMakers = array();
+		$rsMaker = CIBlockElement::GetList(
+			array("NAME" => "ASC", "SORT" => "ASC"),
+			array(
+				"IBLOCK_ID" => 3,
+				"ACTIVE" => "Y"
+			),
+			false,
+			false,
+			array("IBLOCK_ID", "ID", "NAME")
+		);
+		while ($arMaker = $rsMaker->GetNext()) {
+			$arMakers["REFERENCE"][] = $arMaker["NAME"];
+			$arMakers["REFERENCE_ID"][] = $arMaker["ID"];
+		}
+		if (!empty($arMakers)) {
+			echo SelectBoxMFromArray("MAKERS[]", $arMakers, $MAKERS, "", false, 10, "");
+		}
+		?>
+	</td>
+</tr>
+
+<tr>
 	<td width="40%"><?=GetMessage('CAT_DETAIL_PROPS')?>:</td>
 	<td width="60%">
 		<script type="text/javascript">
@@ -411,6 +449,38 @@ if ($STEP==1)
 	</td>
 </tr><?
 	}
+?>
+<tr>
+	<td width="40%">GET-параметры ссылки</td>
+	<td width="60%">
+		<input type="text" name="GET_PARAMS" value="<?echo htmlspecialcharsbx($GET_PARAMS) ?>" size="70">
+	</td>
+</tr>
+<tr>
+	<td width="40%">Выводить в ссылке параметры utm_campaign и utm_term</td>
+	<td width="60%">
+		<input type="checkbox" name="SHOW_UTM" value="Y"<?=($SHOW_UTM=='Y'?' checked':'')?>>
+	</td>
+</tr>
+<tr>
+	<td width="40%">Выгружать только товары, отмечанные флажком "Выгрузка на маркет"</td>
+	<td width="60%">
+		<input type="checkbox" name="CHECK_MARKET" value="Y"<?=($CHECK_MARKET=='Y'?' checked':'')?>>
+	</td>
+</tr>
+<tr>
+	<td width="40%">Выгружать только товары, отмечанные флажком "В наличии"</td>
+	<td width="60%">
+		<input type="checkbox" name="CHECK_AVAILABLE" value="Y"<?=($CHECK_AVAILABLE=='Y'?' checked':'')?>>
+	</td>
+</tr>
+<tr>
+	<td width="40%">Не выгружать торговые предложения без картинки анонса</td>
+	<td width="60%">
+		<input type="checkbox" name="IS_PICTURE" value="Y"<?=($IS_PICTURE=='Y'?' checked':'')?>>
+	</td>
+</tr>
+<?
 }
 
 $tabControl->EndTab();
@@ -446,7 +516,7 @@ if (2 > $STEP)
 	<input type="hidden" name="ACT_FILE" value="<?echo htmlspecialcharsbx($_REQUEST["ACT_FILE"]) ?>">
 	<input type="hidden" name="ACTION" value="<?echo htmlspecialcharsbx($ACTION) ?>">
 	<input type="hidden" name="STEP" value="<?echo intval($STEP) + 1 ?>">
-	<input type="hidden" name="SETUP_FIELDS_LIST" value="V,IBLOCK_ID,SETUP_SERVER_NAME,SETUP_FILE_NAME,XML_DATA">
+	<input type="hidden" name="SETUP_FIELDS_LIST" value="V,IBLOCK_ID,SETUP_SERVER_NAME,SETUP_FILE_NAME,XML_DATA,GET_PARAMS,CHECK_MARKET,CHECK_AVAILABLE,MAKERS,SHOW_UTM,IS_PICTURE">
 	<input type="submit" value="<?echo ($ACTION=="EXPORT")?GetMessage("CET_EXPORT"):GetMessage("CET_SAVE")?>"><?
 }
 

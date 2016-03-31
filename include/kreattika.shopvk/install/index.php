@@ -109,9 +109,9 @@ Class kreattika_shopvk extends CModule
 				else
 				{
 					RegisterModule($this->MODULE_ID);
-					RegisterModuleDependences("iblock", "OnAfterIblockElementAdd", $this->MODULE_ID, "SVK", "wall_auto_post");
-					RegisterModuleDependences("iblock", "OnAfterIBlockElementUpdate", $this->MODULE_ID, "SVK", "wall_auto_post");
-					RegisterModuleDependences("iblock", "OnAfterIBlockElementDelete", $this->MODULE_ID, "SVK", "delete_auto_post");
+					//RegisterModuleDependences("iblock", "OnAfterIblockElementAdd", $this->MODULE_ID, "SVK", "wall_auto_post");
+					//RegisterModuleDependences("iblock", "OnAfterIBlockElementUpdate", $this->MODULE_ID, "SVK", "wall_auto_post");
+					//RegisterModuleDependences("iblock", "OnAfterIBlockElementDelete", $this->MODULE_ID, "SVK", "delete_auto_post");
 					RegisterModuleDependences("iblock", "OnAfterIBlockSectionDelete", $this->MODULE_ID, "SVK", "delete_album");
 				}
 				return true;
@@ -123,9 +123,9 @@ Class kreattika_shopvk extends CModule
                 global $DB, $DBType, $APPLICATION;
 				$this->errors = false;
 				UnRegisterModule($this->MODULE_ID);
-				UnRegisterModuleDependences("iblock", "OnAfterIblockElementAdd", $this->MODULE_ID, "SVK", "wall_auto_post");
-				UnRegisterModuleDependences("iblock", "OnAfterIBlockElementUpdate", $this->MODULE_ID, "SVK", "wall_auto_post");
-				UnRegisterModuleDependences("iblock", "OnAfterIBlockElementDelete", $this->MODULE_ID, "SVK", "delete_auto_post");
+				//UnRegisterModuleDependences("iblock", "OnAfterIblockElementAdd", $this->MODULE_ID, "SVK", "wall_auto_post");
+				//UnRegisterModuleDependences("iblock", "OnAfterIBlockElementUpdate", $this->MODULE_ID, "SVK", "wall_auto_post");
+				//UnRegisterModuleDependences("iblock", "OnAfterIBlockElementDelete", $this->MODULE_ID, "SVK", "delete_auto_post");
 				UnRegisterModuleDependences("iblock", "OnAfterIBlockSectionDelete", $this->MODULE_ID, "SVK", "delete_album");
 				if (!array_key_exists("savedata", $arParams) || $arParams["savedata"] != "Y")
 				{

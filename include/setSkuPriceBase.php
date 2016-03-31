@@ -21,7 +21,7 @@ function BXIBlockAfterSave(&$arFields) {
 					CIBlockElement::SetPropertyValuesEx($arFields["ID"], false, array("AVAILABLE" => NULL));
 				}
 				$arSort = array();
-				$arFilter = array("IBLOCK_ID"=>IBLOCK_SKU_ID,"ACTIVE"=>"Y","PROPERTY_CML2_LINK"=>$arFields["ID"]);
+				$arFilter = array("IBLOCK_ID"=>IBLOCK_SKU_ID,"PROPERTY_CML2_LINK"=>$arFields["ID"]);
 				$arSelect = array("IBLOCK_ID", "ID");
 				$res = CIBlockElement::GetList($arSort, $arFilter, false, false, $arSelect);
 				while ($arRes = $res->GetNext()) {
@@ -105,14 +105,6 @@ class setSkuPrice
 		if (is_array($mxResult)) {
 			//достать цену с наценкой
 			$arMarginPrice = setSkuPrice::getMarginPrice($mxResult["ID"]);
-			/*if ($USER->GetID() == 1) {
-				?>
-				<pre>
-					<?var_dump($arMarginPrice);?>
-				</pre>
-				<?
-				exit();
-			}*/
 			if ($arMarginPrice) {
 				$arFields = array(
 					"PRODUCT_ID" => $elID,

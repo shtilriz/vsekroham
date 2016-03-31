@@ -16,6 +16,8 @@ if (($ACTION == 'EXPORT_EDIT' || $ACTION == 'EXPORT_COPY') && $STEP == 1)
 		$SETUP_FILE_NAME = str_replace($strAllowExportPath,'',$arOldSetupVars['SETUP_FILE_NAME']);
 	if (array_key_exists('SETUP_PROFILE_NAME', $arOldSetupVars))
 		$SETUP_PROFILE_NAME = $arOldSetupVars['SETUP_PROFILE_NAME'];
+	if (array_key_exists('SHOW_PICKUP', $arOldSetupVars))
+		$SHOW_PICKUP = $arOldSetupVars['SHOW_PICKUP'];
 	if (array_key_exists('V', $arOldSetupVars))
 		$V = $arOldSetupVars['V'];
 	if (array_key_exists('XML_DATA', $arOldSetupVars))
@@ -413,6 +415,12 @@ if ($STEP==1)
 	</td>
 </tr><?
 	}
+?>
+<tr>
+	<td width="40%">Выводить тег pickup</td>
+	<td width="60%"><input type="checkbox" name="SHOW_PICKUP" value="Y"<?=($SHOW_PICKUP=='Y'?' checked':'')?>></td>
+</tr>
+<?
 }
 
 $tabControl->EndTab();
@@ -448,7 +456,7 @@ if (2 > $STEP)
 	<input type="hidden" name="ACT_FILE" value="<?echo htmlspecialcharsbx($_REQUEST["ACT_FILE"]) ?>">
 	<input type="hidden" name="ACTION" value="<?echo htmlspecialcharsbx($ACTION) ?>">
 	<input type="hidden" name="STEP" value="<?echo intval($STEP) + 1 ?>">
-	<input type="hidden" name="SETUP_FIELDS_LIST" value="V,IBLOCK_ID,SETUP_SERVER_NAME,SETUP_FILE_NAME,XML_DATA">
+	<input type="hidden" name="SETUP_FIELDS_LIST" value="V,IBLOCK_ID,SETUP_SERVER_NAME,SETUP_FILE_NAME,XML_DATA,SHOW_PICKUP">
 	<input type="submit" value="<?echo ($ACTION=="EXPORT")?GetMessage("CET_EXPORT"):GetMessage("CET_SAVE")?>"><?
 }
 

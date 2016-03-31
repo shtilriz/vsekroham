@@ -1,0 +1,55 @@
+// Spinner
+$spinner_radius: 90%;
+$spinner_size: 100px;
+$spinner_thickness: 15px;
+$spinner_inner_circle: $spinner_size - $spinner_thickness;
+$spinner_fill_radius: 200px;
+$spinner_speed: 2s;
+$spinner_color: #67c9f5;
+$spinner_bg: #fff;
+$spinner_inner_bg: #FFFFFF;
+.spin-loader {
+  display: none;
+    position: relative;
+    margin: 0 auto;
+    border-radius: 90%;
+    width: $spinner_size;
+    height: $spinner_size;
+    animation: loading $spinner_speed infinite linear;
+    background: $spinner_bg;
+    &:before, &:after {
+        content: "";
+        display: block;
+        position: absolute;
+    }
+    &:before {
+        background: linear-gradient($spinner_bg, $spinner_color);
+        border-radius: 0 $spinner_fill_radius $spinner_fill_radius 0;
+        height: $spinner_size;
+        box-shadow: 3px 3px 3px rgba(0, 0, 0, .1);
+        width: 50%;
+        top: 0;
+        right: 0;
+        z-index: 1;
+    }
+    &:after {
+        border-radius: $spinner_radius;
+        height: $spinner_inner_circle;
+        width: $spinner_inner_circle;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: $spinner_inner_bg;
+        z-index: 1;
+    }
+}
+
+@keyframes loading {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+    ;
+}

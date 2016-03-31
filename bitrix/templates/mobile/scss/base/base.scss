@@ -1,0 +1,91 @@
+// base
+
+body {
+    position: relative;
+    color: $text-color;
+    font-family: 'pf_din_text_cond_pro', sans-serif;
+    font-weight: 300;
+    font-size: $font-size;
+    line-height: 1.428571429;
+
+    // min-width: 650px;
+    // margin: 0 auto;
+}
+
+#main {
+    position: relative;
+    background: url(../images/bg-top.png) left $header-menu-height, url(../images/bg-bottom.png) left bottom, url(../images/body-bg.png) left bottom;
+    background-size: 100%, 100%, cover;
+    background-repeat: no-repeat;
+}
+
+.page-content {
+    @include container;
+    padding: $page-padding;
+    // width: 750px;
+}
+
+p {
+    margin: 0 0 30px;
+}
+
+a {
+    color: $color-blue;
+    text-decoration: none;
+    &:hover {
+        color: $hover-color;
+        text-decoration: underline;
+    }
+}
+
+h1 {
+    color: $title-color;
+    font-size: $title-size;
+    font-weight: 400;
+}
+h2 {
+    color: $title-color;
+    font-size: $title-size * .9;
+    font-weight: 400;
+}
+h3 {
+    color: $title-color;
+    font-size: $title-size * .8;
+    font-weight: 400;
+}
+
+
+ul {
+    list-style: none;
+    li {
+        position: relative;
+        padding-left: 15px;
+        &:before {
+            content: " ";
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 10px;
+            @include sprite($sprite-list-custom);
+        }
+    }
+}
+
+dt {
+    // float: left;
+}
+dt, dd {
+    display: inline-block;
+}
+
+// input[type=text], textarea {display: block; width: 100%; height: 49px; padding: 0; border: none; color: #000;
+//   &::-webkit-input-placeholder {color: #000;}
+//   &:-moz-placeholder           {color: #000;}
+//   &::-moz-placeholder          {color: #000; opacity: 1;}
+//   &:-ms-input-placeholder      {color: #000;}
+// }
+
+
+.text-center {
+    text-align: center;
+}

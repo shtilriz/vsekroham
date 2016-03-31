@@ -25,7 +25,7 @@ if (CModule::IncludeModule("iblock")){
 				$makersId[] = array(
 					"ID" => $arRes["PROPERTY_MAKER_VALUE"],
 					"NAME" => $ar_resM["NAME"],
-				); 
+				);
 			}
 		}
 		$arResult[] = array(
@@ -75,7 +75,7 @@ if (CModule::IncludeModule("iblock")){
 		array("SORT"=>"ASC"),
 		array(
 			"IBLOCK_ID" => $IBLOCK_ID_BRANDS,
-			"ACTIVE" => "Y"
+			//"ACTIVE" => "Y"
 		),
 		false,
 		false,
@@ -90,7 +90,21 @@ if (CModule::IncludeModule("iblock")){
 				"ACTIVE" => "Y"
 			),
 			false,
-			array("IBLOCK_ID", "ID")
+			array("ID")
+		);
+		$rsProduct = CIBlockElement::GetList(
+			array(),
+			array(
+				"IBLOCK_ID" => $IBLOCK_ID_PRODUCTS,
+				"ACTIVE" => "Y",
+				"SECTION_ID" => $arRes["PROPERTY_SECTION_ID_VALUE"],
+				"INCLUDE_SUBSECTIONS" => "Y",
+				"PROPERTY_MAKER" => $arRes["PROPERTY_MAKER_VALUE"],
+				"!PROPERTY_AVAILABLE" => false
+			),
+			false,
+			false,
+			array("ID")
 		);
 		$resMakers = CIBlockElement::GetList(
 			array("SORT"=>"ASC"),
@@ -103,12 +117,23 @@ if (CModule::IncludeModule("iblock")){
 			false,
 			array("IBLOCK_ID", "ID")
 		);
-		//если не существует данного активного раздела или активноно производителя
-		if ($db_list->SelectedRowsCount() == 0 || $resMakers->SelectedRowsCount() == 0) {
+
+		//если не существует данного активного раздела или нет товаров по этому разделу и производителю или нет активного производителя
+		if ($db_list->SelectedRowsCount() == 0 || $rsProduct->SelectedRowsCount() == 0 || $resMakers->SelectedRowsCount() == 0) {
 			//деактивировать данный раздел по производителям
 			$el = new CIBlockElement;
 			if ($resEl = $el->Update($arRes["ID"], array("ACTIVE"=>"N"))) {
 				AddMessage2Log("/include/brands2category.php - Деактивирован элемент ID=".$arRes["ID"]);
+			}
+			else {
+				AddMessage2Log("/include/brands2category.php - Возникла ошибка ".$el->LAST_ERROR);
+			}
+		}
+		elseif ($db_list->SelectedRowsCount() && $rsProduct->SelectedRowsCount() && $resMakers->SelectedRowsCount()) {
+			//иначе если выполнены все условия, то активировать данный раздел по производителям
+			$el = new CIBlockElement;
+			if ($resEl = $el->Update($arRes["ID"], array("ACTIVE"=>"Y"))) {
+				AddMessage2Log("/include/brands2category.php - Активирован элемент ID=".$arRes["ID"]);
 			}
 			else {
 				AddMessage2Log("/include/brands2category.php - Возникла ошибка ".$el->LAST_ERROR);

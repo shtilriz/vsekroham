@@ -410,6 +410,7 @@ class ShopVK {
 			if( isset( $data->error ) ) {
 				return ShopVK::error( $data );
 			}
+
 			$data = json_decode(
 						ShopVK::execute(
 							'photos.save',
@@ -424,7 +425,6 @@ class ShopVK {
 							'N'
 						)
 					);
-
 			if( isset( $data->error ) ) {
 				return ShopVK::error( $data );
 			}
@@ -469,7 +469,6 @@ class ShopVK {
 			if( isset( $data->error ) ) {
 				return ShopVK::error( $data );
 			}
-
 			return $data->response;
 		endif;
 	}
@@ -557,7 +556,11 @@ class ShopVK {
 			curl_setopt ( $ch, CURLOPT_POSTFIELDS, $params );
 			$data = curl_exec($ch);
 			curl_close($ch);
-#echo $data;
+			?>
+			<pre>
+				<?var_dump($data);?>
+			</pre>
+			<?
 			return $data;
 		endif;
 	}

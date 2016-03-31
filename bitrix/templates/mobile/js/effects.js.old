@@ -1,0 +1,304 @@
+;(function() {
+
+}());
+
+
+// $('#main')
+//     .width($(window).width()*2)
+//     // .css('display', 'none');
+// alert($(window).width());
+
+
+;(function() {
+    $('.js-side-menu .deeper > a').on('click', function(e) {
+        if ($(this).hasClass('active')) {
+            $(this).removeClass('active');
+            $(this).parent().children('ul').slideUp();
+        } else {
+            $(this).addClass('active');
+            $(this).parent().siblings().children('ul').slideUp();
+            $(this).parent().children('ul').slideDown();
+        };
+        e.preventDefault();
+    })
+}());
+
+
+;(function() {
+    $('.js-b-stars-1 a').on('click', function(e) {
+        var el = $(this);
+        var els = $(this).parent().children('a');
+            els.removeClass('active');
+            els.slice(0, el.index() + 1).stop().addClass('active');
+            el.parent().children('input').val(el.parent().children('a.active').size());
+
+        e.preventDefault();
+    });
+
+    // $('.js-b-stars-1 a').hover(
+    //     function() {
+    //         var el = $(this);
+    //         var els = el.parent().children('a');
+    //             els.addClass('star-hover');
+    //             els.slice(0, el.index() + 1).removeClass('star-hover').addClass('star-hover-active');
+    //     },
+    //     function() {
+    //         var el = $(this);
+    //         var els = el.parent().children('a');
+    //             els.removeClass('star-hover star-hover-active');
+    // });
+}());
+
+
+;(function() {
+    $('.js-b-checker').on('click', function() {
+        var $input = $(this).find('.checkbox-styled');
+        if ($input.is(':checked')) {
+            //$input.prop('checked', false).change()
+        } else {
+            $input.prop('checked', true).change()
+        };
+    });
+}());
+
+;(function() {
+    (function(el) {
+        if ($(el).hasClass('active')) {
+            $('.js-dropdown').slideDown();
+        } else {
+            $('.js-dropdown').slideUp();
+        };
+    }('.js-toogle'));
+    $('.js-toogle').on('click', function() {
+        if ($(this).hasClass('active')) {
+            $(this).removeClass('active');
+            $(this).parent().find('.js-dropdown').slideUp();
+        } else {
+            $(this).addClass('active');
+            $(this).parent().find('.js-dropdown').slideDown();
+        };
+    });
+}());
+
+;(function() {
+    $('.selectpicker').selectpicker({
+        noneResultsText: 'Не найдено',
+        style: 'dropdown-toggle_lg btn-default'
+    });
+}());
+
+
+;(function() {
+    // $(document).foundation();
+    // $('.js-side-menu-link').on('click', function() {
+    //     if ($(this).hasClass('active')) {
+    //         $(this).removeClass('active');
+    //         // $('.sidebar').css({
+    //         //     'left' : 0
+    //         // });
+    //         $('body').animate({
+    //             'left' : '0'
+    //         });
+    //     } else {
+    //         $(this).addClass('active');
+    //         // $('.sidebar').css({
+    //         //     // 'left' : 0
+    //         // });
+    //         $('body').animate({
+    //             'left' : '70%'
+    //         })
+    //     };
+    // });
+
+    $('.js-side-menu-link').on('click', function(e) {
+        e.preventDefault();
+        if ($(this).hasClass('active')) {
+            $(this).removeClass('active');
+            $('.off-canvas-wrap').removeClass('move-right');
+        } else {
+            $(this).addClass('active');
+            $('.off-canvas-wrap').addClass('move-right');
+        };
+    });
+
+    $('.exit-off-canvas').on('click', function() {
+        $('.js-side-menu-link').removeClass('active');
+        $('.off-canvas-wrap').removeClass('move-right');
+    });
+}());
+
+;(function() {
+    $('.slider-default').slick({
+        arrows: false,
+        dots: true
+    });
+    $('.slider-big').slick({
+        arrows: true,
+        dots: false
+    });
+}());
+
+$('#modal-pr-added-to-cart').on('shown.bs.modal', function (event) {
+    $(this).find('.slider-big').slick('unslick');
+    $(this).find('.slider-related').slick({
+        //slidesToShow: 3,
+        //slidesToScroll: 3
+    });
+});
+
+$('.js-change-delivery').on('click', function (e) {
+    e.preventDefault();
+    $('#modal-deliver').modal('hide');
+});
+
+$('.js-icon-clear-control').on('click', function (e) {
+    $(this).parent().children('input').val('').focus();
+    e.preventDefault();
+});
+
+;(function() {
+    $('.has-dropdown > a').on('click', function() {
+        var $this = $(this).parent();
+        $this
+            .siblings()
+                .removeClass('active')
+                .find('.js-dropdown-content').hide();
+        if ($this.hasClass('active')) {
+            $this
+                .removeClass('active')
+                .find('.js-dropdown-content').hide();
+        } else {
+            $this
+                .addClass('active')
+                .find('.js-dropdown-content').show();
+        };
+    });
+    $('.js-dropdown-close').on('click', function(e) {
+        $(this).parents('.js-dropdown-content').hide()
+        $('.has-dropdown > a').removeClass('active');
+        e.preventDefault()
+    });
+}());
+
+// ;(function() {
+//     $(document).bind('mouseup touchend', function (e) {
+//         if ($(".js-dropdown-content").has(e.target).length === 0){
+//             $(".js-dropdown-content").hide();
+//             $('.has-dropdown').removeClass('active');
+//         }
+//     });
+// }());
+
+
+;(function() {
+    $('.js-sity-change-change').on('click', function(e) {
+        e.preventDefault();
+        var link = $(this);
+        var parent = link.parents('.sity-change');
+        parent.addClass('active');
+        // parent.find('.js-sity-change-control').show();
+        parent.find(".js-sity-change-control").select2({
+            language: "ru",
+          ajax: {
+            url: "https://api.github.com/search/repositories",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                q: params.term, // search term
+                page: params.page
+              };
+            },
+            processResults: function (data, page) {
+              // parse the results into the format expected by Select2.
+              // since we are using custom formatting functions we do not need to
+              // alter the remote JSON data
+              return {
+                results: data.items
+              };
+            },
+            cache: true
+          },
+          escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+          minimumInputLength: 1,
+          templateResult: formatRepo, // omitted for brevity, see the source of this page
+          templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        }).select2("open");
+    })
+}());
+
+function formatRepo (repo) {
+   if (repo.loading) return repo.text;
+
+   var markup = '<div class="clearfix">' +
+   '<div class="col-sm-1">' +
+   '<img src="' + repo.owner.avatar_url + '" style="max-width: 100%" />' +
+   '</div>' +
+   '<div clas="col-sm-10">' +
+   '<div class="clearfix">' +
+   '<div class="col-sm-6">' + repo.full_name + '</div>' +
+   '<div class="col-sm-3"><i class="fa fa-code-fork"></i> ' + repo.forks_count + '</div>' +
+   '<div class="col-sm-2"><i class="fa fa-star"></i> ' + repo.stargazers_count + '</div>' +
+   '</div>';
+
+   if (repo.description) {
+     markup += '<div>' + repo.description + '</div>';
+   }
+
+   markup += '</div></div>';
+
+   return markup;
+ }
+
+ function formatRepoSelection (repo) {
+   return repo.full_name || repo.text;
+ }
+
+/*;(function() {
+    $('.js-b-header-view-link').on('click', function(e) {
+        var el = $(this);
+        el.siblings().removeClass('active');
+        el.addClass('active');
+
+        e.preventDefault();
+    })
+}());*/
+
+;(function() {
+    var $rangeSlider = $(".range-slider");
+
+    $rangeSlider.each(function() {
+        var $this = $(this);
+        $this.noUiSlider({
+            start: [$this.data('start-min'), $this.data('start-max')],
+            range: {
+                'min': $this.data('min'),
+                'max': $this.data('max')
+            },
+            format: wNumb({
+                decimals: 0
+            })
+        });
+
+        var measuring = $this.data('measuring') || '';
+
+
+        $this.Link('lower').to('-inline-<div class="tooltip"></div>', function ( value ) {
+            $(this).html(
+                '<span>' + value + '</span> ' + measuring
+            );
+        });
+        $this.Link('upper').to('-inline-<div class="tooltip"></div>', function ( value ) {
+            $(this).html(
+                '<span>' + value + '</span> ' + measuring
+            );
+        });
+        // console.log($this.val());
+    });
+    $(".range-slider").on('change', function() {
+        var $this = $(this)
+        var values = $this.val();
+        $this.parent().find('.range-slider-low').val(values[0]);
+        $this.parent().find('.range-slider-high').val(values[1]);
+    });
+}());

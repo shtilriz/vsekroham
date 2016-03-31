@@ -1,0 +1,21 @@
+.b-box.b-box_filter
+
+    - b_header.title = 'Фильтр';
+    - b_header.icon = 'sprite-equalizer-gray';
+    include ../b-header/5
+
+    .js-dropdown
+        .b-box__content
+            .form-group
+                select.selectpicker.col-(name="")
+                    option(value="") Детские коляски
+                    option(value="") 1
+                    option(value="") 2
+            .form-group
+                select.selectpicker.col-(name="")
+                    option(value="") Производитель
+                    option(value="") 1
+                    option(value="") 2
+            .range-slider(data-min="0" data-max="20000" data-start-min="2000" data-start-max="14000" data-measuring="р.")
+        .b-box__footer
+            a(href="#").b-box__button Найти товар

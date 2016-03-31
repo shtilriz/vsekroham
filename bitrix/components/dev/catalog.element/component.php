@@ -993,6 +993,28 @@ if($this->StartResultCache(false, array(($arParams["CACHE_GROUPS"]==="N"? false:
 				$arResult["NAV_RESULT"] = $result;
 			}
 
+			if ($arResult["IBLOCK_SECTION_ID"] && $arResult["PROPERTIES"]["MAKER"]["VALUE"]) {
+				$rsCat2Maker = CIBlockElement::GetList(
+					array(),
+					array(
+						"IBLOCK_ID" => 4,
+						"ACTIVE" => "Y",
+						"PROPERTY_SECTION_ID" => $arResult["IBLOCK_SECTION_ID"],
+						"PROPERTY_MAKER" => $arResult["PROPERTIES"]["MAKER"]["VALUE"]
+					),
+					false,
+					false,
+					array("IBLOCK_ID", "ID", "NAME", "DETAIL_PAGE_URL")
+				);
+				if ($arCat2Maker = $rsCat2Maker->GetNext()) {
+					$arResult["CAT2MAKER"] = array(
+						"ID" => $arCat2Maker["ID"],
+						"NAME" => $arCat2Maker["NAME"],
+						"DETAIL_PAGE_URL" => $arCat2Maker["DETAIL_PAGE_URL"]
+					);
+				}
+			}
+
 			$resultCacheKeys = array(
 				"IBLOCK_ID",
 				"ID",
@@ -1003,7 +1025,8 @@ if($this->StartResultCache(false, array(($arParams["CACHE_GROUPS"]==="N"? false:
 				"PROPERTIES",
 				"SECTION",
 				"IPROPERTY_VALUES",
-				"NAV_RESULT"
+				"NAV_RESULT",
+				"CAT2MAKER"
 			);
 
 			if ($bCatalog)
@@ -1251,6 +1274,9 @@ if(isset($arResult["ID"]))
 			else
 				$APPLICATION->AddChainItem($arPath["NAME"], $arPath["~SECTION_PAGE_URL"]);
 		}
+	}
+	if ($arParams["ADD_SECTIONS_CHAIN"] && !empty($arResult["CAT2MAKER"])) {
+		$APPLICATION->AddChainItem($arResult["CAT2MAKER"]["NAME"], $arResult["CAT2MAKER"]["DETAIL_PAGE_URL"]);
 	}
 	if ($arParams["ADD_ELEMENT_CHAIN"])
 	{

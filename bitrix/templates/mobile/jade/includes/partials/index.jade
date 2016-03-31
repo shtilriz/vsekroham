@@ -1,0 +1,21 @@
+.b-stars.b-stars-3
+
+select.selectpicker.col-(name="")
+    each val in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        option(value=val) #{val}
+
+.b-steps
+    .b-step.active 1
+    .b-step 2
+
+.b-box
+    .b-box__content
+        .b-checkers
+            .b-checker
+                .b-checker__check
+                    input#check1.checkbox-styled(type='radio', checked='' name='delivery')
+                    label.b-checker__label(for='check1')
+                .b-checker__content
+                    .b-checker__title Курьер
+                    .b-checker__text Доставка заказов до 2000 руб. стоит 400 руб.
+                    .b-checker__days 5 дней

@@ -701,7 +701,7 @@ if (empty($arRunErrors))
 
 	if ('D' == $arCatalog['CATALOG_TYPE'] || 'O' == $arCatalog['CATALOG_TYPE'])
 	{
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL");
+		$arSelect = array("ID", "XML_ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL");
 
 		$filter = array("IBLOCK_ID" => $IBLOCK_ID);
 		if (!$bAllSections && !empty($arSectionIDs))
@@ -711,6 +711,9 @@ if (empty($arRunErrors))
 		}
 		$filter["ACTIVE"] = "Y";
 		$filter["ACTIVE_DATE"] = "Y";
+		if ($DATE_MODIFY == "Y") {
+			$filter["DATE_MODIFY_FROM"] = date("d.m.Y H:i:s", time()-3600*2);
+		}
 		$res = CIBlockElement::GetList(array(), $filter, false, false, $arSelect);
 
 		$total_sum = 0;
@@ -825,7 +828,7 @@ if (empty($arRunErrors))
 				}
 			}
 
-			if ($minPrice <= 0) continue;
+			//if ($minPrice <= 0) continue;
 
 			$boolCurrentSections = false;
 			$bNoActiveGroup = true;
@@ -864,7 +867,7 @@ if (empty($arRunErrors))
 			else
 				$str_TYPE = '';
 
-			$strTmpOff.= "<offer id=\"".$arAcc["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
+			$strTmpOff.= "<offer id=\"".$arAcc["ID"]."\" xml_id=\"".$arAcc["XML_ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
 			$strTmpOff.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arAcc["~DETAIL_PAGE_URL"])."</url>\n";
 
 			$strTmpOff.= "<price>".$minPrice."</price>\n";
@@ -983,7 +986,7 @@ if (empty($arRunErrors))
 	}
 	elseif ('P' == $arCatalog['CATALOG_TYPE'] || 'X' == $arCatalog['CATALOG_TYPE'])
 	{
-		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arOfferSelect = array("ID", "XML_ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
 		$arOfferFilter = array(
 			'IBLOCK_ID' => $intOfferIBlockID,
 			'PROPERTY_'.$arOffers['SKU_PROPERTY_ID'] => 0,
@@ -1002,7 +1005,7 @@ if (empty($arRunErrors))
 			$arOfferFilter[$strExportKey] = $mxValues;
 		}
 
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arSelect = array("ID", "XML_ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
 		$arFilter = array("IBLOCK_ID" => $IBLOCK_ID);
 		if (!$bAllSections && !empty($arSectionIDs))
 		{
@@ -1011,6 +1014,9 @@ if (empty($arRunErrors))
 		}
 		$arFilter["ACTIVE"] = "Y";
 		$arFilter["ACTIVE_DATE"] = "Y";
+		if ($DATE_MODIFY == "Y") {
+			$arFilter["DATE_MODIFY_FROM"] = date("d.m.Y H:i:s", time()-3600*2);
+		}
 
 		$strOfferTemplateURL = '';
 		if (!empty($arSKUExport['SKU_URL_TEMPLATE_TYPE']))
@@ -1200,8 +1206,8 @@ if (empty($arRunErrors))
 							$minPriceGroup = $arPrice['PRICE']['CATALOG_GROUP_ID'];
 						}
 					}
-					if ($minPrice <= 0)
-						continue;
+					//if ($minPrice <= 0)
+					//	continue;
 					if ($boolFirst)
 					{
 						$dblAllMinPrice = $minPriceRUR;
@@ -1287,7 +1293,7 @@ if (empty($arRunErrors))
 					$arOfferItem['YANDEX_TYPE'] = $str_TYPE;
 
 					$strOfferYandex = '';
-					$strOfferYandex .= "<offer id=\"".$arItem["ID"]."-".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
+					$strOfferYandex .= "<offer id=\"".$arItem["ID"]."-".$arOfferItem["ID"]."\" xml_id=\"".$arOfferItem["XML_ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
 					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"])."</url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
@@ -1517,8 +1523,8 @@ if (empty($arRunErrors))
 							$minPriceGroup = $arPrice['PRICE']['CATALOG_GROUP_ID'];
 						}
 					}
-					if ($minPrice <= 0)
-						continue;
+					//if ($minPrice <= 0)
+					//	continue;
 
 					if (strlen($arOfferItem['DETAIL_PAGE_URL']) <= 0)
 						$arOfferItem['DETAIL_PAGE_URL'] = '/';
@@ -1533,7 +1539,7 @@ if (empty($arRunErrors))
 					$arOfferItem['YANDEX_TYPE'] = $str_TYPE;
 
 					$strOfferYandex = '';
-					$strOfferYandex .= "<offer id=\"".$arItem["ID"]."-".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
+					$strOfferYandex .= "<offer id=\"".$arItem["ID"]."-".$arOfferItem["ID"]."\" xml_id=\"".$arOfferItem["XML_ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
 					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"])."</url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
@@ -1755,7 +1761,7 @@ if (empty($arRunErrors))
 					}
 				}
 
-				if ($minPrice <= 0) continue;
+				//if ($minPrice <= 0) continue;
 
 				if ('' == $arItem['DETAIL_PAGE_URL'])
 				{
@@ -1780,7 +1786,7 @@ if (empty($arRunErrors))
 					$str_TYPE = '';
 
 				$strOfferYandex = '';
-				$strOfferYandex.= "<offer id=\"".$arItem["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
+				$strOfferYandex.= "<offer id=\"".$arItem["ID"]."\" xml_id=\"".$arItem["XML_ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
 				$strOfferYandex.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arItem["~DETAIL_PAGE_URL"])."</url>\n";
 
 				$strOfferYandex.= "<price>".$minPrice."</price>\n";

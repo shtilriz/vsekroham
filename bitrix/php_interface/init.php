@@ -10,8 +10,12 @@ if(file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/include/funcs.ph
 
 if (is_file($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/include/logs/LogsDB.class.php")) {
 	require $_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/include/logs/LogsDB.class.php";
-	//$ib_logs = new LogsDB;
 }
+
+require_once($_SERVER["DOCUMENT_ROOT"].'/bitrix/php_interface/classes/Helpers/AutoLoader.php');
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/classes/Handler/CatalogHandler.php");
+require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/classes/Handler/BasketHandler.php");
 
 //запрос данных о пользователя, авторизованном через соцсети
 if (isset($_POST["token"]) && !empty($_POST["token"])) {
@@ -31,10 +35,17 @@ AddEventHandler("catalog", "OnBeforePriceDelete", array("MyEvents", "setAvailabl
 //удаляет наценку у ТП, если удалена наценка у основного товара
 AddEventHandler("catalog", "OnProductPriceDelete", array("MyEvents", "setMarginFromSKUdel"));
 
+//записывает в лог изменение цен каталога
+AddEventHandler('catalog', 'OnPriceUpdate', array('CatalogHandler','OnPriceUpdateHandler'));
+//Если у товара имеется подарок, то добавить его в корзину, изменить либо удалить.
+AddEventHandler('sale', 'OnBasketAdd', array('BasketHandler','addGift'));
+AddEventHandler('sale', 'OnBasketUpdate', array('BasketHandler','updateGift'));
+AddEventHandler('sale', 'OnBeforeBasketDelete', array('BasketHandler','deleteGift'));
+
 /***************logs**************/
-AddEventHandler("iblock", "OnAfterIBlockElementUpdate", Array("MyEvents", "updateElement2Log")); //записывает в лог изменение элемента
-AddEventHandler("iblock", "OnAfterIBlockElementAdd", Array("MyEvents", "addElement2Log")); //записывает в лог добавление элемента
-AddEventHandler("iblock", "OnBeforeIBlockElementDelete", Array("MyEvents", "delElement2Log")); //записывает в лог удаление элемента
+//AddEventHandler("iblock", "OnAfterIBlockElementUpdate", Array("MyEvents", "updateElement2Log")); //записывает в лог изменение элемента
+//AddEventHandler("iblock", "OnAfterIBlockElementAdd", Array("MyEvents", "addElement2Log")); //записывает в лог добавление элемента
+//AddEventHandler("iblock", "OnBeforeIBlockElementDelete", Array("MyEvents", "delElement2Log")); //записывает в лог удаление элемента
 /***************end logs**************/
 
 //прописывает в свойство заказа "Менеджер" логин пользователя, который изменил статус заказа
@@ -285,6 +296,14 @@ class MyEvents {
 					$arFields["INVOICE"] = payKeeperGetInvoice($arOrder);
 					$arFields["PRICE"] = SaleFormatCurrency($arOrder["PRICE"], "RUB");
 					break;
+				case "SALE_STATUS_CHANGED_F":
+				case "SMS4B_SALE_STATUS_CHANGED_F":
+					$arOrder = CSaleOrder::GetByID($arFields["ORDER_ID"]);
+					//если заказ отменен и заказу присвоен статус "Выполнен", то письмо о том, что заказ выполнен высылать не нужно
+					if ($arOrder["CANCELED"] == "Y") {
+						$arFields = array();
+					}
+					break;
 			}
 
 		}
@@ -303,7 +322,7 @@ class PriceCalculate
 			}
 			elseif ($arFields["IBLOCK_ID"] == IBLOCK_PRODUCT_ID) {
 				$arSort = array();
-				$arFilter = array("IBLOCK_ID"=>IBLOCK_SKU_ID,"ACTIVE"=>"Y","PROPERTY_CML2_LINK"=>$arFields["ID"]);
+				$arFilter = array("IBLOCK_ID"=>IBLOCK_SKU_ID,"PROPERTY_CML2_LINK"=>$arFields["ID"]);
 				$arSelect = array("IBLOCK_ID", "ID");
 				$res = CIBlockElement::GetList($arSort, $arFilter, false, false, $arSelect);
 				while ($arRes = $res->GetNext()) {
@@ -409,8 +428,34 @@ class PriceCalculate
 					false,
 					false
 				);
+				CPrice::ReCalculate('', $elID, $new_BCTP);
 			}
 		}
+	}
+}
+
+/* Данные для синхронизации с альбомом ВК */
+AddEventHandler("iblock", "OnAfterIBlockElementAdd", Array("EventVK", "addElement")); //записывает в файл событие добавления элемента
+AddEventHandler("iblock", "OnAfterIBlockElementUpdate", Array("EventVK", "updateElement")); //записывает в файл событие изменения элемента
+AddEventHandler("iblock", "OnAfterIBlockElementDelete", Array("EventVK", "delElement")); //записывает в файл событие удаления элемента
+class EventVK {
+	function addElement (&$arFields) {
+		self::write2file($arFields, 'add');
+	}
+	function updateElement (&$arFields) {
+		self::write2file($arFields, 'update');
+	}
+	function delElement ($arFields) {
+		self::write2file($arFields, 'delete');
+	}
+	//записывает в файл данные массива
+	private function write2file ($arFields, $action) {
+		$arFields["action"] = $action;
+		$file = $_SERVER["DOCUMENT_ROOT"]."/upload/vkevent.log";
+		$arWrite = unserialize(file_get_contents($file));
+		$arWrite[$arFields["ID"]] = $arFields;
+		$str = serialize($arWrite);
+		file_put_contents($file, $str, LOCK_EX);
 	}
 }
 ?>

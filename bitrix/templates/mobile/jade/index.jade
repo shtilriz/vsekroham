@@ -1,0 +1,17 @@
+extends ./layouts/default
+
+block content
+
+    .page-content
+        a.logo(href="#")
+
+        include includes/partials/slider-default
+
+        .b-content
+
+            - b_header.title = 'Спецпредложения';
+            - b_header.class = 'b-content__header';
+            include includes/partials/b-header/2
+
+            - b_goods.class = 'b-content__goods';
+            include includes/partials/b-goods/1

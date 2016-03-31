@@ -1,0 +1,166 @@
+.page-header {
+    position: relative;
+    height: $header-menu-height;
+    padding: 0 0 0 16px;
+    background-color: $color-blue;
+    color: #fff;
+    &__menu {
+        float: right;
+        height: 100%;
+    }
+    &__title {
+        float: left;
+        padding: 25px 3px;
+        color: #fff;
+        font-size: 28px;
+        font-weight: 400;
+    }
+    &__side-menu-link {
+        float: left;
+        width: 70px;
+        height: 100%;
+        margin-left: -16px;
+    }
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+    margin-bottom: 20px;
+    // margin-bottom: 131px;
+}
+
+.side-menu-link {
+    position: relative;
+    display: block;
+    &:before {
+        @include sprite($sprite-three-lines);
+        @include middle;
+    }
+    &:hover {
+        background-color: #68caf8;
+    }
+}
+
+.header-menu {
+    @include list-reset;
+    &__item {
+        float: left;
+        &:hover,
+        &.active {
+            background-color: #68caf8;
+        }
+    }
+    &__link {
+        display: block;
+        height: 88px;
+        padding: 27px 20px;
+    }
+    &__icon {
+        display: inline-block;
+        margin: 0 4px;
+        vertical-align: middle;
+    }
+    &__text {
+        display: inline-block;
+        vertical-align: middle;
+        color: #fff;
+        font-size: 28px;
+        font-weight: 400;
+    }
+    &__caret {
+        display: inline-block;
+        margin: 0 4px;
+        vertical-align: middle;
+        @include sprite($sprite-caret);
+    }
+}
+
+.header-menu-dropdown {
+    display: none;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 100%;
+    padding: 13px 16px;
+    background-color: #68caf8;
+    z-index: 1;
+}
+
+.b-header-search {
+    &__header {
+        margin-bottom: 10px;
+    }
+    &__input {
+        position: relative;
+        height: 60px;
+        padding-left: 60px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, .3);
+        border-radius: 7px;
+        &:before {
+            content: " ";
+            display: block;
+            position: absolute;
+            left: 20px;
+            top: 18px;
+            @include sprite($sprite-search-sm);
+        }
+        input {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: none;
+            border: none;
+        }
+        .icon-close {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            opacity: .7;
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+    &__button {
+        float: right;
+        margin-left: 38px;
+        padding: 10px 0;
+        color: #fff;
+        font-size: 30px;
+        font-weight: 400;
+        opacity: .6;
+        &:hover {
+            text-decoration: none;
+            color: #fff;
+            opacity: 1;
+        }
+    }
+    &__list {
+        @include list-reset;
+        li {
+            border-bottom: 1px solid #92d6f5;
+            &:first-child {
+                border-top: 1px solid #92d6f5;
+            }
+            a {
+                position: relative;
+                display: block;
+                padding: 10px 20px;
+                color: #fff;
+                font-size: 30px;
+                font-weight: 400;
+                &:before {
+                    content: " ";
+                    display: block;
+                    float: left;
+                    left: 0;
+                    margin-top: 13px;
+                    margin-right: 10px;
+                    @include sprite($sprite-list-arr);
+                }
+                &:hover {text-decoration: none;}
+            }
+            &:hover {
+                background: rgba(255, 255, 255, .3);
+            }
+        }
+    }
+}

@@ -1,0 +1,14 @@
+extends ./layouts/clear
+
+block vars
+    //- - var bodyClass = 'has-b-footer-nav';
+
+block content
+    //- include includes/partials/index
+
+    .b-box
+        - b_header.class = 'b-box__header b-header_mod-1 border';
+        - b_header.icon = 'sprite-m-tags-gray';
+        include includes/partials/b-header/index
+
+

@@ -11,7 +11,7 @@ $this->setFrameMode(true);?>
 				BX_RESIZE_IMAGE_EXACT,
 				true
 			);
-			echo '<img src="'.$y["src"].'" alt="'.$arItem["UF_NAME"].'" width="'.$y["width"].'" height="'.$y["height"].'">';
+			echo '<a href="/sales/"><img src="'.$y["src"].'" alt="'.$arItem["UF_NAME"].'" width="'.$y["width"].'" height="'.$y["height"].'"></a>';
 		}?>
 	</div>
 	<a class="slide-prev" href="#">Предыдущий слайд</a>

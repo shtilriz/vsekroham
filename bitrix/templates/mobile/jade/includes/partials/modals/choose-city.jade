@@ -1,0 +1,17 @@
+#modal-choose-city.modal-choose-city.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+        .modal-content
+            .modal-header
+                button.modal__close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                h3#myModalLabel.modal-title Это Ваш город?
+            .modal-body
+                h3.modal-choose-city__city Екатеринбург
+                .form-group
+                        label Если нет, выберите из списка пожалуйста
+                        select.selectpicker.col-xs-12(name="" title="Выберите город")
+                            each val in ['Москва', 'Санкт-Петербург', 'Екатеринбург', 'Киев', 'Севастополь', 'Минск', 'Бобруйск']
+                                option(value=val) #{val}
+                        span.help-text Эти данные нужны для службы доставки.
+            .modal-footer
+                button(type='submit').modal__submit Отправить

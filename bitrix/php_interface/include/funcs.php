@@ -29,9 +29,9 @@ function getProductHTML2Section(&$arItem, &$strMainID = '') {
 
 	$html = '<li class="stuff-list__item"'.($strMainID?' id="'.$strMainID.'"':'').' itemprop="itemListElement" itemscope itemtype="http://schema.org/Product">
 		<meta itemprop="description" content="'.($arItem["PREVIEW_TEXT"]?strip_tags($arItem["PREVIEW_TEXT"]):TruncateText(strip_tags($arItem["DETAIL_TEXT"]), 300).'...').'">
-		<a class="stuff-list__link" href="'.$arItem["DETAIL_PAGE_URL"].'" itemprop="url">
+		<a class="stuff-list__link" href="'.$arItem["DETAIL_PAGE_URL"].'" itemprop="url" target="_blank">
 			<img src="'.$y["src"].'" alt="'.$arItem["NAME"].'" itemprop="image">
-			<span itemprop="name">'.$arItem["NAME"].'</span>
+			<span class="stuff-list__link-title" itemprop="name">'._strCrop($arItem["NAME"], 60).'</span>
 		</a>
 		<table class="stars-wrapper">
 			<tr>
@@ -52,6 +52,93 @@ function getProductHTML2Section(&$arItem, &$strMainID = '') {
 			</div>
 		</div>
 	</li>';
+	return $html;
+}
+
+//возвращает html товара в списке товаров в мобильной версии со строками
+function getProductHTML2SectionMobileRows (&$arItem, &$strMainID = '') {
+	$y=CFile::ResizeImageGet(
+		$arItem["PREVIEW_PICTURE"]["ID"],
+		array("width" => 277, "height" => 324),
+		BX_RESIZE_IMAGE_PROPORTIONAL,
+		true
+	);
+	$arPrices = array();
+	if (!empty($arItem["OFFERS"])) {
+		$arFirstOffer = reset($arItem["OFFERS"]);
+		$arPrices = $arFirstOffer["PRICES"];
+	}
+	else
+		$arPrices = $arItem["PRICES"];
+
+	/*$oldPrice = "";
+	if ($arPrices["BASE"]["DISCOUNT_DIFF"] > 0) {
+		$oldPrice = "<i>{$arPrices["BASE"]["PRINT_VALUE"]}</i>";
+	}
+	elseif ($arPrices["MARGIN"]["VALUE"] > 0) {
+		$oldPrice = "<i>{$arPrices["MARGIN"]["PRINT_VALUE"]}</i>";
+	}*/
+	$arRate = getRatingProduct($arItem["ID"]);
+
+	$html = '<div class="b-g b-g_list" itemprop="itemListElement" itemscope itemtype="http://schema.org/Product">
+		<meta itemprop="description" content="'.($arItem["PREVIEW_TEXT"]?strip_tags($arItem["PREVIEW_TEXT"]):TruncateText(strip_tags($arItem["DETAIL_TEXT"]), 300).'...').'">
+		<a href="'.$arItem["DETAIL_PAGE_URL"].'" class="b-g__img"><img src="'.$y["src"].'" alt="'.$arItem["NAME"].'" itemprop="image" />
+		</a>
+		<div class="b-g__content"><a href="'.$arItem["DETAIL_PAGE_URL"].'" class="b-g__title" itemprop="url"><span itemprop="name">'.$arItem["NAME"].'</span></a>
+			<div class="b-g__price" itemscope itemtype="http://schema.org/Offer">
+				'.$arPrices["BASE"]["PRINT_DISCOUNT_VALUE"].'
+				<meta itemprop="price" content="'.$arPrices["BASE"]["PRINT_DISCOUNT_VALUE"].'"/>
+				<meta itemprop="priceCurrency" content="RUB"/>
+			</div>
+			<div class="b-g__stars b-stars b-stars-'.$arRate["RATE"].'"></div>
+			<a href="'.$arItem["DETAIL_PAGE_URL"].'#reviews" class="b-g__count-comments">'.($arRate["COUNT"]>0?$arRate["COUNT"].' '.rating_txt($arRate["COUNT"]):'Оцените первым').'</a>
+		</div>
+		<a href="'.$arItem["DETAIL_PAGE_URL"].'" class="b-g__next"></a>
+	</div>';
+
+	return $html;
+}
+
+//возвращает html товара в списке товаров в мобильной версии с колонками
+function getProductHTML2SectionMobileCols (&$arItem, &$strMainID = '') {
+	$y=CFile::ResizeImageGet(
+		$arItem["PREVIEW_PICTURE"]["ID"],
+		array("width" => 277, "height" => 324),
+		BX_RESIZE_IMAGE_PROPORTIONAL,
+		true
+	);
+	$arPrices = array();
+	if (!empty($arItem["OFFERS"])) {
+		$arFirstOffer = reset($arItem["OFFERS"]);
+		$arPrices = $arFirstOffer["PRICES"];
+	}
+	else
+		$arPrices = $arItem["PRICES"];
+
+	/*$oldPrice = "";
+	if ($arPrices["BASE"]["DISCOUNT_DIFF"] > 0) {
+		$oldPrice = "<i>{$arPrices["BASE"]["PRINT_VALUE"]}</i>";
+	}
+	elseif ($arPrices["MARGIN"]["VALUE"] > 0) {
+		$oldPrice = "<i>{$arPrices["MARGIN"]["PRINT_VALUE"]}</i>";
+	}*/
+	$arRate = getRatingProduct($arItem["ID"]);
+
+	$html = '<div class="b-g b-g_floors" itemprop="itemListElement" itemscope itemtype="http://schema.org/Product">
+		<meta itemprop="description" content="'.($arItem["PREVIEW_TEXT"]?strip_tags($arItem["PREVIEW_TEXT"]):TruncateText(strip_tags($arItem["DETAIL_TEXT"]), 300).'...').'">
+		<a href="'.$arItem["DETAIL_PAGE_URL"].'" class="b-g__img" itemprop="url"><img src="'.$y["src"].'" alt="'.$arItem["NAME"].'" itemprop="image" />
+		</a>
+		<div class="b-g__content"><a href="'.$arItem["DETAIL_PAGE_URL"].'" class="b-g__title">'.$arItem["NAME"].'</a>
+			<div class="b-g__stars b-stars b-stars-'.$arRate["RATE"].'"></div><a href="'.$arItem["DETAIL_PAGE_URL"].'#reviews" class="b-g__count-comments">'.($arRate["COUNT"]>0?$arRate["COUNT"].' '.rating_txt($arRate["COUNT"]):'Оцените первым').'</a>
+			<div class="b-g__price" itemscope itemtype="http://schema.org/Offer">
+				'.$arPrices["BASE"]["PRINT_DISCOUNT_VALUE"].'
+				<meta itemprop="price" content="'.$arPrices["BASE"]["PRINT_DISCOUNT_VALUE"].'"/>
+				<meta itemprop="priceCurrency" content="RUB"/>
+			</div>
+		</div>
+		<footer class="b-g__footer"><a href="'.$arItem["DETAIL_PAGE_URL"].'" class="b-g__button">Подробнее</a></footer>
+	</div>';
+
 	return $html;
 }
 
@@ -270,8 +357,29 @@ function user_browser() {
 	return array("BROWSER" => $browser, $version);
 }
 
-function _substr($text, $length) {
+/**
+ * Обрезает исходную строку до указанной длины с сохранением последнего слова
+ *
+ * @param string $text - исходная строка
+ * @param int $length - длина конечной строки
+ *
+ * @return string - конечная строка
+ */
+function _strCrop($text, $length)
+{
+	if (strlen($text) <= $length) {
+		return $text;
+	}
+	else {
+		$length = strripos(substr($text, 0, $length), ' ');
+		return substr($text, 0, $length).'...';
+	}
+}
+
+function _substr($text, $length)
+{
 	$length = strripos(substr($text, 0, $length), '.');
+	$length = ($length ? $length : 250);
 	return substr($text, 0, $length);
 }
 
@@ -311,5 +419,128 @@ function payKeeperGetInvoice ($arOrder) {
 		return $arInvoice["invoice_id"];
 	else
 		return false;
+}
+
+//возвращает true, если нужно выводить слайдер в разделе $SECTION_ID и false в противном случае
+function bShowSlider ($SECTION_ID) {
+	$bShowSlider = true;
+	if ($SECTION_ID && CModule::IncludeModule("iblock")) {
+		$rsSection = CIBlockSection::GetList(array(),array("IBLOCK_ID" => IBLOCK_PRODUCT_ID,"ACTIVE" => "Y","ID" => $SECTION_ID),false,array("IBLOCK_ID", "UF_SLIDER"));
+		if ($arSection = $rsSection->GetNext()) {
+			if ($arSection["UF_SLIDER"])
+				$bShowSlider = false;
+		}
+	}
+	return $bShowSlider;
+}
+
+//возвращает массив, содержащий поля самой привлекательной по цене службы доставки из edost для товара $PRODUCT_ID в город $CITY
+function getBestDelivery ($PRODUCT_ID, $CITY) {
+	if (!$PRODUCT_ID || !$CITY)
+		return false;
+	if (!CModule::IncludeModule("iblock"))
+		return false;
+	//достать параметры товара
+	$weight = 0; $width = 0; $length = 0; $height = 0;
+	$rsProduct = CIBlockElement::GetList(array(),array("ID" => $PRODUCT_ID),false,false,array("IBLOCK_ID", "IBLOCK_SECTION_ID", "CATALOG_GROUP_1"));
+	if ($arProduct = $rsProduct->GetNext()) {
+		$weight = (int)$arProduct["CATALOG_WEIGHT"];
+		$width = (int)$arProduct["CATALOG_WIDTH"];
+		$length = (int)$arProduct["CATALOG_LENGTH"];
+		$height = (int)$arProduct["CATALOG_HEIGHT"];
+	}
+	//если параметры товара (вес, длина, ширина и высота) равны 0, то достаем эти параметры из свойств родительского раздела
+	if (($weight == 0 || $width == 0 || $length == 0 || $height == 0) && $arProduct["IBLOCK_SECTION_ID"] > 0) {
+		$rsSection = CIBlockSection::GetList(
+			array(),
+			array("IBLOCK_ID" => $arProduct["IBLOCK_ID"], "ID" => $arProduct["IBLOCK_SECTION_ID"]),
+			false,
+			array("IBLOCK_ID", "ID", "UF_WEIGHT", "UF_WIDTH", "UF_LENGTH", "UF_HEIGHT")
+		);
+		if ($arSection = $rsSection->GetNext()) {
+			$weight = (int)$arSection["UF_WEIGHT"];
+			$width = (int)$arSection["UF_WIDTH"];
+			$length = (int)$arSection["UF_LENGTH"];
+			$height = (int)$arSection["UF_HEIGHT"];
+		}
+	}
+	//сделать запрос на сервер edost по параметрам товара и городу доставки
+	$cache_id = md5(serialize(array($CITY, $weight, $width, $length, $height)));
+	$cache_dir = "/edost";
+	$obCache = new CPHPCache;
+
+	if($obCache->InitCache(3600*24, $cache_id, $cache_dir)) {
+		$arReturn = $obCache->GetVars();
+	}
+	elseif ($obCache->StartDataCache()) {
+		if ($CITY && $weight > 0) {
+			if ($curl = curl_init()) {
+				$arPost = array(
+					"id" => 4590,
+					"p" => "CC5jGjKi9guSHltNUiNmZG7XQ3vRf2js",
+					"to_city" => $CITY,
+					"weight" => (round($weight/1000, 2)),
+					"strah" => 0
+				);
+				if ($length > 0 && $width > 0 && $height > 0) {
+					$arPost["ln"] = $length;
+					$arPost["wd"] = $width;
+					$arPost["hg"] = $height;
+				}
+				curl_setopt($curl, CURLOPT_URL, 'http://www.edost.ru/edost_calc_kln.php');
+				curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+				curl_setopt($curl, CURLOPT_POST, true);
+				curl_setopt($curl, CURLOPT_POSTFIELDS, $arPost);
+				$out = curl_exec($curl);
+				curl_close($curl);
+
+				$arReturn = array();
+				$xml = new CDataXML();
+				$xml->LoadString($out);
+
+				$arData = $xml->GetArray();
+				foreach ($arData["rsp"]["#"]["tarif"] as $key => $arItem) {
+					$id = (int)$arItem["#"]["id"][0]["#"];
+					$company = trim($arItem["#"]["company"][0]["#"]);
+					$price = (int)$arItem["#"]["price"][0]["#"];
+					$day = trim($arItem["#"]["day"][0]["#"]);
+					$name = trim($arItem["#"]["name"][0]["#"]);
+					$arReturn[$id] = array(
+						"id" => $id,
+						"company" => $company,
+						"price" => $price,
+						"day" => $day,
+						"name" => $name
+					);
+				}
+			}
+		}
+		$obCache->EndDataCache($arReturn);
+	}
+	//выбрать самый привлекательный вариант службы доставки по цене
+	$arCurrent = array();
+	if (!empty($arReturn)) {
+		$price = 999999;
+		$arCurrent = array();
+		foreach ($arReturn as $key => $arItem) {
+			if ((int)$arItem["price"] < $price && in_array($arItem["name"], array("до подъезда", "авто - до подъезда"))) {
+				$arCurrent = $arItem;
+				$price = $arItem["price"];
+			}
+			if ($price == 0)
+				break;
+		}
+		if (empty($arCurrent)) {
+			foreach ($arReturn as $key => $arItem) {
+				if ((int)$arItem["price"] < $price) {
+					$arCurrent = $arItem;
+					$price = $arItem["price"];
+				}
+				if ($price == 0)
+					break;
+			}
+		}
+	}
+	return $arCurrent;
 }
 ?>

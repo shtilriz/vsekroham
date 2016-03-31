@@ -106,50 +106,53 @@ if ($ORDER_ID && CModule::IncludeModule("sale")) {
 		<div class="p-toggle toggle">
 			<div class="toggle-header">
 				<div class="toggle-title">
-					Ваш заказ № 1256896 подтвержден менеджером. Вы можете произвести оплату.
+					Ваш заказ № <?=$ORDER_ID?> подтвержден менеджером. Вы можете произвести оплату.
 				</div>
 				<a href="#" class="toggle-link">Показать детали заказа</a>
 			</div>
 			<div class="toggle-content">
-				 <?if (!empty($arResult["ITEMS"]["AnDelCanBuy"])):?> <?foreach ($arResult["ITEMS"]["AnDelCanBuy"] as $key => $arItem):?><?endforeach;?>
+				<?if (!empty($arResult["ITEMS"]["AnDelCanBuy"])):?>
+
 				<table class="table-o-block">
-				<thead>
-				<tr>
-					<th colspan="4">
-						Вы заказали
-					</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr>
-					<td width="116">
-						<a href="<?=$arItem["DETAIL_PAGE_URL"]?>" class="table-product__img" target="_blank"><img src="<?=$arItem["IMG"]?>" alt="<?=$arItem["NAME"]?>">
-						</a>
-					</td>
-					<td>
-						<div class="table-product__content">
-							<a href="<?=$arItem["DETAIL_PAGE_URL"]?>" class="table-product__title" target="_blank"><?=$arItem["NAME"]?></a>
-							<?if ($arItem["COLOR"]):?>
-								<span class="table-product__color">Цвет: <?=$arItem["COLOR"]?></span>
-							<?endif;?>
-							<?if ($arItem["SIZE"]):?>
-								<span class="table-product__color">Цвет: <?=$arItem["SIZE"]?></span>
-							<?endif;?>
-						</div>
-					</td>
-					<td>
-						<?=(int)$arItem["QUANTITY"]?> шт.
-					</td>
-					<td>
-						<?if (floatval($arItem["DISCOUNT_PRICE_PERCENT"]) > 0):?>
-							<del><?=number_format($arItem["FULL_PRICE"]*$arItem["QUANTITY"], 0, '', ' ')?> р.</del>
-						<?elseif ($arItem["PRICE_MARGIN"]["PRICE"] > 0):?>
-							<del><?=number_format($arItem["PRICE_MARGIN"]["PRICE"], 0, '', ' ')?> р.</del>
-						<?endif;?>
-						<span class="table-product__price"><?=SaleFormatCurrency($arItem["PRICE"], "RUB")?></span>
-					</td>
-				</tr>
-				</tbody>
+					<thead>
+					<tr>
+						<th colspan="4">
+							Вы заказали
+						</th>
+					</tr>
+					</thead>
+					<tbody>
+					<?foreach ($arResult["ITEMS"]["AnDelCanBuy"] as $key => $arItem):?>
+						<tr>
+							<td width="116">
+								<a href="<?=$arItem["DETAIL_PAGE_URL"]?>" class="table-product__img" target="_blank"><img src="<?=$arItem["IMG"]?>" alt="<?=$arItem["NAME"]?>">
+								</a>
+							</td>
+							<td>
+								<div class="table-product__content">
+									<a href="<?=$arItem["DETAIL_PAGE_URL"]?>" class="table-product__title" target="_blank"><?=$arItem["NAME"]?></a>
+									<?if ($arItem["COLOR"]):?>
+										<span class="table-product__color">Цвет: <?=$arItem["COLOR"]?></span>
+									<?endif;?>
+									<?if ($arItem["SIZE"]):?>
+										<span class="table-product__color">Цвет: <?=$arItem["SIZE"]?></span>
+									<?endif;?>
+								</div>
+							</td>
+							<td>
+								<?=(int)$arItem["QUANTITY"]?> шт.
+							</td>
+							<td>
+								<?if (floatval($arItem["DISCOUNT_PRICE_PERCENT"]) > 0):?>
+									<del><?=number_format($arItem["FULL_PRICE"]*$arItem["QUANTITY"], 0, '', ' ')?> р.</del>
+								<?elseif ($arItem["PRICE_MARGIN"]["PRICE"] > 0):?>
+									<del><?=number_format($arItem["PRICE_MARGIN"]["PRICE"], 0, '', ' ')?> р.</del>
+								<?endif;?>
+								<span class="table-product__price"><?=SaleFormatCurrency($arItem["PRICE"], "RUB")?></span>
+							</td>
+						</tr>
+					<?endforeach;?>
+					</tbody>
 				</table>
 				 <?endif;?>
 			</div>

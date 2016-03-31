@@ -1,5 +1,6 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
+$APPLICATION->SetPageProperty("ecomm_pagetype", "purchase");
 $APPLICATION->SetTitle("Оформление заказа");
 CModule::IncludeModule("iblock");
 CModule::IncludeModule("sale");
@@ -100,7 +101,7 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 	if (!empty($arBasketItems)) {
 		$arOrder = array(
 			'SITE_ID' => SITE_ID,
-			'USER_ID' => $USER_ID,
+			'USER_ID' => $ID_USER,
 			'ORDER_PRICE' => $allSum,
 			'ORDER_WEIGHT' => $allWeight,
 			'BASKET_ITEMS' => $arBasketItems
@@ -113,8 +114,8 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 
 	$allSum = 0.0;
 	foreach ($arBasketItems as $key => $arItem) {
-		$allSum += intval($arItem["PRICE"])*intval($arItem["QUANTITY"]);
-		$discount += intval($arItem["DISCOUNT_PRICE"])*intval($arItem["QUANTITY"]);
+		$allSum += $arItem["PRICE"]*$arItem["QUANTITY"];
+		$discount += $arItem["DISCOUNT_PRICE"]*$arItem["QUANTITY"];
 
 		if ($arItem["PRODUCT_ID"]) {
 			$rsProduct = CIBlockElement::GetList(
@@ -122,7 +123,7 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 				array("ID" => $arItem["PRODUCT_ID"]),
 				false,
 				false,
-				array("IBLOCK_ID", "ID", "NAME", "PREVIEW_PICTURE", "DETAIL_PAGE_URL", "PROPERTY_COLOR", "PROPERTY_SIZE")
+				array("IBLOCK_ID", "ID", "NAME", "IBLOCK_SECTION_ID", "PREVIEW_PICTURE", "DETAIL_PAGE_URL", "PROPERTY_COLOR", "PROPERTY_SIZE", "PROPERTY_MAKER")
 			);
 			if ($arProduct = $rsProduct->GetNext()) {
 				$y=CFile::ResizeImageGet(
@@ -136,11 +137,39 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 				$arItem["COLOR"] = $arProduct["PROPERTY_COLOR_VALUE"];
 				$arItem["SIZE"] = $arProduct["PROPERTY_SIZE_VALUE"];
 
+				$IBLOCK_SECTION_ID = $arProduct["IBLOCK_SECTION_ID"];
+				$MAKER_ID = $arProduct["PROPERTY_MAKER_VALUE"];
+				$mxResult = CCatalogSku::GetProductInfo($arProduct["ID"]);
+				if (is_array($mxResult)) {
+					$rsMainPr = CIBlockElement::GetList(array(), array("ID" => $mxResult["ID"]), false, false, array("IBLOCK_SECTION_ID", "PROPERTY_MAKER"));
+					if ($arMainPr = $rsMainPr->GetNext()) {
+						$IBLOCK_SECTION_ID = $arMainPr["IBLOCK_SECTION_ID"];
+						$MAKER_ID = $arMainPr["PROPERTY_MAKER_VALUE"];
+					}
+				}
+
+				$arSections = array();
+				if ($IBLOCK_SECTION_ID) {
+					$nav = CIBlockSection::GetNavChain(false, $IBLOCK_SECTION_ID);
+					while ($arSectionPath = $nav->GetNext())
+						$arSections[] = $arSectionPath["NAME"];
+				}
+				$makerName = '';
+				if ($MAKER_ID) {
+					$rsMaker = CIBlockElement::GetList(array(), array("ID" => $MAKER_ID), false, false, array("NAME"));
+					if ($arMaker = $rsMaker->GetNext())
+						$makerName = $arMaker["NAME"];
+				}
+
 				$yaGoods[] = array(
 					"ID" => $arProduct["ID"],
 					"NAME" => $arProduct["NAME"],
 					"PRICE" => $arItem["PRICE"],
-					"QUANTITY" => $arItem["QUANTITY"]
+					"QUANTITY" => $arItem["QUANTITY"],
+					"COLOR" => $arProduct["PROPERTY_COLOR_VALUE"],
+					"SIZE" => $arProduct["PROPERTY_SIZE_VALUE"],
+					"SECTIONS" => $arSections,
+					"MAKER" => $makerName
 				);
 			}
 		}
@@ -193,9 +222,12 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 			if ($ardeliv = $db_dtype->Fetch()) {
 				$priceDeliv = $ardeliv["PRICE"];
 				$nameDeliv = $ardeliv["NAME"];
+				if ($DELIVERY == 6 && isset($_SESSION["DELIVERY_CURRENT"])) {
+					$priceDeliv = $_SESSION["DELIVERY_CURRENT"]["price"];
+					$nameDeliv .= '('.$_SESSION["DELIVERY_CURRENT"]["company"].')';
+				}
 			}
 		}
-		$allSum = $allSum + $priceDeliv;
 
 		if ($basketList) {
 			$basketList .= '<table cellspacing="0" cellpadding="0" border="0" class="table-sum">
@@ -213,8 +245,11 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 					'.$sostav.'
 				</tbody>
 			</table>
-			<span class="lead" style="font-size: 18px;color: #151734;">Стоимость заказа'.($priceDeliv>0?' с учётом доставки':'').': </span><span class="price" style="padding-left: 10px;font-size: 30px;color: #007acf;">'.SaleFormatCurrency($allSum,"RUB").'</span>';
+			'.($priceDeliv>0?'<span class="lead" style="font-size: 18px;color: #151734;">Стоимость доставки:</span> <span class="price" style="padding-left: 10px;font-size: 30px;color: #007acf;">'.SaleFormatCurrency($priceDeliv,"RUB").'</span><br>':'').'
+			<span class="lead" style="font-size: 18px;color: #151734;">Стоимость заказа:</span> <span class="price" style="padding-left: 10px;font-size: 30px;color: #007acf;">'.SaleFormatCurrency($allSum,"RUB").'</span>';
 		}
+
+		$allSum = $allSum + $priceDeliv;
 
 		$namePayment = '';
 		if ($PAY_SYSTEM_ID) {
@@ -270,29 +305,36 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 			"PAYED" => "N",
 			"CANCELED" => "N",
 			"STATUS_ID" => "N",
-			"PRICE" => $allSum,
+			"PRICE" => round($allSum),
 			"CURRENCY" => "RUB",
 			"USER_ID" => $ID_USER,
 			"PAY_SYSTEM_ID" => $PAY_SYSTEM_ID,
 			"PRICE_DELIVERY" => $priceDeliv,
 			"DELIVERY_ID" => $DELIVERY,
-			"DISCOUNT_VALUE" => $discount,
+			"DISCOUNT_VALUE" => round($discount),
 			"TAX_VALUE" => 0.0,
 			"USER_DESCRIPTION" => $USER_DESCRIPTION
 		);
 
 		if ($ORDER_ID = CSaleOrder::Add($arFields)) {
+			if ($_SERVER['HTTP_X_FORWARDED_FOR']) {
+				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			}
+			else {
+				$ip = $_SERVER["REMOTE_ADDR"];
+			}
+			AddMessage2Log("Заказ #$ORDER_ID сделан с IP $ip пользователем с ID $ID_USER");
 
-			if ($USER_ID == 3) {
+			/*if ($ID_USER == 3) {
 				if ($_SERVER['HTTP_X_FORWARDED_FOR']) {
 					$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 				}
 				else {
 					$ip = $_SERVER["REMOTE_ADDR"];
 				}
-				$mess2log = "Сделан заказ №$ORDER_ID с IP $ip пользователем ID=$USER_ID";
+				$mess2log = "Сделан заказ №$ORDER_ID с IP $ip пользователем ID=$ID_USER";
 				AddMessage2Log($mess2log);
-			}
+			}*/
 
 			CSaleBasket::OrderBasket($ORDER_ID, $_SESSION["SALE_USER_ID"], SITE_ID);
 			//Если введены свойства заказа, добавляем их к заказу
@@ -354,6 +396,40 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 					);
 					CSaleOrderPropsValue::Add($arFields);
 				}
+				if ($_POST["delivery"] == 6 && isset($_SESSION["DELIVERY_CURRENT"])) {
+					$arFields = array(
+						"ORDER_ID" => $ORDER_ID,
+						"ORDER_PROPS_ID" => 10,
+						"NAME" => "Служба доставки",
+						"CODE" => "DELIVERY",
+						"VALUE" => $_SESSION["DELIVERY_CURRENT"]["company"]
+					);
+					CSaleOrderPropsValue::Add($arFields);
+					$arFields = array(
+						"ORDER_ID" => $ORDER_ID,
+						"ORDER_PROPS_ID" => 11,
+						"NAME" => "Тариф службы доставки",
+						"CODE" => "TARIFF",
+						"VALUE" => $_SESSION["DELIVERY_CURRENT"]["name"]
+					);
+					CSaleOrderPropsValue::Add($arFields);
+					$arFields = array(
+						"ORDER_ID" => $ORDER_ID,
+						"ORDER_PROPS_ID" => 12,
+						"NAME" => "Город, для которого производился расчет дотавки",
+						"CODE" => "CITY_EDOST",
+						"VALUE" => $_SESSION["DELIVERY_CURRENT"]["city"]
+					);
+					CSaleOrderPropsValue::Add($arFields);
+					$arFields = array(
+						"ORDER_ID" => $ORDER_ID,
+						"ORDER_PROPS_ID" => 13,
+						"NAME" => "Количество дней доставки",
+						"CODE" => "DAY",
+						"VALUE" => $_SESSION["DELIVERY_CURRENT"]["day"]
+					);
+					CSaleOrderPropsValue::Add($arFields);
+				}
 			}
 			//формируем массив для почтового уведомления
 			$arEventFields = array(
@@ -366,14 +442,14 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 				"DELIVERY" => $nameDeliv,
 				"PAYMENT" => $namePayment,
 				"DATA" => $user_data,
-				"PRICE" => SaleFormatCurrency($allSum+$priceDeliv,"RUB"),
+				"PRICE" => SaleFormatCurrency(round($allSum)+$priceDeliv,"RUB"),
 				"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$SERVER_NAME)
 			);
 			if (isset($_POST["ADDRESS_SHOP"]) && strlen($_POST["ADDRESS_SHOP"]) > 0 && $DELIVERY == 5) {
 				$arEventFields["DELIVERY"] = $arEventFields["DELIVERY"].' ('.$_POST["ADDRESS_SHOP"].')';
 			}
 			ob_start();
-			CEvent::Send("SALE_NEW_ORDER", "s1", $arEventFields);
+			CEvent::Send("SALE_NEW_ORDER", "s1", $arEventFields, "Y", 22);
 			ob_end_clean();
 			?>
 
@@ -447,26 +523,51 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 			<?
 			if (!empty($yaGoods)) {
 				$yaScriptG = '';
-				$orderSumm = number_format($allSum, 2, '.', '');
+				$orderSumm = number_format(round($allSum), 2, '.', '');
+				foreach ($yaGoods as $key => $good) {
+					$quan = (int)$good["QUANTITY"];
+					$yaScriptG .= '{
+						"id": "'.$good["ID"].'",
+						"name": "'.$good["NAME"].'",
+						"price": '.$good["PRICE"].',
+						'.($good["MAKER"]?'"brand": "'.$good["MAKER"].'",':'').'
+						'.(!empty($good["SECTIONS"])?'"category": "'.implode("/", $good["SECTIONS"]).'",':'').'
+						'.($good["COLOR"]?'"variant": "'.$good["COLOR"].'",':'').'
+					},';
+				}
+				$GLOBALS["YAPARAMS"] = 'dataLayer.push({
+					"ecommerce": {
+						"purchase": {
+							"actionField": {
+								"id" : "'.$ORDER_ID.'",
+							},
+							"products": [
+								'.$yaScriptG.'
+							]
+						}
+					}
+				});';
+
+				$gaScript = "ga('require', 'ecommerce');";
+				$gaScript .= "ga('ecommerce:addTransaction', {
+					'id': '{$ORDER_ID}',
+					'affiliation': 'Всё для крохи',
+					'revenue': '{$orderSumm}',
+					'shipping': '0',
+					'tax': '0'
+				});";
 				foreach ($yaGoods as $key => $good) {
 					$quan = intval($good["QUANTITY"]);
-					$yaScriptG .= "{
-						id: {$good["ID"]},
-						name: \"{$good["NAME"]}\",
-						price: {$good["PRICE"]},
-						quantity: {$quan}
-					}";
-					if (($key+1)<count($yaGoods)) {
-						$yaScriptG .= ',';
-					}
+					$gaScript .= "ga('ecommerce:addItem', {
+						'id': '{$ORDER_ID}',
+						'name': '{$good["NAME"]}',
+						'sku': '{$good["ID"]}',
+						'price': '{$good["PRICE"]}',
+						'quantity': '{$quan}'
+					});";
 				}
-				$GLOBALS["YAPARAMS"] = "var yaParams = {
-					order_id: {$ORDER_ID},
-					order_price: {$orderSumm},
-					currency: \"RUR\",
-					exchange_rate: 1,
-					goods: [{$yaScriptG}]
-				};";
+				$gaScript .= "ga('ecommerce:send');";
+				$GLOBALS["GAPARAMS"] = $gaScript;
 			}
 			?>
 			<script type="text/javascript">
@@ -489,6 +590,7 @@ if (strlen($arUserProps["FIO"]) && strlen($arUserProps["EMAIL"]) && strlen($arUs
 			})
 			</script>
 			<?
+			unset($_SESSION["DELIVERY_CURRENT"]);
 		}
 		else {
 			?>
@@ -523,5 +625,45 @@ else {
 		rrApiOnReady.push(function () { rrApi.setEmail('<?=$arUserProps["EMAIL"]?>'); });
 	</script>
 <?endif;?>
+
+<?
+$arRecreativ = array();
+foreach ($yaGoods as $key => $good) {
+	$mxResult = CCatalogSku::GetProductInfo($good["ID"]);
+	if (is_array($mxResult))
+		$arRecreativ[] = $mxResult['ID'];
+	else
+		$arRecreativ[] = $good["ID"];
+}
+?>
+<script type="text/javascript">
+(function(d,w){
+var n=d.getElementsByTagName("script")[0],
+s=d.createElement("script"),
+f=function(){n.parentNode.insertBefore(s,n);};
+s.type="text/javascript";
+s.async=true;
+s.src="http://track.recreativ.ru/trck.php?shop=1584&del=1&offer=<?=implode(',', $arRecreativ)?>&rnd="+Math.floor(Math.random()*999);
+if(window.opera=="[object Opera]"){d.addEventListener("DOMContentLoaded", f, false);}
+else{f();}
+})(document,window);
+</script>
+
+<?
+$arProductIDs = array();
+foreach ($yaGoods as $key => $good) {
+	$arProductIDs[] = $good["ID"];
+}
+$GLOBALS["GOOGLE_TAG_PARAMS"] = array(
+	"ECOMM_PRODID" => (!empty($arProductIDs) ? (count($arProductIDs) > 1 ? "[".implode(", ", $arProductIDs)."]" : $arProductIDs[0]) : 0),
+	"ECOMM_TOTALVALUE" => round($allSum)
+);
+?>
+
+<script type="text/javascript">
+$(function() {
+	bskSmallRefresh();
+})
+</script>
 
 <?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

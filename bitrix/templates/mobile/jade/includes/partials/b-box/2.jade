@@ -1,0 +1,16 @@
+.b-box.b-box_filter
+
+    - b_header.title = 'Бренды';
+    //- - b_header.class = 'b-box__header active';
+    - b_header.icon = 'sprite-m-tags-gray';
+    include ../b-header/5
+
+    .js-dropdown
+        .b-box__content
+            .b-checkers
+                each val, i in ["Dion Kids", "Barty", "CAM", "Cybex", "Happy baby"]
+                    .b-checker.b-checker_simple.js-b-checker
+                        .b-checker__check
+                            input.checkbox-styled(type='checkbox' id="check#{i}")
+                            label.b-checker__label(for='check#{i}')
+                        .b-checker__title #{val}

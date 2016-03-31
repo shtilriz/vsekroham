@@ -1,0 +1,68 @@
+#main {
+    position: relative; // need for only one vertical scroll on page
+}
+
+.off-canvas-wrap {
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.inner-wrap {
+    position: relative;
+    transition: transform 500ms ease 0s;
+    width: 100%;
+}
+
+.inner-wrap::before, .inner-wrap::after {
+    content: " ";
+    display: table;
+}
+.inner-wrap::after {
+    clear: both;
+}
+
+.inner-wrap::before, .inner-wrap::after {
+    content: " ";
+    display: table;
+}
+
+.left-off-canvas-menu {
+    transform: translate3d(-100.5%, 0px, 0px);
+}
+.left-off-canvas-menu {
+    background: #0b648e none repeat scroll 0 0;
+    bottom: 0;
+    box-sizing: content-box;
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: absolute;
+    top: 0;
+    transform: translate3d(-100%, 0px, 0px);
+    transition: transform 500ms ease 0s;
+    width: 70%;
+    z-index: 1001;
+}
+
+.off-canvas-wrap.move-right, .off-canvas-wrap.move-left {
+    min-height: 100%;
+}
+
+.move-right > .inner-wrap {
+    transform: translate3d(70%, 0px, 0px);
+}
+
+.move-right .exit-off-canvas {
+    background: rgba(255, 255, 255, 0.2) none repeat scroll 0 0;
+    bottom: 0;
+    box-shadow: -4px 0 4px rgba(0, 0, 0, 0.2), 4px 0 4px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    display: block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: background 300ms ease 0s;
+    z-index: 1002;
+}

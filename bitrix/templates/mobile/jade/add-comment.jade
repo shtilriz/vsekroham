@@ -1,0 +1,66 @@
+extends ./layouts/default
+
+block content
+
+    .page-content
+        a.logo(href="#")
+
+        .b-content
+
+            - b_header.title = 'Мой отзыв';
+            - b_header.class = 'b-content__header';
+            include includes/partials/b-header/3_1
+
+            .my-review
+                .my-review__inner
+                    .form
+                        .form__group.form-group.form__group_gray
+                            label.form__label.control-label Оценить товар
+                            .my-review__stars.b-stars-1.js-b-stars-1
+                                a.active(href="#")
+                                a.active(href="#")
+                                a.active(href="#")
+                                a(href="#")
+                                a(href="#")
+                                input(type="hidden")
+
+                        .form__group.form-group
+                            label.form__label.control-label Достоинства:
+                            .form__control
+                                input.form-control(type="text")
+                        .form__group.form-group
+                            label.form__label.control-label Недостатки:
+                            .form__control
+                                input.form-control(type="text")
+                        .form__group.form-group
+                            label.form__label.control-label Комментарий:
+                            .form__control
+                                textarea.form-control(rows="4")
+                    .my-review__footer
+                        .form
+                            .form__group.form-group
+                                label.form__label.control-label Имя
+                                .form__control
+                                    input.form-control(type="text")
+                            .form__group.form-group
+                                label.form__label.control-label Email
+                                .form__control
+                                    input.form-control(type="email")
+
+                            .social-authorize
+                                .social-authorize__title Или авторизуйтесь через
+                                ul
+                                    li
+                                        a.sprite-vk-1(href="#")
+                                    li
+                                        a.sprite-fb-1(href="#")
+                                    li
+                                        a.sprite-tw-1(href="#")
+                                    li
+                                        a.sprite-ok-1(href="#")
+                                    li
+                                        a.sprite-yd-1(href="#")
+                                    li
+                                        a.sprite-gg-1(href="#")
+                button(type='submit').my-review__submit Отправить отзыв
+

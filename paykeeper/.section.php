@@ -1,0 +1,6 @@
+<?
+$sSectionName = "paykeeper";
+$arDirProperties = Array(
+
+);
+?>

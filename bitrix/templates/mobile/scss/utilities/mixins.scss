@@ -1,0 +1,47 @@
+// mixins
+
+@mixin sticky-footer($footer-height, $root-selector: unquote("#main"), $root-footer-selector: unquote(".root-footer"), $footer-selector: unquote(".page-footer_sticky")) {
+  html, body {
+    height: 100%;
+  }
+  #{$root-selector} {
+    clear: both;
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin-bottom: -$footer-height;
+    #{$root-footer-selector} {
+      height: $footer-height;
+    }
+  }
+  #{$footer-selector} {
+    clear: both;
+    position: relative;
+    height: $footer-height;
+  }
+}
+
+// do not work in iphone
+@mixin middle {
+    content: " ";
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+}
+
+@mixin list-reset {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    position: static;
+    padding: 0;
+    &:before {
+      display: none;
+    }
+  }
+}

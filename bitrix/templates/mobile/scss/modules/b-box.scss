@@ -1,0 +1,79 @@
+.b-box-group {
+    margin-bottom: 48px;
+}
+.b-box {
+    margin-bottom: 24px;
+    border: $border;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    &__header {
+        height: 87px;
+        // padding-top: 24px;
+        padding-left: 30px;
+        padding-right: 30px;
+        &:hover {
+            text-decoration: none;
+        }
+    }
+    .b-header__title {
+        span {height: 87px;}
+    }
+    &__content {
+        padding: 24px 24px 24px;
+        border-top: 1px solid #e5e3e3;
+        background-color: #f5f5f5;
+        & > *:last-child:not(.range-slider) {
+            margin-bottom: 0;
+        }
+    }
+    &__footer {
+        padding: 13px 0;
+        border-top: 1px solid #e5e3e3;
+        text-align: center;
+    }
+    &__button {
+        @extend .btn-primary;
+        font-size: $font-size * 1.42;
+        font-weight: 400;
+        padding: 9px 30px;
+        border-radius: 8px;
+    }
+    &_filter {
+        .form-group {
+            @extend .clearfix;
+        }
+        .bootstrap-select {
+            float: none;
+            width: 100%;
+            &:last-child {
+                float: none;
+                width: 100%;
+            }
+            @media (min-width: 768px) {
+                @include span(2);
+                &:last-child {
+                    @include span(2 last);
+                }
+            }
+        }
+        .range-slider {
+            margin-top: 38px;
+        }
+        // .form-group {
+        //     @extend .clearfix;
+        //     .form-control {
+        //         @include span(2);
+        //         &:last-child {
+        //             @include span(2 last);
+        //         }
+        //     }
+        // }
+    }
+    &_colors {
+        margin-top: 20px;
+        .bootstrap-select {
+            width: 100% !important;
+            margin-bottom: 20px;
+        }
+    }
+}

@@ -68,22 +68,6 @@ $APPLICATION->SetTitle("Производители");
 		}?>
 		</h1>
 
-		<?/*$APPLICATION->IncludeComponent(
-			"dev:maker.links",
-			".default",
-			array(
-				"IBLOCK_TYPE" => "catalogs",
-				"IBLOCK_ID" => "4",
-				"IBLOCK_ID_CATALOG" => "1",
-				"SECTION_ID" => $SECTION_ID,
-				"SECTION_CODE" => "",
-				"FOLDER" => "/makers/",
-				"CACHE_TYPE" => "A",
-				"CACHE_TIME" => "3600"
-			),
-			$component
-		);*/?>
-
 		<?include($_SERVER["DOCUMENT_ROOT"].'/include/catalog-sort.php');?>
 
 		<?$GLOBALS["arrFilter"]["PROPERTY_MAKER"] = $MAKER;?>

@@ -1,0 +1,25 @@
+include ../includes/data
+
+<!DOCTYPE html>
+html.off-canvas-wrap(lang="en" data-offcanvas='')
+
+    include ../includes/head.jade
+
+    - var bodyClass = 'has-b-footer-nav';
+
+    block vars
+
+    body(class='#{bodyClass} inner-wrap')
+        #main
+            include ../includes/partials/side-menu/1
+
+            block content
+            .root-footer
+        include ../includes/footer
+
+        // bower:js
+        script(src='../../../bower_components/jquery/dist/jquery.js')
+        script(src='../../../bower_components/slick.js/slick/slick.min.js')
+        script(src='../../../bower_components/bootstrap-select/dist/js/bootstrap-select.js')
+        // endbower
+        script(src='js/main.js')

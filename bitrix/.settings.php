@@ -1,31 +1,31 @@
 <?php
 return array (
-  'utf_mode' => 
+  'utf_mode' =>
   array (
     'value' => true,
     'readonly' => true,
   ),
-  'cache_flags' => 
+  'cache_flags' =>
   array (
-    'value' => 
+    'value' =>
     array (
       'config_options' => 3600,
       'site_domain' => 3600,
     ),
     'readonly' => false,
   ),
-  'cookies' => 
+  'cookies' =>
   array (
-    'value' => 
+    'value' =>
     array (
       'secure' => false,
       'http_only' => true,
     ),
     'readonly' => false,
   ),
-  'exception_handling' => 
+  'exception_handling' =>
   array (
-    'value' => 
+    'value' =>
     array (
       'debug' => true,
       'handled_errors_types' => 4437,
@@ -37,11 +37,11 @@ return array (
     ),
     'readonly' => false,
   ),
-  'connections' => 
+  'connections' =>
   array (
-    'value' => 
+    'value' =>
     array (
-      'default' => 
+      'default' =>
       array (
         'className' => '\\Bitrix\\Main\\DB\\MysqlConnection',
         'host' => 'localhost',

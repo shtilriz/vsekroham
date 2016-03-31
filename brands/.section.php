@@ -1,6 +1,7 @@
 <?
 $sSectionName = "Производители";
 $arDirProperties = Array(
-   "cssclass" => "two-column left-aside"
+   "cssclass" => "two-column left-aside",
+   "ecomm_pagetype" => "category"
 );
 ?>
