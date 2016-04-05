@@ -20,8 +20,15 @@ $yourCity = trim($yourCity);
 if (in_array($yourCity, $arCityMoskowRegion))
 	exit();
 
-$cache_id = md5(serialize(array($yourCity, $_REQUEST["weight"], $_REQUEST["length"], $_REQUEST["width"], $_REQUEST["height"])));
-$cache_dir = "/edost";
+$arrCacheParams = [
+	$yourCity,
+	$_REQUEST['weight'],
+	$_REQUEST['length'],
+	$_REQUEST['width'],
+	$_REQUEST['height']
+];
+$cache_id = md5(serialize($arrCacheParams));
+$cache_dir = "/edost/" . $cache_id;
 $obCache = new CPHPCache;
 
 if($obCache->InitCache(3600*24, $cache_id, $cache_dir)) {

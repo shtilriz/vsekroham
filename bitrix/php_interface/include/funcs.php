@@ -465,8 +465,8 @@ function getBestDelivery ($PRODUCT_ID, $CITY) {
 		}
 	}
 	//сделать запрос на сервер edost по параметрам товара и городу доставки
-	$cache_id = md5(serialize(array($CITY, $weight, $width, $length, $height)));
-	$cache_dir = "/edost";
+	$cache_id = md5(serialize(array($CITY, $weight, $length, $width, $height)));
+	$cache_dir = "/edost/" . $cache_id;
 	$obCache = new CPHPCache;
 
 	if($obCache->InitCache(3600*24, $cache_id, $cache_dir)) {
