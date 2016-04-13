@@ -69,6 +69,12 @@ $(function() {
 			phone_number.match(/^(\+?\d+)?\s*(\(\d+\))?[\s-]*([\d-]*)$/);
 	}, "Please specify a valid phone number");
 
+	$.validator.addMethod("email_or_phoneRU", function(value, element) {
+		value = value.replace(/\s+/g, "");
+		return this.optional(element) || (value.length > 9 &&
+			value.match(/^(\+?\d+)?\s*(\(\d+\))?[\s-]*([\d-]*)$/) || value.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/));
+	}, "Please specify a valid phone number");
+
 	//подгрузка списка товаров по ajax в списке товаров
 	var loading = false;
 	$('body').delegate('#catalogMoreLink', 'click', function(e) {
@@ -1202,5 +1208,58 @@ $(function() {
 				}
 			});
 		};
+	});
+
+	$('body').delegate('button[name=rr_email_or_phone_send]', 'click', function(e) {
+		e.preventDefault();
+		var form = $(this).closest('form'),
+			input = form.find('input[name=rr_email_or_phone]');
+
+		form.validate({
+			rules: {
+				rr_email_or_phone: {
+					required: true,
+					email_or_phoneRU: true
+				}
+			},
+			messages: {
+				rr_email_or_phone: {
+					required: 'Введите ваш E-mail или номер телефона',
+					email_or_phoneRU: 'E-mail или номер телефона введен некорректно'
+				}
+			},
+			showErrors: function(errorMap, errorList) {
+				if (errorList.length) {
+					input.closest('.item__form-group').addClass('has-error')
+				} else {
+					input.closest('.item__form-group').removeClass('has-error');
+				}
+			}
+		});
+		if (form.valid()) {
+			var value = input.val(),
+				product_id = parseInt(input.data('id'), 10),
+				successMess = 'Ваша заявка принята. Как только товар появится в наличии, мы отправим уведомление.';
+			if (value.match(/^(\+?\d+)?\s*(\(\d+\))?[\s-]*([\d-]*)$/)) {
+				//если введен номер телефона
+				if (product_id) {
+					var getData = {
+						product_id: product_id,
+						phone: value
+					};
+					$.getJSON('/include/reminders.php', getData, function(response) {
+						info_alert(response.TITLE, response.MESSAGE);
+					});
+				}
+			} else if (value.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)) {
+				//если введен E-mail
+				if (product_id) {
+					rrApi.subscribeOnItemBackInStock(value, product_id);
+					info_alert('Сообщение', successMess);
+				}
+			} else {
+				info_alert('Ошибка', 'Произошла ошибка ввода данных');
+			}
+		}
 	});
 });
