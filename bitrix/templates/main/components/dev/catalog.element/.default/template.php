@@ -56,7 +56,7 @@ $this->setFrameMode(true);?>
 		</div>
 	</div>
 	<div class="item__info" id="item__info">
-		<form action="#">
+		<form action="#" name="product_form">
 			<?$arRate = getRatingProduct($arResult["ID"]);?>
 			<div class="item__info-top">
 				<div class="stars">
@@ -73,9 +73,6 @@ $this->setFrameMode(true);?>
 					<div class="manufacturer"><span>Производитель:</span> <?=$arResult["COUNTRY"]["UF_NAME"]?></div>
 				<?endif;?>
 
-				<?/*if ($arResult["PROPERTIES"]["WARRANTY"]["VALUE"]):?>
-					<div class="warranty"><span>Гарантия:</span> <?=$arResult["PROPERTIES"]["WARRANTY"]["VALUE"]?></div>
-				<?endif;*/?>
 				<?if (isset($arResult["GIFT"]) && !empty($arResult["GIFT"])):?>
 					<div class="gift"><span>Подарок:</span> <a href="<?=$arResult["GIFT"]["DETAIL_PAGE_URL"]?>" target="_blank"><?=$arResult["GIFT"]["NAME"]?></a></div>
 				<?endif;?>
@@ -89,7 +86,6 @@ $this->setFrameMode(true);?>
 					<?if (!empty($arResult["THIS_SKU_PROPS"]["COLOR"]["VALUES"])):?>
 						<div class="form-field__select">
 							<select class="form-select select_type_color" data-placeholder="Выберите цвет" name="COLOR">
-								<?/*<option value=""></option>*/?>
 								<?
 								$bFirst = true;
 								foreach ($arResult["THIS_SKU_PROPS"]["COLOR"]["VALUES"] as $keyColor => $arColor) {
@@ -109,7 +105,6 @@ $this->setFrameMode(true);?>
 					<?if (!empty($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"])):?>
 						<div class="form-field__select">
 							<select class="form-select select_type_size" data-placeholder="Выберите размер" name="SIZE">
-								<?/*<option value=""></option>*/?>
 								<?
 								$bFirst = true;
 								foreach ($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"] as $keyColor => $arSize) {
@@ -118,35 +113,11 @@ $this->setFrameMode(true);?>
 								}?>
 							</select>
 						</div>
-
-						<?/*<div class="form-field">
-							<div class="product-size-ch">
-								<?$arColorOne = reset($arResult["THIS_SKU_PROPS"]["COLOR"]["VALUES"]);
-								$bFirst = true;
-								foreach ($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"] as $keySize => $arSize) {
-									$disabled = '';
-									if (!empty($arResult["THIS_SKU_PROPS"]["COLOR"]["VALUES"]))
-										$disabled = ' disabled';
-									if (in_array($arSize["VALUE"], $arResult["JS"]["SIZE_IN_COLOR"][$arColorOne["VALUE"]]))
-										$disabled = '';
-									echo "<input type='radio' id='size-ch$keySize' name='SIZE' value='{$arSize["VALUE"]}' class='radiobox-styled1'$disabled".($bFirst?' checked':'')."/><label for='size-ch$keySize'>{$arSize["VALUE"]}</label>";
-									$bFirst = false;
-								}?>
-							</div>
-						</div>
-						<div class="form-field__select">
-							<select class="form-select select_type_size" data-placeholder="Выберите размер" name="SIZE">
-								<option value=""></option>
-								<?foreach ($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"] as $keySize => $arSize) {
-									echo '<option value="'.$arSize["VALUE"].'">'.$arSize["VALUE"].'</option>';
-								}?>
-							</select>
-						</div>*/?>
 					<?endif;?>
 				</div>
 				<?endif;?>
 				<?if ($arResult["SECTION"]["PATH"][0]["ID"] == 241):?>
-				<a class="size-table-link" data-target="size-table" href="#">Таблица размеров</a>
+					<a class="size-table-link" data-target="size-table" href="#">Таблица размеров</a>
 				<?endif;?>
 			</div>
 			<div class="item__info-btm item-box" itemprop="offers" itemscope itemtype="http://schema.org/Offer" id="product_price">
@@ -164,18 +135,16 @@ $this->setFrameMode(true);?>
 					<?endif;?>
 					<link itemprop="availability" href="http://schema.org/InStock">
 				<?else:?>
-					<span class="not-available btn btn2">Нет в наличии</span>
-				<?endif;?>
-				<?/*if ($arResult["B_OFFERS"]):?>
-					<?if (!empty($arResult["OFFERS"])):?>
-						<?$arFirstOffer = reset($arResult["OFFERS"]);?>
-						<a class="add-to-basket form-button" href="#" data-id="<?=$arFirstOffer["ID"];?>">В корзину</a>
-					<?else:?>
-						<a class="add-to-basket form-button" href="#" data-id="<?=$arResult["ID"];?>">В корзину</a>
-					<?endif;?>
-				<?else:?>
+					<div class="item__immediate">
+						<div class="item__immediate-title">Сообщить о поступлении в продажу?</div>
+						<div class="item__form-group">
+							<input type="text" name="rr_email_or_phone" class="item__form-group-control" placeholder="Укажите ваш email или телефон" data-id="<?=$arResult['ID']?>">
+							<button type="submit" name="rr_email_or_phone_send" value="Y" class="item__form-group-submit button-pink button-sm">Сообщить</button>
+							<!-- <a href="#" class="item__form-group-submit">Сообщить</a> -->
+						</div>
+					</div>
 					<span class="not-available">Нет в наличии</span>
-				<?endif;*/?>
+				<?endif;?>
 				<?
 				$arPrices = array();
 				if (!empty($arResult["OFFERS"])) {
