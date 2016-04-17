@@ -2,6 +2,9 @@
 define("IBLOCK_PRODUCT_ID", 1); //ID инфоблока каталога товаров
 define("IBLOCK_SKU_ID", 2); //ID инфоблока торговых предложений
 
+require_once 'classes/AutoLoader.php';
+\spl_autoload_register('\Vsekroham\AutoLoader::autoLoad');
+
 include($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/geobaza/geobaza.php");
 
 if(file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/include/funcs.php")) {
@@ -12,10 +15,10 @@ if (is_file($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/include/logs/LogsDB
 	require $_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/include/logs/LogsDB.class.php";
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"].'/bitrix/php_interface/classes/Helpers/AutoLoader.php');
+//require_once($_SERVER["DOCUMENT_ROOT"].'/bitrix/php_interface/classes/Helpers/AutoLoader.php');
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/classes/Handler/CatalogHandler.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/classes/Handler/BasketHandler.php");
+//require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/classes/Handler/CatalogHandler.php");
+//require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/classes/Handler/BasketHandler.php");
 
 //запрос данных о пользователя, авторизованном через соцсети
 if (isset($_POST["token"]) && !empty($_POST["token"])) {
@@ -36,11 +39,12 @@ AddEventHandler("catalog", "OnBeforePriceDelete", array("MyEvents", "setAvailabl
 AddEventHandler("catalog", "OnProductPriceDelete", array("MyEvents", "setMarginFromSKUdel"));
 
 //записывает в лог изменение цен каталога
-AddEventHandler('catalog', 'OnPriceUpdate', array('CatalogHandler','OnPriceUpdateHandler'));
+AddEventHandler('catalog', 'OnPriceUpdate', array('Vsekroham\Handler\CatalogHandler','OnPriceUpdateHandler'));
+
 //Если у товара имеется подарок, то добавить его в корзину, изменить либо удалить.
-AddEventHandler('sale', 'OnBasketAdd', array('BasketHandler','addGift'));
-AddEventHandler('sale', 'OnBasketUpdate', array('BasketHandler','updateGift'));
-AddEventHandler('sale', 'OnBeforeBasketDelete', array('BasketHandler','deleteGift'));
+AddEventHandler('sale', 'OnBasketAdd', array('Vsekroham\Handler\BasketHandler', 'addGift'));
+AddEventHandler('sale', 'OnBasketUpdate', array('Vsekroham\Handler\BasketHandler', 'updateGift'));
+AddEventHandler('sale', 'OnBeforeBasketDelete', array('Vsekroham\Handler\BasketHandler', 'deleteGift'));
 
 /***************logs**************/
 //AddEventHandler("iblock", "OnAfterIBlockElementUpdate", Array("MyEvents", "updateElement2Log")); //записывает в лог изменение элемента

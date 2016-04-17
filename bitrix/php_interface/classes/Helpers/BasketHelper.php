@@ -1,8 +1,11 @@
 <?php
+namespace Vsekroham\Helpers;
 /**
  * Class BasketHelper
  *
  * Класс содержит свойства и методы, помогающие в работе с корзиной
+ *
+ * @package Vsekroham\Helpers
  *
  * @author Artem Luchnikov <artem@luchnikov.ru>
  */
@@ -21,10 +24,10 @@ class BasketHelper
 		if (!$id)
 			return false;
 
-		$rsList = CSaleBasket::GetList(
+		$rsList = \CSaleBasket::GetList(
 			array(),
 			array(
-				'FUSER_ID' => CSaleBasket::GetBasketUserID(),
+				'FUSER_ID' => \CSaleBasket::GetBasketUserID(),
 				'LID' => SITE_ID,
 				'ORDER_ID' => 'NULL',
 				'ID' => $id
@@ -52,10 +55,10 @@ class BasketHelper
 		if (!$id)
 			return false;
 
-		$rsList = CSaleBasket::GetList(
+		$rsList = \CSaleBasket::GetList(
 			array(),
 			array(
-				'FUSER_ID' => CSaleBasket::GetBasketUserID(),
+				'FUSER_ID' => \CSaleBasket::GetBasketUserID(),
 				'LID' => SITE_ID,
 				'ORDER_ID' => 'NULL',
 				'PRODUCT_ID' => $id

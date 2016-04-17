@@ -1,8 +1,11 @@
 <?php
+namespace Vsekroham\Helpers;
 /**
  * Class MobBanerHelper
  *
  * Класс содержит свойства и методы, помогающие в работе с банерами в мобильной версии сайта
+ *
+ * @package Vsekroham\Helpers
  *
  * @author Artem Luchnikov <artem@luchnikov.ru>
  */
@@ -50,7 +53,7 @@ class MobBanerHelper
 	{
 		$arBaners = [];
 
-		$rsList = CIBlockElement::GetList(
+		$rsList = \CIBlockElement::GetList(
 			['SORT' => 'ASC'],
 			[
 				'IBLOCK_ID' => self::IBLOCK_ID,
@@ -78,7 +81,7 @@ class MobBanerHelper
 	 */
 	public function getAvailableBaner($sectionId = 0, $sectionCode = '')
 	{
-		$sectionId = CIBlockFindTools::GetSectionID(
+		$sectionId = \CIBlockFindTools::GetSectionID(
 			$sectionId,
 			$sectionCode,
 			[
@@ -95,7 +98,7 @@ class MobBanerHelper
 		if ($sectionId) {
 			$arFilter['PROPERTY_SECTIONS' ] = $sectionId;
 		}
-		$rsList = CIBlockElement::GetList(
+		$rsList = \CIBlockElement::GetList(
 			['RAND' => 'ASC'],
 			$arFilter,
 			false,

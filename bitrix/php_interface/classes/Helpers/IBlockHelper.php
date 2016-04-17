@@ -1,8 +1,11 @@
 <?php
+namespace Vsekroham\Helpers;
 /**
  * Class IBlockHelper
  *
  * Класс содержит свойства и методы необходимые для работы с модулем 'Информационные блоки'.
+ *
+ * @package Vsekroham\Helpers
  *
  * @author Artem Luchnikov <artem@luchnikov.ru>
  */
@@ -27,7 +30,7 @@ class IBlockHelper
 	public static function getPropertyEnumByCode($iblockId, $code)
 	{
 		$arReturn = array();
-		$rsEnums = CIBlockPropertyEnum::GetList(
+		$rsEnums = \CIBlockPropertyEnum::GetList(
 			array('SORT'=>'ASC'),
 			array(
 				'IBLOCK_ID' => $iblockId,
@@ -51,7 +54,7 @@ class IBlockHelper
 	{
 		$cnt = 0;
 		if (!empty($arFilter)) {
-			$rsElements = CIBlockElement::GetList(
+			$rsElements = \CIBlockElement::GetList(
 				array(),
 				$arFilter,
 				false,

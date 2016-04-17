@@ -1,12 +1,15 @@
 <?php
+namespace Vsekroham\Helpers;
+use Bitrix\Sale\Internals\DiscountTable as DT;
 /**
  * Class DiscountsHelper
  *
  * Класс содержит свойства и методы необходимые для работы с модулем 'Информационные блоки'.
  *
+ * @package Vsekroham\Helpers
+ *
  * @author Artem Luchnikov <artem@luchnikov.ru>
  */
-use Bitrix\Sale\Internals\DiscountTable as DT;
 
 class DiscountsHelper
 {

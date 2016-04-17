@@ -1,6 +1,11 @@
 <?php
+namespace Vsekroham\Helpers;
 /**
  * Class CatalogHelper
+ *
+ * Класс содержит свойства и методы, помогающие в работе с модулем каталога
+ *
+ * @package Vsekroham\Helpers
  *
  * @author Artem Luchnikov <artem@luchnikov.ru>
  */
@@ -22,8 +27,8 @@ class CatalogHelper
 		if (!$sectionId)
 			return false;
 
-		CModule::IncludeModule('iblock');
-		$rsElements = CIBlockElement::GetList(
+		\CModule::IncludeModule('iblock');
+		$rsElements = \CIBlockElement::GetList(
 			array('CATALOG_PRICE_1' => 'DESC'),
 			array(
 				'IBLOCK_ID' => self::IBLOCK_ID,
@@ -54,8 +59,8 @@ class CatalogHelper
 		if (!$sectionId)
 			return false;
 
-		CModule::IncludeModule('iblock');
-		$rsElements = CIBlockElement::GetList(
+		\CModule::IncludeModule('iblock');
+		$rsElements = \CIBlockElement::GetList(
 			array('CATALOG_WEIGHT_1' => 'DESC'),
 			array(
 				'IBLOCK_ID' => self::IBLOCK_ID,
@@ -85,7 +90,7 @@ class CatalogHelper
 	{
 		$returnId = $id;
 
-		$arList = CCatalogSku::GetProductInfo($id);
+		$arList = \CCatalogSku::GetProductInfo($id);
 		if (is_array($arList)) {
 			$returnId = $arList['ID'];
 		}

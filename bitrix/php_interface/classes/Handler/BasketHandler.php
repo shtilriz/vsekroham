@@ -1,4 +1,8 @@
 <?php
+namespace Vsekroham\Handler;
+use Vsekroham\Helpers\CatalogHelper;
+use Vsekroham\Helpers\BasketHelper;
+use Vsekroham\Helpers\DiscountsHelper;
 /**
  * Class BasketHandler
  *
@@ -59,7 +63,7 @@ class BasketHandler
 					$arGiftFields = array(
 						'QUANTITY' => $arFields['QUANTITY']
 					);
-					CSaleBasket::Update($basketId, $arGiftFields);
+					\CSaleBasket::Update($basketId, $arGiftFields);
 				}
 			}
 		}
@@ -79,7 +83,7 @@ class BasketHandler
 			$productId = CatalogHelper::getProductId($productId);
 			if ($giftId = DiscountsHelper::getGiftByProduct($productId)) {
 				if ($basketId = BasketHelper::getBasketIdByProductId($giftId)) {
-					CSaleBasket::Delete($basketId);
+					\CSaleBasket::Delete($basketId);
 				}
 			}
 		}

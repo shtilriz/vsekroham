@@ -1,8 +1,11 @@
 <?php
+namespace Vsekroham\Helpers;
 /**
  * Class BanerHelper
  *
  * Класс содержит свойства и методы, помогающие в работе с банерами и слайдерами
+ *
+ * @package Vsekroham\Helpers
  *
  * @author Artem Luchnikov <artem@luchnikov.ru>
  */
@@ -46,7 +49,7 @@ class BanerHelper
 	{
 		$arBaners = array();
 		if (!empty($arFilter)) {
-			$rsBaners = CIBlockElement::GetList(
+			$rsBaners = \CIBlockElement::GetList(
 				$arSort,
 				$arFilter,
 				false,
@@ -72,7 +75,7 @@ class BanerHelper
 	{
 		$isShowSlider = true;
 		if ($sectionId) {
-			$rsSection = CIBlockSection::GetList(
+			$rsSection = \CIBlockSection::GetList(
 				array(),
 				array(
 					'IBLOCK_ID' => IBLOCK_PRODUCT_ID,

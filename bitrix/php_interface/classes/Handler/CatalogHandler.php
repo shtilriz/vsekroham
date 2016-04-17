@@ -1,13 +1,23 @@
 <?php
+namespace Vsekroham\Handler;
+
 /**
  * Class CatalogHandler
- *  Содержит обработчики событий модуля торгового каталога
+ *
+ * Содержит обработчики событий модуля торгового каталога
+ *
+ * @author Artem Luchnikov <artem@luchnikov.ru>
  */
 
 class CatalogHandler
 {
 	/**
 	 * обработчик события, вызываемого в случае успешного изменения ценового предложения
+	 *
+	 * @param int   $id       - идентификатор ценового предложения
+	 * @param array $arFields - массив параметров ценового предложения
+	 *
+	 * @return null
 	 */
 	public static function OnPriceUpdateHandler($id, $arFields)
 	{
@@ -23,7 +33,7 @@ class CatalogHandler
 
 			if ($priceFile != $arFields['PRICE']) {
 				$productId = $arFields['PRODUCT_ID'];
-				$rsPrice = CPrice::GetList(
+				$rsPrice = \CPrice::GetList(
 					array(),
 					array('ID' => $id),
 					false,
