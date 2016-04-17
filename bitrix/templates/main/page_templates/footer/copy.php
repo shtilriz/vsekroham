@@ -6,4 +6,3 @@
 		 Разработку и продвижение осуществляет команда <noindex><a href="http://www.mpiar.ru">www.mpiar.ru</a></noindex>
 	</div>
 </div>
-<br>
