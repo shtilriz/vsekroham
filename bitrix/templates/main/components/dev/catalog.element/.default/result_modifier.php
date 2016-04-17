@@ -1,4 +1,9 @@
 <?
+use Vsekroham\Helpers\DiscountsHelper;
+use Bitrix\Highloadblock as HL;
+use Bitrix\Main\Entity;
+use Bitrix\Main\Type as FieldType;
+
 if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED!==true) die();
 /** @var CBitrixComponentTemplate $this */
 /** @var array $arParams */
@@ -90,9 +95,6 @@ $arResult["JS"]["DISCOUNT_DIFF"] = $arOffersDiscountDiff;
 $arResult["JS"]["CNT_COLOR"] = count($arResult["THIS_SKU_PROPS"]["COLOR"]["VALUES"]);
 $arResult["JS"]["CNT_SIZE"] = count($arResult["THIS_SKU_PROPS"]["SIZE"]["VALUES"]);
 
-use Bitrix\Highloadblock as HL;
-use Bitrix\Main\Entity;
-use Bitrix\Main\Type as FieldType;
 //страна бренда
 if (CModule::IncludeModule("iblock") && CModule::IncludeModule("highloadblock") && intval($arResult["PROPERTIES"]["MAKER"]["VALUE"]) > 0) {
 	$countryID = 0;
