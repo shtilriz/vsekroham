@@ -165,7 +165,6 @@
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery.jscrollpane.min.js"></script>
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery.mousewheel.js"></script>
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/autosize.js"></script>
-<?/*<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/fancybox.js"></script>*/?>
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery.nouislider.all.min.js"></script>
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/jquery.validate.min.js"></script>
