@@ -10,19 +10,23 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) {
 	die();
 }
 
-if (!strlen($_COOKIE['rrpusid'])) {
+if (!strlen($_COOKIE['rcuid'])) {
 	die();
 }
 
 $recomendation = file_get_contents(
 	sprintf(
-		'http://api.retailrocket.ru/api/1.0/Recomendation/PersonalRecommendation/%s/?rrUserId=%s',
+		'http://api.retailrocket.ru/api/2.0/recommendation/personalized/popular/%s?session=%s',
 		'53a000601e994424286fc7d9',
-		$_COOKIE['rrpusid']
+		$_COOKIE['rcuid']
 	)
 );
 
-$arProductIDs = json_decode($recomendation, true);
+$arResult = json_decode($recomendation, true);
+
+foreach ($arResult as $key => $arItem) {
+	$arProductIDs[] = $arItem['ItemId'];
+}
 
 if (!empty($arProductIDs)) {
 	?>
