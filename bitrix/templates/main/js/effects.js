@@ -150,23 +150,23 @@ $(document).ready(function() {
 		showPopup($(this).data('target'));
 	});
 
-	$('body').delegate('.popup__close, .popup__button__close', 'click', function(event) {
+	$(document).on('click', '.popup__close, .popup__button__close', function(event) {
 		event.preventDefault();
 		var el = $(this);
 		el.closest('.popup').trigger('hidden.modal');
 		if ($('#popupSelectOffers:hidden').length) {
 			$('#popupSelectOffers:hidden').remove();
 		}
-		$('body').find('.popup').fadeOut(200, function() {
-			$('body').removeClass('no-scroll').find('.shadow').remove();
-			if (
-				el.closest('.popup').attr('id') == 'add2basketModal' ||
-				el.closest('.popup').attr('id') == 'info-modal' ||
-				el.closest('.popup').attr('id') == 'popupSelectOffers'
-			) {
-				el.closest('.popup').remove();
-			}
-		});
+        el.parents('.popup').fadeOut(200, function() {
+            $('body').removeClass('no-scroll').find('.shadow').remove();
+        });
+        if (
+            el.closest('.popup').attr('id') == 'add2basketModal' ||
+            el.closest('.popup').attr('id') == 'info-modal' ||
+            el.closest('.popup').attr('id') == 'popupSelectOffers'
+        ) {
+            el.closest('.popup').remove();
+        }
 	});
 
 	if ($('.item-tabs').length > 0) {
