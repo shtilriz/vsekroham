@@ -5,6 +5,8 @@ define("IBLOCK_SKU_ID", 2); //ID инфоблока торговых предл�
 require_once 'classes/AutoLoader.php';
 \spl_autoload_register('\Vsekroham\AutoLoader::autoLoad');
 
+include_once 'config/common.php';
+
 include($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/geobaza/geobaza.php");
 
 if(file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/include/funcs.php")) {
