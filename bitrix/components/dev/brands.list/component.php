@@ -91,12 +91,12 @@ if ($this->StartResultCache(false, [($arParams['CACHE_GROUPS']==='N'? false : $U
 			['ID']
 		);
 		if ($rsProducts->SelectedRowsCount()) {
-			$arResult['MAKERS'][] = $arList;
-
-			$chr = substr($arList['NAME'], 0, 1);
-			if (!in_array(strtoupper($chr), $arResult['ABC'])) {
-				$arResult['ABC'][] = strtoupper($chr);
+			$chr = strtoupper(substr($arList['NAME'], 0, 1));
+			if (!in_array($chr, $arResult['ABC'])) {
+				$arResult['ABC'][] = $chr;
 			}
+
+			$arResult['MAKERS'][$chr][] = $arList;
 		}
 	}
 
