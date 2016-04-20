@@ -70,8 +70,10 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED!==true) die();
 <?if (!empty($arResult['MAKERS'])):?>
 <ul class="b-list-group" id="resultList">
 	<?if ($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest') $APPLICATION->RestartBuffer();?>
-	<?foreach ($arResult['MAKERS'] as $key => $arItem) {
-		echo sprintf('<li><a href="%s">%s</a></li>', $arItem['DETAIL_PAGE_URL'], $arItem['NAME']);
+	<?foreach ($arResult['MAKERS'] as $chr => $arChars) {
+		foreach ($arChars as $key => $arItem) {
+			echo sprintf('<li><a href="%s">%s</a></li>', $arItem['DETAIL_PAGE_URL'], $arItem['NAME']);
+		}
 	}?>
 	<?if ($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest') die();?>
 </ul>
