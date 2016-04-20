@@ -43,11 +43,11 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 					if ($mPrice = CatalogHelper::getMaxPriceSect($arReturn["SECTION_ID"]))
 						$maxPrice = (int)$mPrice;
 				}
-				$startMinPrice = round($maxPrice * 0.1);
+				$startMinPrice = 0;
 				if (isset($_GET["price_from"])) {
 					$startMinPrice = (int)$_GET["price_from"];
 				}
-				$startMaxPrice = round($maxPrice * 0.9);
+				$startMaxPrice = $maxPrice;
 				if ($_GET["price_to"]) {
 					$startMaxPrice = (int)$_GET["price_to"];
 				}
@@ -104,28 +104,6 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 					<?endforeach;?>
 				</div>
 				<?endif;?>
-				<?/*if (!empty($arReturn["PROPS"]["HANDLE_BEFORE"])):?>
-				<div class="form-field">
-					<div class="like-label"><?echo $arReturn["PROPS_NAME"]["HANDLE_BEFORE"]?></div>
-					<?foreach ($arReturn["PROPS"]["HANDLE_BEFORE"] as $key => $value):?>
-					<div class="form-field__checkbox">
-						<input type="checkbox" name="prop[HANDLE_BEFORE][]" value="<?=$key?>"<?=(in_array($key, $_GET["prop"]["HANDLE_BEFORE"]) ? ' checked' : '')?> id="HANDLE_BEFORE<?=$key?>" class="checkbox-styled" />
-						<label for="HANDLE_BEFORE<?=$key?>"><?=($value=="Y" ? 'да' : $value)?></label>
-					</div>
-					<?endforeach;?>
-				</div>
-				<?endif;?>
-				<?if (!empty($arReturn["CARRYING_HANDLE"])):?>
-				<div class="form-field">
-					<div class="like-label">Ручка для переноски люльки</div>
-					<?foreach ($arReturn["CARRYING_HANDLE"] as $key => $value):?>
-					<div class="form-field__checkbox">
-						<input type="checkbox" name="carrying_handle[]" value="<?=$key?>"<?=(in_array($key, $_GET["carrying_handle"]) ? ' checked' : '')?> id="CARRYING_HANDLE<?=$key?>" class="checkbox-styled" />
-						<label for="CARRYING_HANDLE<?=$key?>"><?=($value=="Y" ? 'да' : $value)?></label>
-					</div>
-					<?endforeach;?>
-				</div>
-				<?endif;*/?>
 				<?if (!empty($arReturn["PROPS"]["PARENT_HANDLE"])):?>
 				<div class="form-field">
 					<div class="like-label"><?echo $arReturn["PROPS_NAME"]["PARENT_HANDLE"]?></div>
@@ -157,11 +135,11 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 						if ($mWeight = CatalogHelper::getMaxWeightSect($arReturn["SECTION_ID"]))
 							$maxWeight = round($mWeight/1000);
 					}
-					$startMinWeight = round($maxWeight * 0.1);
+					$startMinWeight = 0;
 					if (isset($_GET["weight_from"])) {
 						$startMinWeight = (int)$_GET["weight_from"];
 					}
-					$startMaxWeight = round($maxWeight * 0.9);
+					$startMaxWeight = $maxWeight;
 					if ($_GET["weight_to"]) {
 						$startMaxWeight = (int)$_GET["weight_to"];
 					}
@@ -205,19 +183,6 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 							<?endforeach;?>
 						</div>
 						<?endif;?>
-						<?/*if (!empty($arReturn["PROPS"]["BACK_ANGLE"])):?>
-						<div class="form-field">
-							<div class="like-label"><?echo $arReturn["PROPS_NAME"]["BACK_ANGLE"]?></div>
-							<div class="scroll-pane js-scroll-pane" data-max-els="4">
-								<?foreach ($arReturn["PROPS"]["BACK_ANGLE"] as $key => $value):?>
-								<div class="form-field__checkbox">
-									<input type="checkbox" name="prop[BACK_ANGLE][]" value="<?=$key?>"<?=(in_array($key, $_GET["prop"]["BACK_ANGLE"]) ? ' checked' : '')?> id="BACK_ANGLE<?=$key?>" class="checkbox-styled" />
-									<label for="BACK_ANGLE<?=$key?>"><?=($value=="Y" ? 'да' : $value)?></label>
-								</div>
-								<?endforeach;?>
-							</div>
-						</div>
-						<?endif;*/?>
 					</div>
 					<div class="col-xs-6">
 						<div class="form-field">
@@ -259,17 +224,6 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 								endif;
 							endforeach;?>
 						</div>
-						<?/*if (!empty($arReturn["PROPS"]["CUSHIONING_SYSTEM"])):?>
-						<div class="form-field">
-							<div class="like-label"><?echo $arReturn["PROPS_NAME"]["CUSHIONING_SYSTEM"]?></div>
-							<?foreach ($arReturn["PROPS"]["CUSHIONING_SYSTEM"] as $key => $value):?>
-							<div class="form-field__checkbox">
-								<input type="checkbox" name="prop[CUSHIONING_SYSTEM][]" value="<?=$key?>"<?=(in_array($key, $_GET["prop"]["CUSHIONING_SYSTEM"]) ? ' checked' : '')?> id="CUSHIONING_SYSTEM<?=$key?>" class="checkbox-styled" />
-								<label for="CUSHIONING_SYSTEM<?=$key?>"><?=($value=="Y" ? 'да' : $value)?></label>
-							</div>
-							<?endforeach;?>
-						</div>
-						<?endif;*/?>
 					</div>
 				</div>
 			</td>
