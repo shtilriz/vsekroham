@@ -1262,4 +1262,32 @@ $(function() {
 			}
 		}
 	});
+
+	$('form[name=makerFilter] input:checkbox').on('change', function() {
+		getBrandsByQuery();
+	});
+
+	timeout_mf_id = 0; //идентификатор таймаута при вводе поискового запроса
+	$('form[name=makerFilter] input[name=q_brands]').on('keyup', function() {
+		if (timeout_mf_id != undefined) {
+			clearTimeout(timeout_mf_id);
+		}
+
+		timeout_mf_id = setTimeout(function() {
+			getBrandsByQuery();
+		}, 1000);
+	});
 });
+
+/**
+ * Ajax-запрос списка брендов на странице /brands/
+ */
+function getBrandsByQuery()
+{
+	var form = $('form[name=makerFilter]'),
+		getData = form.serialize();
+	$.get('', getData, function(response) {
+		$('#resultList').html(response);
+		$('html, body').stop().animate({scrollTop: form.offset().top}, 800);
+	});
+}
