@@ -87,6 +87,17 @@ $(document).ready(function() {
         };
     });
 
+	$('.js-b-az-link').on('click', function(e) {
+        var link = $(this);
+        var lang = link.data('lang');
+        $('.js-b-az-link').removeClass('active');
+        link.addClass('active');
+        $('.js-b-az-lang').hide();
+        $('.js-b-az-' + lang).show();
+
+        e.preventDefault();
+    });
+
 	if ($('.product-filter-2__body').is(':visible'))
 		$('.product-filter-2 .js-scroll-pane').jScrollPane();
 
@@ -103,7 +114,7 @@ $(document).ready(function() {
 		}
 	);
 
-	if ($('.menu__list_name_brands').length > 0) {
+	/*if ($('.menu__list_name_brands').length > 0) {
 
 		var _this = $('.menu__list_name_brands'),
 			ulHeightMax = _this.height(),
@@ -143,7 +154,7 @@ $(document).ready(function() {
 				});
 			}
 		});
-	}
+	}*/
 
 	$('body').delegate('a[data-target]', 'click', function(event) {
 		event.preventDefault();
