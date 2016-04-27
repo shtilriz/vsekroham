@@ -4,18 +4,28 @@ $APPLICATION->SetTitle("Производители");
 ?>
 
 <?if (!isset($_REQUEST["ELEMENT_CODE"]) && empty($_REQUEST["ELEMENT_CODE"])):?>
-	<h1><?=$APPLICATION->ShowTitle();?></h1>
-	<?$APPLICATION->IncludeComponent("bitrix:menu", "brands-list", Array(
-		"ROOT_MENU_TYPE" => "brands",	// Тип меню для первого уровня
-			"MENU_CACHE_TYPE" => "A",	// Тип кеширования
-			"MENU_CACHE_TIME" => "3600",	// Время кеширования (сек.)
-			"MENU_CACHE_USE_GROUPS" => "Y",	// Учитывать права доступа
-			"MENU_CACHE_GET_VARS" => "",	// Значимые переменные запроса
-			"MAX_LEVEL" => "1",	// Уровень вложенности меню
-			"CHILD_MENU_TYPE" => "",	// Тип меню для остальных уровней
-			"USE_EXT" => "N",	// Подключать файлы с именами вида .тип_меню.menu_ext.php
-			"DELAY" => "N",	// Откладывать выполнение шаблона меню
-			"ALLOW_MULTI_SELECT" => "N",	// Разрешить несколько активных пунктов одновременно
+	<?
+	if (isset($_GET['q_brands']) && strlen($_GET['q_brands'])) {
+		$GLOBALS['arFilterMaker']['q_brands'] = trim(strip_tags($_GET['q_brands']));
+	}
+	if (!empty($_GET['maker'])) {
+		$GLOBALS['arFilterMaker']['maker'] = $_GET['maker'];
+	}
+	?>
+	<?$APPLICATION->IncludeComponent(
+		"dev:brands.list",
+		"main",
+		array(
+			"COMPONENT_TEMPLATE" => ".default",
+			"IBLOCK_TYPE" => "reference",
+			"IBLOCK_ID" => "3",
+			"SORT_BY" => "NAME",
+			"SORT_ORDER" => "ASC",
+			"FILTER_NAME" => "arFilterMaker",
+			"CACHE_TYPE" => "A",
+			"CACHE_TIME" => "36000000",
+			"CACHE_FILTER" => "N",
+			"CACHE_GROUPS" => "Y"
 		),
 		false
 	);?>
