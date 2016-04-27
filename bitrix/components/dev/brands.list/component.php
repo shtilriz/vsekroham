@@ -43,77 +43,79 @@ if (strlen($arParams['FILTER_NAME']) <= 0
 	}
 }
 
-if ($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest') {
-	$this->ClearResultCache([($arParams['CACHE_GROUPS']==='N'? false : $USER->GetGroups()), $arrFilter]);
+
+if (!CModule::IncludeModule('iblock')) {
+	$this->AbortResultCache();
+	ShowError(GetMessage('IBLOCK_MODULE_NOT_INSTALLED'));
+	return;
 }
 
-if ($this->StartResultCache(false, [($arParams['CACHE_GROUPS']==='N'? false : $USER->GetGroups()), $arrFilter])) {
-	if (!CModule::IncludeModule('iblock')) {
-		$this->AbortResultCache();
-		ShowError(GetMessage('IBLOCK_MODULE_NOT_INSTALLED'));
-		return;
+$arFilter = [
+	'IBLOCK_ID' => $arParams['IBLOCK_ID'],
+	'ACTIVE'    => 'Y',
+];
+if ($arrFilter['maker']) {
+	foreach ($arrFilter['maker'] as $key => $value) {
+		$arrFilter['maker'][$key] = "$value%";
 	}
+	$arFilter['NAME'] = $arrFilter['maker'];
+}
+if ($arrFilter['q_brands']) {
+	if (isset($arFilter['NAME']) && !empty($arFilter['NAME'])) {
+		$arFilter['NAME'] = array_merge($arFilter['NAME'], ["%{$arrFilter['q_brands']}%"]);
+	} else {
+		$arFilter['NAME'] = "%{$arrFilter['q_brands']}%";
+	}
+}
 
-	$arFilter = [
-		'IBLOCK_ID' => $arParams['IBLOCK_ID'],
-		'ACTIVE'    => 'Y',
+$rsList = CIBlockElement::GetList(
+	[$arParams['SORT_BY'] => $arParams['SORT_ORDER']],
+	$arFilter,
+	false,
+	false,
+	array('IBLOCK_ID', 'ID', 'NAME', 'DETAIL_PAGE_URL')
+);
+while ($arList = $rsList->GetNext()) {
+	//проверить, если у данного бренда товары
+	$arFilterProd = [
+		'IBLOCK_ID'      => IBLOCK_PRODUCT_ID,
+		'ACTIVE'         => 'Y',
+		'PROPERTY_MAKER' => $arList['ID']
 	];
-	if ($arrFilter['maker']) {
-		foreach ($arrFilter['maker'] as $key => $value) {
-			$arrFilter['maker'][$key] = "$value%";
-		}
-		$arFilter['NAME'] = $arrFilter['maker'];
+	if ($arrFilter['categories']) {
+		$arFilterProd['SECTION_ID'] = $arrFilter['categories'];
+		$arFilterProd['INCLUDE_SUBSECTIONS'] = 'Y';
 	}
-
-	$rsList = CIBlockElement::GetList(
-		[$arParams['SORT_BY'] => $arParams['SORT_ORDER']],
-		$arFilter,
+	$rsProducts = CIBlockElement::GetList(
+		[],
+		$arFilterProd,
 		false,
 		false,
-		array('IBLOCK_ID', 'ID', 'NAME', 'DETAIL_PAGE_URL')
+		['ID']
 	);
-	while ($arList = $rsList->GetNext()) {
-		//проверить, если у данного бренда товары
-		$arFilterProd = [
-			'IBLOCK_ID'      => IBLOCK_PRODUCT_ID,
-			'ACTIVE'         => 'Y',
-			'PROPERTY_MAKER' => $arList['ID']
-		];
-		if ($arrFilter['categories']) {
-			$arFilterProd['SECTION_ID'] = $arrFilter['categories'];
-			$arFilterProd['INCLUDE_SUBSECTIONS'] = 'Y';
+	if ($rsProducts->SelectedRowsCount()) {
+		$chr = strtoupper(substr($arList['NAME'], 0, 1));
+		if (!in_array($chr, $arResult['ABC'])) {
+			$arResult['ABC'][] = $chr;
 		}
-		$rsProducts = CIBlockElement::GetList(
-			[],
-			$arFilterProd,
-			false,
-			false,
-			['ID']
-		);
-		if ($rsProducts->SelectedRowsCount()) {
-			$chr = strtoupper(substr($arList['NAME'], 0, 1));
-			if (!in_array($chr, $arResult['ABC'])) {
-				$arResult['ABC'][] = $chr;
-			}
 
-			$arResult['MAKERS'][$chr][] = $arList;
-		}
+		$arResult['MAKERS'][$chr][] = $arList;
 	}
+}
 
-	//категории товаров 1 уровня для вывода в фильтре
-	$rsSections = CIBlockSection::GetList(
-		['SORT' => 'ASC'],
-		[
-			'IBLOCK_ID'   => IBLOCK_PRODUCT_ID,
-			'ACTIVE'      => 'Y',
-			'DEPTH_LEVEL' => 1
-		],
-		false,
-		['ID', 'NAME']
-	);
-	while ($arSection = $rsSections->Fetch()) {
-		$arResult['SECTIONS'][$arSection['ID']] = $arSection['NAME'];
-	}
+//категории товаров 1 уровня для вывода в фильтре
+$rsSections = CIBlockSection::GetList(
+	['SORT' => 'ASC'],
+	[
+		'IBLOCK_ID'   => IBLOCK_PRODUCT_ID,
+		'ACTIVE'      => 'Y',
+		'DEPTH_LEVEL' => 1
+	],
+	false,
+	['ID', 'NAME']
+);
+while ($arSection = $rsSections->Fetch()) {
+	$arResult['SECTIONS'][$arSection['ID']] = $arSection['NAME'];
 }
 
 $this->IncludeComponentTemplate();
