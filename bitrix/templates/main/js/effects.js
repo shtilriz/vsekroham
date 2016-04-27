@@ -58,6 +58,16 @@ $(document).ready(function() {
         $this.parent().find('.range-slider-high').val(values[1]);
     });
 
+    ;(function() {
+        $('.js-brands-toggle').on('click', function() {
+            var dropdown = $(this).parents('.js-dropdown');
+            dropdown
+                .toggleClass('active')
+                .find('.js-dropdown-content').toggle('fast');
+            dropdown.find('.js-brands-item-hidden').toggle();
+        });
+    }());
+
     $('.link-advanced-filter').on('click', function() {
         if ($(this).hasClass('link-hide')) {
             $('.product-filter-2').removeClass('active');
