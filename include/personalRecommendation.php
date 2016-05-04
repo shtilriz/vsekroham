@@ -10,19 +10,8 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) {
 	die();
 }
 
-if (!strlen($_COOKIE['rcuid'])) {
-	die();
-}
-
-$recomendation = file_get_contents(
-	sprintf(
-		'http://api.retailrocket.ru/api/2.0/recommendation/personalized/popular/%s?session=%s',
-		'53a000601e994424286fc7d9',
-		$_COOKIE['rcuid']
-	)
-);
-
-$arResult = json_decode($recomendation, true);
+$rr = new Vsekroham\Service\RetailRocket();
+$arResult = $rr->getPersonalizedPopular();
 
 foreach ($arResult as $key => $arItem) {
 	$arProductIDs[] = $arItem['ItemId'];
