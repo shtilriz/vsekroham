@@ -40,7 +40,7 @@ if($this->StartResultCache(false, array($arParams["SECTION_ID"], $arParams["SECT
 
 	$arResult = array();
 	$res = CIBlockElement::GetList(
-		array("NAME" => "ASC"),
+		array("shows" => "DESC"),
 		array(
 			"IBLOCK_ID" => $arParams["IBLOCK_ID"],
 			"ACTIVE" => "Y",
@@ -59,7 +59,9 @@ if($this->StartResultCache(false, array($arParams["SECTION_ID"], $arParams["SECT
 				"ACTIVE" => "Y",
 				"SECTION_ID" => $arParams["SECTION_ID"],
 				"INCLUDE_SUBSECTIONS" => "Y",
-				"PROPERTY_MAKER" => $arRes["PROPERTY_MAKER_VALUE"]
+				"PROPERTY_MAKER" => $arRes["PROPERTY_MAKER_VALUE"],
+				"!PROPERTY_AVAILABLE" => false,
+				"!CATALOG_PRICE_1" => false,
 			),
 			false,
 			false,
