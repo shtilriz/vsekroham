@@ -31,15 +31,16 @@ class IBlockHelper
 	{
 		$arReturn = array();
 		$rsEnums = \CIBlockPropertyEnum::GetList(
-			array('SORT'=>'ASC'),
-			array(
+			['SORT'=>'ASC'],
+			[
 				'IBLOCK_ID' => $iblockId,
 				'CODE' => $code
-			)
+			]
 		);
-		while ($arEnum = $rsEnums->GetNext()) {
+		while ($arEnum = $rsEnums->Fetch()) {
 			$arReturn[$arEnum['ID']] = $arEnum['VALUE'];
 		}
+
 		return $arReturn;
 	}
 
@@ -55,14 +56,15 @@ class IBlockHelper
 		$cnt = 0;
 		if (!empty($arFilter)) {
 			$rsElements = \CIBlockElement::GetList(
-				array(),
+				[],
 				$arFilter,
 				false,
 				false,
-				array("ID")
+				['ID']
 			);
 			$cnt = $rsElements->SelectedRowsCount();
 		}
+
 		return $cnt;
 	}
 }
