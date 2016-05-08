@@ -152,7 +152,7 @@ foreach ($arReturn['SECTIONS'] as $key => $arSection) {
 		<div class="product-filter-wrapper">
 			<div class="product-filter-2">
 				<form action="<?=($APPLICATION->GetCurDir()=="/search/"?'/search/':'')?>" name="catalog-filter" data-section_id="<?=$arReturn["SECTION_ID"]?>" data-section_code="<?=$_REQUEST["SECTION_CODE"]?>">
-					<input type="hidden" name="send-filter" value="Y">
+					<input type="hidden" name="send-filter" value="<?echo $_GET['send-filter']?>">
 					<?include('kolyaski.php');?>
 				</form>
 			</div>

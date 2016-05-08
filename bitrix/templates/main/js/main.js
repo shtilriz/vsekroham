@@ -93,10 +93,11 @@ $(function() {
 		if (nextPageNum <= NavPageCount) {
 			$('#preloader').show();
 			var getData = '';
-			if ($('form[name=catalog-filter] input[name=send-filter]').val()=="Y")
+			if ($('form[name=catalog-filter] input[name=send-filter]').val()=="Y") {
 				getData = $('form[name=catalog-filter],form[name=makersForm]').serialize();
-			else
+			} else {
 				getData = $('form[name=makersForm]').serialize();
+			}
 
 			getData += (getData.length>0?'&':'')+'PAGEN_'+NavNum+'='+nextPageNum;
 			var licount = ProductList.find('li').length;
@@ -192,10 +193,15 @@ $(function() {
 		var el = $(this),
 			sort = el.data('sort'),
 			order = el.data('order'),
-			getData = $('form[name=catalog-filter],form[name=makersForm]').serialize(),
 			ProductList = $('.stuff-list-container ul.stuff-list'),
 			NavBlock = el.closest('#catalog-section').find('#paginatorBlock'),
 			SECTION_CODE = $('.stuff-list-container').data('code');
+
+		if ($('form[name=catalog-filter] input[name=send-filter]').val()=="Y") {
+			getData = $('form[name=catalog-filter],form[name=makersForm]').serialize();
+		} else {
+			getData = $('form[name=makersForm]').serialize();
+		}
 
 		getData += (getData.length>0?'&':'?')+'SECTION_CODE='+SECTION_CODE+'&sort='+sort;
 
@@ -230,6 +236,10 @@ $(function() {
 	});
 
 	//фильтр
+	$('form[name=catalog-filter]').on('submit', function(e) {
+		var form = $(this);
+		form.find('[name=send-filter]').val('Y');
+	});
 
 	//картинки товаров в лайтбоксе
 	$('body').delegate('a[data-target="cart-img-popup"]', 'click', function() {
