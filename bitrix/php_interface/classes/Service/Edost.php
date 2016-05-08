@@ -1,4 +1,5 @@
 <?php
+namespace Vsekroham\Service;
 /**
  * Class Edost
  * Содержит свойства и методы для работы с API сервиса Edost
