@@ -707,6 +707,13 @@ $(function() {
 			basketRefresh();
 		},1);
 	});
+	//ввод купона
+	$('body').delegate('.js-basket-coupon-send', 'click',  function(e) {
+		e.preventDefault();
+		var el = $(this),
+			coupon = el.closest('.js-promo-content').find('input[name=COUPON]').val();
+		basketRefresh();
+	});
 
 	//заказ обратного звонка
 	$('form[name=callbackModal]').on('submit', function(e) {

@@ -166,6 +166,14 @@ $(document).ready(function() {
 		});
 	}*/
 
+	$('body').delegate('.js-more-link-promo', 'click', function(e) {
+        e.preventDefault();
+        $(this).addClass('active');
+        $('.js-promo').slideDown('400');
+        $('.js-promo-content').fadeIn(400);
+        $('.js-promo-control').focus();
+    });
+
 	$('body').delegate('a[data-target]', 'click', function(event) {
 		event.preventDefault();
 		showPopup($(this).data('target'));
