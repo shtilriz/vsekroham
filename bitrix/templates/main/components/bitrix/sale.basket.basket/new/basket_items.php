@@ -68,8 +68,6 @@ if ($normalCount > 0):?>
 					<?if ($arItem["CAN_BUY"] == "Y"):?>
 					<div class="item-count">
 						<div class="form-field__inputtext plus-minus">
-							<?/*<input id="item-count" name="item-count" type="text" value="1">*/?>
-
 							<input type="text" name="QUANTITY_INPUT_<?=$arItem["ID"]?>" value="<?=$arItem["QUANTITY"]?>" data-price="<?=intval($arItem["PRICE"])?>" data-discount="<?=intval($arItem["DISCOUNT_PRICE"])?>" readonly="readonly" class="input-quan">
 							<input type="hidden" id="QUANTITY_<?=$arItem['ID']?>" name="QUANTITY_<?=$arItem['ID']?>" value="<?=$arItem["QUANTITY"]?>" />
 
@@ -95,7 +93,6 @@ if ($normalCount > 0):?>
 						<span class="item-price" style="font-size: 16px;">нет в продаже</span>
 					<?endif;?>
 				</td>
-				<?/*<td><a class="item-hold" href="#">Отложить</a></td>*/?>
 				<td>
 					<a class="item-remove" href="#" data-product-id="<?=$arItem["PRODUCT_ID"]?>"<?=($isGift?' style="display: none"':'')?>>Удалить</a>
 					<input type="checkbox" name="DELETE_<?=$arItem["ID"]?>" value="Y" style="display: none" class="productDel">
@@ -105,7 +102,6 @@ if ($normalCount > 0):?>
 		<?endforeach;?>
 		</tbody>
 		<tfoot>
-			<?//if (!in_array($yourCity, $arCityMoskowRegion)):?>
 			<tr data-role="delivery-row"><td colspan="7"><p>Доставка</p></td></tr>
 			<tr class="delivery-row" data-role="delivery-row">
 				<td colspan="4">
@@ -113,36 +109,10 @@ if ($normalCount > 0):?>
 				</td>
 				<td colspan="3" class="delivery-price" id="eDeliveryPrice"></td>
 			</tr>
-			<?//endif;?>
 			<tr class="delivery-footer">
 				<td colspan="4">
-					<?/*
-					if ($arParams["HIDE_COUPON"] != "Y"):
-						$couponClass = "";
-						if (array_key_exists('VALID_COUPON', $arResult))
-						{
-							$couponClass = ($arResult["VALID_COUPON"] === true) ? "good" : "bad";
-						}
-						elseif (array_key_exists('COUPON', $arResult) && !empty($arResult["COUPON"]))
-						{
-							$couponClass = "good";
-						}?>
-						<div class="form-field">
-							<div class="form-field__inputtext coupon">
-								<label for="coupon">Скидочный купон</label>
-								<input id="coupon" class="inputtext <?=$couponClass?>" type="text" name="COUPON" value="<?=$arResult["COUPON"]?>"/>
-							</div>
-						</div>
-					<?else:?>
-						&nbsp;
-					<?endif;*/?>
 					<?if ($yourCity == "Москва" && $arResult["allSum"] < 2000):?>
 						Доставка заказов до 2000 руб платная - 350 руб
-					<?/*elseif ($countNastella):
-						if ($countNastella > 2)
-							$countNastella = 2;
-						$totalBonus = $countNastella * 2000;
-						echo "Ваш неиспользованный бонус составляет: ".round($totalBonus-$arResult["DISCOUNT_PRICE_ALL"])." руб.<br/>Использовано: {$arResult["DISCOUNT_PRICE_ALL"]} руб.";*/?>
 					<?else:?>
 						<div class="js-dropdown b-info-1" id="infoAboutDelivery">
 							<div class="js-dropdown-toggle">
@@ -170,9 +140,24 @@ if ($normalCount > 0):?>
 			</tr>
 		</tfoot>
 	</table>
-	<div class="form-field">
-		<div class="form-field__button">
-			<a href="/basket/order.php" class="cart__submit">Оформить заказ</a>
+
+	<div class="row">
+		<div class="col-xs-8">
+			<div class="form-field js-promo b-promo has-error">
+				<a href="#" class="more-link more-link-promo js-more-link-promo lead">Ввести промокод</a>
+				<div class="form-field__inputtext b-promo__content js-promo-content"<?echo ($arResult['COUPON'] ? ' style="display: block;"' : '');?>>
+					<input type="text" name="COUPON" value="<?echo ($arResult['COUPON'] ? $arResult['COUPON'] : '');?>" id="coupon" class="inputtext b-promo__control js-promo-control" />
+					<button class="button-pink button-sm b-promo__submit js-basket-coupon-send">ok</button>
+					<?/*<span class="help-text">Промокод не действителен</span>*/?>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-4">
+			<div class="form-field">
+				<div class="form-field__button">
+					<a href="/basket/order.php" class="cart__submit">Оформить заказ</a>
+				</div>
+			</div>
 		</div>
 	</div>
 <?else:?>
@@ -195,3 +180,9 @@ $GLOBALS["GOOGLE_TAG_PARAMS"] = array(
 	"ECOMM_TOTALVALUE" => $arResult["allSum"]
 );
 ?>
+
+<?if ($_GET["dev"] == "Y"):?>
+	<pre>
+		<?var_dump($arResult);?>
+	</pre>
+<?endif?>
