@@ -47,7 +47,7 @@ $this->setFrameMode(true);?>
 			<?if ($arResult["PRICES"]["BASE"]["DISCOUNT_DIFF_PERCENT"] > 0):?>
 				<span class="badge badge_type_discount">Cкидка <?=$arResult["PRICES"]["BASE"]["DISCOUNT_DIFF_PERCENT"]?>%</span>
 			<?endif;?>
-			<?if (!empty($arResult["PROPERTIES"]["GIFT"]["VALUE"])):?>
+			<?if (!empty($arResult["GIFT"])):?>
 				<span class="badge badge_type_gift">+ Подарок</span>
 			<?endif;?>
 			<?if ($arResult["PROPERTIES"]["NEW"]["VALUE"] == "Y"):?>
