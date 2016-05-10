@@ -1,7 +1,10 @@
 function showPopup(target) {
+	var popupName = '#' + target;
+
+	$(popupName).trigger('show.vk.modal');
+
 	$('body').find('.popup').fadeOut(200);
 
-	var popupName = '#' + target;
 	if ($('body').find(popupName).parent()[0].tagName != 'body') {
 		$('body').find(popupName).show();
 	};
