@@ -650,7 +650,8 @@ $(function() {
 				skuPrice = window.SKU.PRICE[skuID],
 				skuPriceMargin = window.SKU.PRICE_MARGIN[skuID];
 			//меняем цену ТП
-			$('#item__info .price #prPrice, #popupSelectOffers #prPrice').text(skuPriceDiscount);
+			$('#item__info .price #prPrice, #popupSelectOffers #prPrice').text(numeric_format(skuPriceDiscount) + ' р.');
+			$('#item__info .price #prPrice').data('price', skuPriceDiscount);
 			if (discountDiff > 0) {
 				$('#item__info .price .price__old, #popupSelectOffers .price__old').text(skuPrice);
 			}
@@ -1293,6 +1294,92 @@ $(function() {
 		timeout_mf_id = setTimeout(function() {
 			getBrandsByQuery();
 		}, 1000);
+	});
+
+	//Нашли дешевле? сделаем скидку.
+	$('#found-cheaper').find('.js-item-color, .js-item-size, .js-item-price').hide();
+	$('#found-cheaper').on('show.vk.modal', function (e) {
+		var modal = $(this),
+			product_form = $('form[name=product_form]'),
+			color = product_form.find('select[name=COLOR] option:selected').val(),
+			size = product_form.find('select[name=SIZE] option:selected').val()
+			price = parseInt(product_form.find('#prPrice').data('price'), 10);
+
+		modal.find('.js-item-color').text('Цвет: ' + color);
+
+		if (color) {
+			modal.find('.js-item-color').show().text('Цвет: ' + color);
+		} else {
+			modal.find('.js-item-color').hide().empty();
+		}
+
+		if (size) {
+			modal.find('.js-item-size').show().text('Размер: ' + size);
+		} else {
+			modal.find('.js-item-size').hide().empty();
+		}
+
+		if (price) {
+			modal.find('.js-item-price').show().text(numeric_format(price)+' р.');
+		} else {
+			modal.find('.js-item-price').hide().empty();
+		}
+
+		modal.find('form[name=found-cheaper] input[name=PRICE]').val(price);
+	});
+
+	$('body').delegate('form[name=found-cheaper] button', 'click', function(e) {
+		e.preventDefault();
+		var form = $(this).closest('form');
+
+		form.validate({
+			debug: true,
+			rules: {
+				FIO: 'required',
+				PHONE: {
+					required: true,
+					phoneRU:  true
+				},
+				EMAIL: {
+					required: true,
+					email:    true
+				},
+				LINK: 'required',
+				PRICE_LINK: 'required'
+			},
+			messages: {
+				FIO: '',
+				PHONE: '',
+				EMAIL: '',
+				LINK: '',
+				PRICE_LINK: ''
+			},
+			errorClass: 'has-error',
+			errorElement: 'span',
+			errorPlacement: function(error, element) {
+				error.addClass('validation-message validation-error js-validation-message').appendTo(element.closest('tr').find('td:last'));
+			}
+		});
+
+		if (form.valid()) {
+			form.append('<div class="js-loader"></div>');
+			var postData = form.serialize();
+			$.post(
+				'/include/sendFoundCheaper.php',
+				postData,
+				function(response) {
+					form.find('.js-loader').remove();
+					info_alert(
+						response.TITLE,
+						response.MESSAGE
+					);
+					if (response.STATUS == 'SUCCESS') {
+						form.find(':text').val('');
+					}
+				},
+				'json'
+			);
+		}
 	});
 });
 

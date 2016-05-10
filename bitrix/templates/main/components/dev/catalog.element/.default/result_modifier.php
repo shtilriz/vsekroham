@@ -73,7 +73,7 @@ foreach ($arResult["OFFERS"] as $key => $arOffer) {
 			$arTree[$arOffer["ID"]][$prop] = $arProp["VALUE"];
 		}
 	}
-	$arOffersPriceDiscount[$arOffer["ID"]] = $arOffer["PRICES"]["BASE"]["PRINT_DISCOUNT_VALUE"];
+	$arOffersPriceDiscount[$arOffer["ID"]] = $arOffer["PRICES"]["BASE"]["DISCOUNT_VALUE"];
 	$arOffersPrice[$arOffer["ID"]] = $arOffer["PRICES"]["BASE"]["PRINT_VALUE"];
 	$arOffersPriceMargin[$arOffer["ID"]] = $arOffer["PRICES"]["MARGIN"]["PRINT_VALUE"];
 	$arOffersDiscountDiff[$arOffer["ID"]] = $arOffer["PRICES"]["BASE"]["DISCOUNT_DIFF"];

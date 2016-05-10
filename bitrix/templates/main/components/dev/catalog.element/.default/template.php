@@ -163,12 +163,13 @@ $this->setFrameMode(true);?>
 						$oldPrice = "<span class='price__old'>{$arPrices["MARGIN"]["PRINT_VALUE"]}</span>";
 					}
 					echo "<div class='price'>
-						<span id='prPrice' itemprop='price'>{$arPrices["BASE"]["PRINT_DISCOUNT_VALUE"]}</span>
+						<span id='prPrice' itemprop='price' data-price='{$arPrices["BASE"]["DISCOUNT_VALUE"]}'>{$arPrices["BASE"]["PRINT_DISCOUNT_VALUE"]}</span>
 						$oldPrice
 					</div>";
 				}
 				?>
 				<?$frame->end();?>
+				<a href="#" class="found-cheaper-link" data-target="found-cheaper">Нашли дешевле? Сделаем скидку</a>
 			</div>
 		</form>
 	</div>
@@ -426,6 +427,7 @@ if (
 <?endif;?>
 
 <?include('carousel-modal.php');?>
+<?include('found-cheaper.php');?>
 
 <?
 $arJS = array(
