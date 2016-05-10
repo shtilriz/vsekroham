@@ -25,12 +25,16 @@
 	text-decoration: line-through;
 }
 
+.js-load-block {
+	position: relative;
+}
 #basket-list {
 	position: relative;
 }
 #basket-list .loader,
 .my-review .loader,
-#reviews .review__item .loader {
+#reviews .review__item .loader,
+.js-loader {
 	position: absolute;
 	top: 0;
 	left: 0;
