@@ -5,8 +5,9 @@ use Vsekroham\Helpers\EnvironmentHelper;
  */
 
 EnvironmentHelper::setConfiguration([
-	'catalogIblockId'    => 1,
-	'catalogSkuIblockId' => 2,
+	'catalogIblockId'      => 1,  //Каталог товаров
+	'catalogSkuIblockId'   => 2,  //SKU
+	'foundCheaperIblockId' => 12, //Нашли дешевле? Сделаем скидку.
 
 	//RetailRocket
 	'rrPartnerId' => '53a000601e994424286fc7d9',
