@@ -17,23 +17,21 @@ if(!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) {
 						<a href="<?echo $arResult['DETAIL_PAGE_URL']?>" class="item-img">
 							<?$arFirstOffer = reset($arResult['OFFERS']);?>
 							<?if (!empty($arResult['OFFERS']) && $arFirstOffer['PREVIEW_PICTURE']):?>
-									<?$y=CFile::ResizeImageGet(
-										$arFirstOffer['PREVIEW_PICTURE'],
-										array('width' => 250, 'height' => 250),
-										BX_RESIZE_IMAGE_PROPORTIONAL,
-										true
-									);?>
-									<img src="<?echo $y['src']?>" alt="<?echo $arFirstOffer['NAME']?>">
-								</a>
+								<?$y=CFile::ResizeImageGet(
+									$arFirstOffer['PREVIEW_PICTURE'],
+									array('width' => 250, 'height' => 250),
+									BX_RESIZE_IMAGE_PROPORTIONAL,
+									true
+								);?>
+								<img src="<?echo $y['src']?>" alt="<?echo $arFirstOffer['NAME']?>">
 							<?else:?>
-								<a href="<?echo $arResult['DETAIL_PAGE_URL']?>"  class="item-img">
-									<?$y=CFile::ResizeImageGet(
-										$arResult['PREVIEW_PICTURE']['ID'],
-										array('width' => 250, 'height' => 250),
-										BX_RESIZE_IMAGE_PROPORTIONAL,
-										true
-									);?>
-									<img src="<?=$y['src']?>" alt="<?echo $arResult['NAME']?>">
+								<?$y=CFile::ResizeImageGet(
+									$arResult['PREVIEW_PICTURE']['ID'],
+									array('width' => 250, 'height' => 250),
+									BX_RESIZE_IMAGE_PROPORTIONAL,
+									true
+								);?>
+								<img src="<?=$y['src']?>" alt="<?echo $arResult['NAME']?>">
 							<?endif;?>
 						</a>
 					</td>
